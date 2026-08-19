@@ -1,6 +1,6 @@
 import { createStartHandler, defaultRenderHandler } from "@tanstack/react-start/server";
-import { startInstance } from "./start";
+import { getRouter } from "./router";
 
 export default createStartHandler({
   createNextHandler: defaultRenderHandler,
-})(startInstance);
+})(getRouter);

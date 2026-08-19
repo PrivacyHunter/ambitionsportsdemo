@@ -12,32 +12,8 @@ export function getRouter() {
     defaultPreloadStaleTime: 0,
   });
 
-  const originalGetMatchedRoutes = router.getMatchedRoutes.bind(router);
-
-  // Patch getMatchedRoutes to return an object instead of an array
-  // This satisfies @tanstack/start-server-core's expectation in dev mode
-  router.getMatchedRoutes = (pathname: string) => {
-    const [matchedRoutes, routeParams, foundRoute] = originalGetMatchedRoutes(pathname);
-    
-    // Internal compatibility patch for TanStack Start
-    if (typeof window === "undefined") {
-      // console.log(`[SSR] Patched getMatchedRoutes for: ${pathname}`);
-    }
-
-
-    // Return the object shape expected by Start's createStartHandler
-    return {
-      matchedRoutes,
-      routeParams,
-      foundRoute,
-      // Also maintain array-like access if needed by other internal callers
-      [Symbol.iterator]: function* () {
-        yield matchedRoutes;
-        yield routeParams;
-        yield foundRoute;
-      }
-    } as any;
-  };
+  return router;
+}
 
   return router;
 }
