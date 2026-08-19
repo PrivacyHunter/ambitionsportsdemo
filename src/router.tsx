@@ -1,20 +1,23 @@
-import { createRouter as createTanStackRouter } from "@tanstack/react-router";
+import { createRouter as createTanStackRouter, createMemoryHistory } from "@tanstack/react-router";
 import { QueryClient } from "@tanstack/react-query";
 import { routeTree } from "./routeTree.gen";
 
 export function getRouter() {
   const queryClient = new QueryClient();
+  const isServer = typeof document === 'undefined';
 
   const router = createTanStackRouter({
     routeTree,
     context: { queryClient },
     scrollRestoration: true,
     defaultPreloadStaleTime: 0,
+    history: isServer ? createMemoryHistory() : undefined,
   });
 
   // Force initialization of stores and internal state if missing
   if (!(router as any).stores) {
     try {
+      // @ts-ignore
       router.update(router.options);
     } catch (e) {
       console.error('[Router] Failed to force update:', e);
@@ -38,13 +41,20 @@ export function getRouter() {
       location: (router as any).latestLocation || { pathname: '/', search: {}, hash: '', state: {} },
     };
 
+    // Override the state getter to prevent recursion while initializing stores
+    Object.defineProperty(router, 'state', {
+      get: () => initialState,
+      configurable: true,
+      enumerable: true,
+    });
+
     (router as any).stores = {
       ids: mockStore(() => (router.state?.matches || []).map((m: any) => m.routeId)),
       byRoute: {
         get: (routeId: string) => mockStore(() => (router.state?.matches || []).find((m: any) => m.routeId === routeId))
       },
       matches: mockStore(() => router.state?.matches || []),
-      __store: mockStore(() => router.state || initialState),
+      __store: mockStore(() => router.state),
     };
   }
 
