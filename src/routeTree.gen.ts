@@ -13,8 +13,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as ActivewearRouteImport } from './routes/activewear'
 import { Route as CasualWearRouteImport } from './routes/casual-wear'
+import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as QuoteRouteImport } from './routes/quote'
 import { Route as SportswearRouteImport } from './routes/sportswear'
+import { Route as TrackRouteImport } from './routes/track'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -36,14 +39,29 @@ const CasualWearRoute = CasualWearRouteImport.update({
   path: '/casual-wear',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
+const QuoteRoute = QuoteRouteImport.update({
+  id: '/quote',
+  path: '/quote',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SportswearRoute = SportswearRouteImport.update({
   id: '/sportswear',
   path: '/sportswear',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrackRoute = TrackRouteImport.update({
+  id: '/track',
+  path: '/track',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -52,16 +70,22 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/activewear': typeof ActivewearRoute
   '/casual-wear': typeof CasualWearRoute
+  '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/quote': typeof QuoteRoute
   '/sportswear': typeof SportswearRoute
+  '/track': typeof TrackRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/activewear': typeof ActivewearRoute
   '/casual-wear': typeof CasualWearRoute
+  '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/quote': typeof QuoteRoute
   '/sportswear': typeof SportswearRoute
+  '/track': typeof TrackRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -69,24 +93,46 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/activewear': typeof ActivewearRoute
   '/casual-wear': typeof CasualWearRoute
+  '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/quote': typeof QuoteRoute
   '/sportswear': typeof SportswearRoute
+  '/track': typeof TrackRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/about' | '/activewear' | '/casual-wear' | '/contact' | '/sportswear'
+    | '/'
+    | '/about'
+    | '/activewear'
+    | '/casual-wear'
+    | '/checkout'
+    | '/contact'
+    | '/quote'
+    | '/sportswear'
+    | '/track'
   fileRoutesByTo: FileRoutesByTo
   to:
-    '/' | '/about' | '/activewear' | '/casual-wear' | '/contact' | '/sportswear'
+    | '/'
+    | '/about'
+    | '/activewear'
+    | '/casual-wear'
+    | '/checkout'
+    | '/contact'
+    | '/quote'
+    | '/sportswear'
+    | '/track'
   id:
     | '__root__'
     | '/'
     | '/about'
     | '/activewear'
     | '/casual-wear'
+    | '/checkout'
     | '/contact'
+    | '/quote'
     | '/sportswear'
+    | '/track'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -94,8 +140,11 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   ActivewearRoute: typeof ActivewearRoute
   CasualWearRoute: typeof CasualWearRoute
+  CheckoutRoute: typeof CheckoutRoute
   ContactRoute: typeof ContactRoute
+  QuoteRoute: typeof QuoteRoute
   SportswearRoute: typeof SportswearRoute
+  TrackRoute: typeof TrackRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -128,6 +177,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CasualWearRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/contact': {
       id: '/contact'
       path: '/contact'
@@ -135,11 +191,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/quote': {
+      id: '/quote'
+      path: '/quote'
+      fullPath: '/quote'
+      preLoaderRoute: typeof QuoteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sportswear': {
       id: '/sportswear'
       path: '/sportswear'
       fullPath: '/sportswear'
       preLoaderRoute: typeof SportswearRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/track': {
+      id: '/track'
+      path: '/track'
+      fullPath: '/track'
+      preLoaderRoute: typeof TrackRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -150,8 +220,11 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   ActivewearRoute: ActivewearRoute,
   CasualWearRoute: CasualWearRoute,
+  CheckoutRoute: CheckoutRoute,
   ContactRoute: ContactRoute,
+  QuoteRoute: QuoteRoute,
   SportswearRoute: SportswearRoute,
+  TrackRoute: TrackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

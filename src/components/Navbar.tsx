@@ -22,6 +22,7 @@ export function Navbar() {
     { name: "Casual Wear", href: "/casual-wear" },
     { name: "About Us", href: "/about" },
     { name: "Contact Us", href: "/contact" },
+    { name: "Track Order", href: "/track" },
   ];
 
   return (
@@ -79,7 +80,7 @@ export function Navbar() {
               </Link>
             ))}
             <Link
-              to="/contact"
+              to="/quote"
               className="bg-neon-cyan hover:bg-neon-cyan/80 text-background px-6 py-2 rounded font-black text-sm uppercase transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(0,243,255,0.4)]"
             >
               Get a Quote
@@ -109,7 +110,7 @@ export function Navbar() {
               </Link>
             ))}
             <Link
-              to="/contact"
+              to="/quote"
               className="bg-neon-cyan text-background px-6 py-3 rounded text-center font-black uppercase"
               onClick={() => setIsMobileMenuOpen(false)}
             >
