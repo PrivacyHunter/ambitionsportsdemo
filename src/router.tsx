@@ -12,31 +12,6 @@ export function getRouter() {
     defaultPreloadStaleTime: 0,
   });
 
-  const originalGetMatchedRoutes = router.getMatchedRoutes.bind(router);
-
-  router.getMatchedRoutes = (pathname: string) => {
-    const result = originalGetMatchedRoutes(pathname);
-    
-    if (Array.isArray(result)) {
-      const [matchedRoutes, routeParams, foundRoute] = result;
-      
-      const obj = {
-        matchedRoutes,
-        routeParams,
-        foundRoute,
-        [Symbol.iterator]: function* () {
-          yield matchedRoutes;
-          yield routeParams;
-          yield foundRoute;
-        },
-      };
-
-      return obj as any;
-    }
-
-    return result;
-  };
-
   return router;
 }
 
