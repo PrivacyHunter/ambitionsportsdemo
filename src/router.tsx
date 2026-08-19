@@ -19,7 +19,9 @@ const createStoreMock = (getValue: () => any) => {
 
 export function getRouter() {
   const isServer = typeof document === 'undefined';
+  console.log("[Router] getRouter starting, isServer:", isServer);
   const queryClient = new QueryClient();
+
 
   const router = createTanStackRouter({
     routeTree,
