@@ -2,61 +2,162 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { motion } from "framer-motion";
-import { ArrowRight, ShoppingCart } from "lucide-react";
+import { ArrowRight, ShoppingCart, Info, CheckCircle2, Zap } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/sportswear")({
   component: Sportswear,
 });
 
 const products = [
-  { name: "Apex Pro Jersey", category: "Performance" },
-  { name: "Velocity Compression Top", category: "Training" },
-  { name: "Endurance Team Short", category: "Teamwear" },
-  { name: "Stealth Training Jacket", category: "Outerwear" },
-  { name: "Elite Sublimated Kit", category: "Performance" },
-  { name: "Precision Training Pant", category: "Fitness" },
+  { 
+    name: "Apex Pro Soccer Jersey", 
+    category: "Performance", 
+    desc: "Vibrant full-sublimation jersey with moisture-wicking technology.",
+    price: "Custom Quote",
+    image: "https://images.unsplash.com/photo-1543351611-58f69d7c1781?q=80&w=1974&auto=format&fit=crop"
+  },
+  { 
+    name: "Elite Basketball Uniform", 
+    category: "Teamwear", 
+    desc: "Lightweight, breathable mesh fabric designed for maximum mobility.",
+    price: "Custom Quote",
+    image: "https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=2090&auto=format&fit=crop"
+  },
+  { 
+    name: "Velocity Cricket Kit", 
+    category: "Teamwear", 
+    desc: "Premium white & colored kits with UV protection and stretch panels.",
+    price: "Custom Quote",
+    image: "https://images.unsplash.com/photo-1531415074968-036ba1b575da?q=80&w=2067&auto=format&fit=crop"
+  },
+  { 
+    name: "Stealth Training Jacket", 
+    category: "Outerwear", 
+    desc: "Wind-resistant, thermal-lined performance outerwear for elite clubs.",
+    price: "Custom Quote",
+    image: "https://images.unsplash.com/photo-1556817411-31ae72fa3ea0?q=80&w=2070&auto=format&fit=crop"
+  },
+  { 
+    name: "Apex Sublimated Hoodie", 
+    category: "Casual Sport", 
+    desc: "Infinite design possibilities with high-density precision stitching.",
+    price: "Custom Quote",
+    image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=1974&auto=format&fit=crop"
+  },
+  { 
+    name: "Pro-Tech Soccer Shorts", 
+    category: "Performance", 
+    desc: "Anti-friction seams with adaptive fit technology.",
+    price: "Custom Quote",
+    image: "https://images.unsplash.com/photo-1526676037777-05a232554f75?q=80&w=2070&auto=format&fit=crop"
+  },
 ];
 
 function Sportswear() {
+  const handleInquiry = (productName: string) => {
+    toast.success(`Inquiry for ${productName} registered!`, {
+      description: "Redirecting to quote form...",
+      duration: 3000,
+    });
+  };
+
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground selection:bg-neon-cyan selection:text-background">
       <Navbar />
 
       <main>
         {/* Banner */}
-        <section className="h-[40vh] bg-white/[0.03] flex items-center justify-center border-b border-white/5">
-          <div className="text-center">
-             <h1 className="text-6xl md:text-7xl font-black uppercase italic tracking-tighter">
-               Performance <span className="text-neon-cyan">Sportswear</span>
-             </h1>
+        <section className="relative h-[50vh] flex items-center justify-center overflow-hidden border-b border-white/5">
+          <div className="absolute inset-0 z-0 opacity-20">
+            <div className="w-full h-full bg-[url('https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center grayscale" />
           </div>
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center relative z-10 px-4"
+          >
+             <h3 className="text-neon-lime font-black tracking-[0.4em] uppercase mb-4 text-sm">Professional Grade</h3>
+             <h1 className="text-6xl md:text-9xl font-black uppercase italic tracking-tighter leading-none mb-6">
+               Performance <br /><span className="text-neon-cyan">Sportswear</span>
+             </h1>
+             <div className="flex items-center justify-center gap-4">
+               <div className="h-[2px] w-12 bg-neon-cyan" />
+               <p className="text-white font-bold uppercase tracking-widest text-xs">Custom Sublimation Specialists</p>
+               <div className="h-[2px] w-12 bg-neon-cyan" />
+             </div>
+          </motion.div>
         </section>
 
         {/* Product Grid */}
-        <section className="py-24 px-4 lg:px-8 max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <section className="py-32 px-4 lg:px-8 max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
             {products.map((p, i) => (
               <motion.div 
                 key={i}
-                whileHover={{ y: -5 }}
-                className="bg-card border border-white/5 rounded-xl overflow-hidden group"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                whileHover={{ y: -10 }}
+                className="bg-card border border-white/10 rounded-3xl overflow-hidden group flex flex-col h-full"
               >
-                <div className="h-80 bg-white/5 relative flex items-center justify-center">
-                  <div className="w-40 h-40 bg-neon-cyan/10 rounded-full blur-2xl group-hover:bg-neon-cyan/20 transition-all" />
+                <div className="h-80 relative overflow-hidden bg-white/5">
+                  <div 
+                    className="w-full h-full bg-cover bg-center group-hover:scale-110 transition-transform duration-700 opacity-60 group-hover:opacity-100" 
+                    style={{ backgroundImage: `url(${p.image})` }} 
+                  />
+                  <div className="absolute top-6 right-6">
+                    <span className="bg-neon-cyan text-background px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                      <Zap size={10} fill="currentColor" /> {p.category}
+                    </span>
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-60" />
                 </div>
-                <div className="p-6">
-                  <span className="text-neon-lime text-xs font-bold uppercase tracking-widest">{p.category}</span>
-                  <h3 className="text-xl font-black uppercase tracking-tighter italic my-2">{p.name}</h3>
-                  <div className="flex gap-3 mt-6">
-                    <button className="flex-1 bg-white/5 hover:bg-white/10 py-3 rounded font-black text-xs uppercase transition-all">Quick View</button>
-                    <button className="flex-1 bg-neon-cyan hover:bg-neon-lime text-background py-3 rounded font-black text-xs uppercase flex items-center justify-center gap-2 transition-all">
-                      Inquire <ArrowRight size={14} />
+
+                <div className="p-10 flex flex-col flex-grow">
+                  <h3 className="text-2xl font-black uppercase tracking-tighter italic mb-3 group-hover:text-neon-cyan transition-colors leading-tight">{p.name}</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed mb-8 flex-grow">{p.desc}</p>
+                  
+                  <div className="flex items-center justify-between mb-8">
+                    <span className="text-white font-black text-xl italic tracking-tighter">{p.price}</span>
+                    <div className="flex gap-1">
+                      <CheckCircle2 size={16} className="text-neon-lime" />
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Premium QC</span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <button className="bg-white/5 hover:bg-white/10 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all border border-white/10 flex items-center justify-center gap-2">
+                      <Info size={14} /> Spec Sheet
+                    </button>
+                    <button 
+                      onClick={() => handleInquiry(p.name)}
+                      className="bg-neon-cyan hover:bg-neon-lime text-background py-4 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 transition-all shadow-[0_10px_20px_rgba(0,243,255,0.1)]"
+                    >
+                      Inquire Now <ArrowRight size={14} />
                     </button>
                   </div>
                 </div>
               </motion.div>
             ))}
           </div>
+        </section>
+
+        {/* Global Catalog CTA */}
+        <section className="py-24 px-4 bg-neon-cyan relative overflow-hidden">
+           <div className="absolute inset-0 bg-background/5 opacity-10 pointer-events-none">
+             <div className="w-full h-full bg-[url('https://www.transparenttextures.com/patterns/graphy-dark.png')]" />
+           </div>
+           <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-12 relative z-10">
+              <div className="text-center lg:text-left">
+                <h2 className="text-background font-black text-4xl md:text-5xl uppercase italic tracking-tighter mb-4">Download Our Latest Catalog</h2>
+                <p className="text-background/70 font-bold uppercase tracking-widest text-xs">Explore 500+ designs across all categories</p>
+              </div>
+              <button className="bg-background text-neon-cyan hover:text-white px-12 py-6 rounded-2xl font-black uppercase tracking-widest text-sm transition-all shadow-xl">
+                Get PDF Catalog
+              </button>
+           </div>
         </section>
       </main>
 
