@@ -12,13 +12,31 @@ export function getRouter() {
     defaultPreloadStaleTime: 0,
   });
 
-  // Debugging matches
-  if (typeof window === "undefined") {
-    console.log("Router created in SSR");
-    console.log("Route Tree keys:", Object.keys(router.routeTree.children || {}));
-    const matches = router.getMatchedRoutes("/");
-    console.log("Matches for '/':", matches ? Object.keys(matches) : "null");
-  }
+  const originalGetMatchedRoutes = router.getMatchedRoutes.bind(router);
+
+  // Patch getMatchedRoutes to return an object instead of an array
+  // This satisfies @tanstack/start-server-core's expectation in dev mode
+  router.getMatchedRoutes = (pathname: string) => {
+    const [matchedRoutes, routeParams, foundRoute] = originalGetMatchedRoutes(pathname);
+    
+    if (typeof window === "undefined") {
+      console.log(`[SSR Debug] Patched getMatchedRoutes for: ${pathname}`);
+      console.log(`[SSR Debug] Found ${matchedRoutes?.length || 0} matched routes`);
+    }
+
+    // Return the object shape expected by Start's createStartHandler
+    return {
+      matchedRoutes,
+      routeParams,
+      foundRoute,
+      // Also maintain array-like access if needed by other internal callers
+      [Symbol.iterator]: function* () {
+        yield matchedRoutes;
+        yield routeParams;
+        yield foundRoute;
+      }
+    } as any;
+  };
 
   return router;
 }
