@@ -15,44 +15,66 @@ export function getRouter() {
   // Compatibility patch for TanStack Start v1 framework expecting router.stores
   (router as any).stores = {
     matches: {
-      get: () => router.state.matches,
+      get: () => {
+        try {
+          return router.state.matches || [];
+        } catch (e) {
+          return [];
+        }
+      },
     },
   };
 
   const originalGetMatchedRoutes = router.getMatchedRoutes.bind(router);
 
   router.getMatchedRoutes = (pathname: string) => {
-    const result = originalGetMatchedRoutes(pathname);
-    
-    if (Array.isArray(result)) {
-      const [matchedRoutes, routeParams, foundRoute] = result;
+    try {
+      const result = originalGetMatchedRoutes(pathname);
       
-      const patched = {
-        matchedRoutes,
-        routeParams,
-        foundRoute,
+      if (Array.isArray(result)) {
+        const [matchedRoutes, routeParams, foundRoute] = result;
+        
+        const patched = {
+          matchedRoutes: matchedRoutes || [],
+          routeParams: routeParams || {},
+          foundRoute: foundRoute || null,
+          [Symbol.iterator]: function* () {
+            yield matchedRoutes || [];
+            yield routeParams || {};
+            yield foundRoute || null;
+          },
+        };
+        
+        return patched as any;
+      }
+
+      if (result && typeof result === 'object') {
+         if (!(Symbol.iterator in result)) {
+           (result as any)[Symbol.iterator] = function* () {
+              yield (result as any).matchedRoutes || [];
+              yield (result as any).routeParams || {};
+              yield (result as any).foundRoute || null;
+           };
+         }
+         return result;
+      }
+
+      return result;
+    } catch (e) {
+      console.error('Error in getMatchedRoutes patch:', e);
+      const emptyResult = {
+        matchedRoutes: [],
+        routeParams: {},
+        foundRoute: null,
         [Symbol.iterator]: function* () {
-          yield matchedRoutes;
-          yield routeParams;
-          yield foundRoute;
-        },
+          yield [];
+          yield {};
+          yield null;
+        }
       };
-      
-      return patched as any;
+      return emptyResult as any;
     }
-
-    if (result && typeof result === 'object' && !Array.isArray(result)) {
-       (result as any)[Symbol.iterator] = function* () {
-          yield (result as any).matchedRoutes;
-          yield (result as any).routeParams;
-          yield (result as any).foundRoute;
-       };
-    }
-
-    return result;
   };
-
-
 
   return router;
 }
