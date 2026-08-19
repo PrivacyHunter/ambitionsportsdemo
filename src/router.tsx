@@ -32,8 +32,8 @@ export function getRouter() {
         get: getValue,
         set: () => {},
         subscribe: () => () => {},
+        state: getValue(), // Support direct .state access if used by internal stores
       };
-      (s as any).state = getValue();
       return s;
     };
 
@@ -43,6 +43,7 @@ export function getRouter() {
       location: (router as any).latestLocation || { pathname: '/', search: {}, hash: '', state: {} },
     };
 
+    // Safely define the state property to avoid 'undefined' reads during hydration
     if (!Object.getOwnPropertyDescriptor(router, 'state')) {
       Object.defineProperty(router, 'state', {
         get: () => (router as any)._state || (router as any).state || initialState,
@@ -54,7 +55,12 @@ export function getRouter() {
     const stores = {
       ids: mockStore(() => (router.state?.matches || []).map((m: any) => m.routeId)),
       byRoute: {
-        get: (routeId: string) => mockStore(() => (router.state?.matches || []).find((m: any) => m.routeId === routeId))
+        get: (routeId: string) => {
+           const store = mockStore(() => (router.state?.matches || []).find((m: any) => m.routeId === routeId));
+           // Framework internals might call store.get() on the result of byRoute.get(routeId)
+           (store as any).get = store.get;
+           return store;
+        }
       },
       matches: mockStore(() => router.state?.matches || []),
       __store: mockStore(() => router.state),
@@ -74,14 +80,17 @@ export function getRouter() {
       else if (result && typeof result === 'object') {
         ({ matchedRoutes = [], routeParams = {}, foundRoute = null } = result);
       }
+      const matched = matchedRoutes || [];
+      const params = routeParams || {};
+      const found = foundRoute || null;
       return {
-        matchedRoutes: matchedRoutes || [],
-        routeParams: routeParams || {},
-        foundRoute: foundRoute || null,
+        matchedRoutes: matched,
+        routeParams: params,
+        foundRoute: found,
         [Symbol.iterator]: function* () {
-          yield matchedRoutes || [];
-          yield routeParams || {};
-          yield foundRoute || null;
+          yield matched;
+          yield params;
+          yield found;
         },
       } as any;
     } catch (e) {
