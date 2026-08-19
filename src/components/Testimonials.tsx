@@ -1,80 +1,54 @@
+import { Star } from "lucide-react";
 import { motion } from "framer-motion";
-import { Quote } from "lucide-react";
-import { useState, useEffect } from "react";
 
 const testimonials = [
   {
-    name: "Alex Johnson",
-    role: "Soccer Club Director",
-    text: "The quality of the jerseys is unmatched. The neon sublimation is vibrant and has survived countless washes. Ambition Sports is our go-to for all custom gear.",
+    name: "John Smith",
+    role: "Club Manager, UK",
+    content: "The quality of the custom kits we received was outstanding. The sublimation is crisp and the fabric is professional grade.",
     rating: 5
   },
   {
-    name: "Sarah Miller",
-    role: "Fitness Influencer",
-    text: "Their compression wear is elite. The fit is perfect and the fabric technology actually aids performance. Highly recommend for any serious athlete.",
+    name: "Elena Rodriguez",
+    role: "Fitness Influencer, USA",
+    content: "Ambition Sports delivered my activewear line ahead of schedule. The fit and finish are perfect for high-intensity training.",
     rating: 5
   },
   {
-    name: "David Chen",
-    role: "Basketball Coach",
-    text: "Fast turnaround and incredible design support. They took our rough ideas and turned them into professional-grade uniforms that our team loves.",
+    name: "Ahmed Khan",
+    role: "Local League Coordinator",
+    content: "Great communication throughout the design process. They really understood our brand vision for the team uniforms.",
     rating: 5
   }
 ];
 
 export function Testimonials() {
-  const [current, setCurrent] = useState(0);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % testimonials.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, []);
-
   return (
-    <section className="py-24 px-4 lg:px-8 bg-white/[0.02] overflow-hidden relative">
-      <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none" />
-      
-      <div className="max-w-4xl mx-auto text-center relative z-10">
-        <h2 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter mb-16 leading-none">
-          Trusted By <br /><span className="text-neon-cyan">Elite Athletes</span>
+    <section className="py-24 bg-slate-900/30">
+      <div className="max-w-7xl mx-auto px-4">
+        <h2 className="text-4xl font-black italic uppercase text-center mb-16">
+          What Our <span className="text-neon-cyan">Clients Say</span>
         </h2>
-
-        <div className="relative h-64 md:h-48">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {testimonials.map((t, i) => (
-            <motion.div
+            <motion.div 
               key={i}
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ 
-                opacity: i === current ? 1 : 0, 
-                scale: i === current ? 1 : 0.9,
-                y: i === current ? 0 : 20,
-                pointerEvents: i === current ? "auto" : "none"
-              }}
-              transition={{ duration: 0.5 }}
-              className="absolute inset-0 flex flex-col items-center justify-center"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1 }}
+              className="bg-background/50 border border-white/5 p-8 rounded-xl"
             >
-              <Quote className="text-neon-lime mb-6 w-12 h-12 opacity-50" />
-              <p className="text-xl md:text-2xl text-muted-foreground italic leading-relaxed mb-8">
-                "{t.text}"
-              </p>
+              <div className="flex gap-1 mb-4">
+                {[...Array(t.rating)].map((_, i) => (
+                  <Star key={i} size={16} className="fill-neon-lime text-neon-lime" />
+                ))}
+              </div>
+              <p className="text-muted-foreground italic mb-6">"{t.content}"</p>
               <div>
-                <h4 className="font-black uppercase tracking-widest text-white">{t.name}</h4>
-                <p className="text-xs font-bold text-neon-cyan uppercase tracking-[0.2em]">{t.role}</p>
+                <p className="font-bold text-neon-cyan">{t.name}</p>
+                <p className="text-xs uppercase tracking-widest text-white/40">{t.role}</p>
               </div>
             </motion.div>
-          ))}
-        </div>
-
-        <div className="flex justify-center gap-3 mt-12">
-          {testimonials.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrent(i)}
-              className={`h-1.5 transition-all duration-300 rounded-full ${i === current ? "w-12 bg-neon-cyan" : "w-3 bg-white/10"}`}
-            />
           ))}
         </div>
       </div>
