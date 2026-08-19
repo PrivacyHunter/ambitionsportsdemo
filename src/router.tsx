@@ -8,27 +8,11 @@ export function getRouter() {
 
   const queryClient = new QueryClient();
 
-  const routerOptions: any = {
-    routeTree,
-    context: { queryClient },
-    scrollRestoration: true,
-    defaultPreloadStaleTime: 0,
-  };
-
-  if (isServer) {
-    routerOptions.history = createMemoryHistory();
-  }
-
-  const router = createTanStackRouter(routerOptions);
-  console.log("[Router] instance created");
-
   // Robust framework compatibility layer for TanStack Start v1
   const createMockStores = (target: any) => {
     const mockStore = (name: string, getValue: () => any) => {
       const s = {
-        get: () => {
-          return getValue();
-        },
+        get: () => getValue(),
         set: () => {},
         subscribe: (cb: any) => {
           const unsub = () => {};
@@ -62,18 +46,14 @@ export function getRouter() {
       ids: mockStore('ids', () => (getCurrentState().matches || []).map((m: any) => m.routeId)),
       matchesId: mockStore('matchesId', () => (getCurrentState().matches || []).map((m: any) => m.id || m.routeId)),
       byRoute: {
-        get: (routeId: string) => {
-          return getMatchStore(routeId);
-        }
+        get: (routeId: string) => getMatchStore(routeId)
       },
       matches: mockStore('matches', () => getCurrentState().matches || []),
       location: mockStore('location', () => getCurrentState().location || { pathname: '/', search: {}, hash: '', state: {} }),
       status: mockStore('status', () => getCurrentState().status || 'idle'),
       resolvedLocation: mockStore('resolvedLocation', () => getCurrentState().resolvedLocation || getCurrentState().location),
       __store: mockStore('__store', () => getCurrentState()),
-      getMatchStore: (routeId: string) => {
-        return getMatchStore(routeId);
-      },
+      getMatchStore: (routeId: string) => getMatchStore(routeId),
       setMatches: (matches: any) => {
         if (target.update) target.update({ ...target.options });
       }
@@ -81,45 +61,36 @@ export function getRouter() {
 
     return new Proxy(stores, {
       get(targetObj: any, prop: string) {
-        if (prop in targetObj) {
-          return targetObj[prop];
-        }
+        if (prop in targetObj) return targetObj[prop];
         return mockStore(prop, () => undefined);
       }
     });
   };
 
-  const inject = (obj: any) => {
-    if (!obj) return;
-    if (!obj.stores) {
-      Object.defineProperty(obj, 'stores', {
-        get() {
-          if (!this._injectedStores) {
-            this._injectedStores = createMockStores(this);
-          }
-          return this._injectedStores;
-        },
-        set(v) {
-          this._injectedStores = v;
-        },
-        configurable: true,
-        enumerable: true,
-      });
-    }
-    obj._stores = obj.stores;
+  const storesPlaceholder: any = {};
+  
+  const routerOptions: any = {
+    routeTree,
+    context: { queryClient },
+    scrollRestoration: true,
+    defaultPreloadStaleTime: 0,
+    stores: storesPlaceholder,
   };
 
-  inject(router);
-  if (router.options) {
-    inject(router.options);
+  if (isServer) {
+    routerOptions.history = createMemoryHistory();
   }
 
-  // Final fallback: Ensure the prototype has it too
-  if (Object.getPrototypeOf(router) && !Object.getPrototypeOf(router).stores) {
-    try {
-      inject(Object.getPrototypeOf(router));
-    } catch (e) {}
-  }
+  const router = createTanStackRouter(routerOptions);
+  console.log("[Router] instance created");
+
+  // Initialize the placeholder with the real mock stores
+  const realStores = createMockStores(router);
+  Object.assign(storesPlaceholder, realStores);
+  
+  // Ensure the router instance also has them directly
+  (router as any).stores = storesPlaceholder;
+  (router as any)._stores = storesPlaceholder;
 
   // Patch getMatchedRoutes
   const originalGetMatchedRoutes = router.getMatchedRoutes.bind(router);
