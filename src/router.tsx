@@ -19,8 +19,7 @@ export function getRouter() {
 
   const router = createTanStackRouter(routerOptions);
 
-  // Framework compatibility layer for TanStack Start v1
-  // Injects internal stores and mocks required for early hydration/SSR
+  // Robust framework compatibility layer for TanStack Start v1
   const injectMockStores = (target: any) => {
     if (target && !target.stores) {
       const mockStore = (getValue: () => any) => {
@@ -52,6 +51,7 @@ export function getRouter() {
 
       const stores = {
         ids: mockStore(() => (getCurrentState().matches || []).map((m: any) => m.routeId)),
+        matchesId: mockStore(() => (getCurrentState().matches || []).map((m: any) => m.id || m.routeId)),
         byRoute: {
           get: (routeId: string) => {
             const store = mockStore(() => (getCurrentState().matches || []).find((m: any) => m.routeId === routeId));
@@ -73,10 +73,9 @@ export function getRouter() {
     }
   };
 
-  // Only inject if stores are missing (prevents recursive or early access issues)
   injectMockStores(router);
 
-  // Patch getMatchedRoutes to handle different destructuring patterns in TanStack versions
+  // Patch getMatchedRoutes to satisfy TanStack Start's internal destructuring requirements
   const originalGetMatchedRoutes = router.getMatchedRoutes.bind(router);
   router.getMatchedRoutes = (pathname: string) => {
     try {
