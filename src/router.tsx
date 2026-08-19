@@ -66,7 +66,7 @@ export function getRouter() {
 
   router.getMatchedRoutes = (pathname: string) => {
     try {
-      const result = originalGetMatchedRoutes(pathname);
+      const result = originalGetMatchedRoutes(pathname) as any;
       
       let matchedRoutes: any[] = [];
       let routeParams: Record<string, any> = {};
