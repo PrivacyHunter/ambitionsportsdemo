@@ -14,13 +14,17 @@ export function getRouter() {
 
   const originalGetMatchedRoutes = router.getMatchedRoutes.bind(router);
 
-  // Patch getMatchedRoutes to return an object that also behaves like an array
-  // to satisfy @tanstack/start-server-core's internal expectation.
   router.getMatchedRoutes = (pathname: string) => {
     const result = originalGetMatchedRoutes(pathname);
-    
-    // If it's already an object with the expected keys, return it.
-    // Otherwise, it might be an array [matchedRoutes, routeParams, foundRoute].
+    if (typeof window === 'undefined') {
+      console.log('[DEBUG] getMatchedRoutes result type:', Array.isArray(result) ? 'Array' : typeof result);
+      if (Array.isArray(result)) {
+        console.log('[DEBUG] getMatchedRoutes array length:', result.length);
+      } else if (result) {
+        console.log('[DEBUG] getMatchedRoutes keys:', Object.keys(result));
+      }
+    }
+
     if (Array.isArray(result)) {
       const [matchedRoutes, routeParams, foundRoute] = result;
       const obj = {
@@ -29,7 +33,6 @@ export function getRouter() {
         foundRoute,
       };
 
-      // Add iterator support so it can be destructured like an array if needed.
       return Object.assign(obj, {
         [Symbol.iterator]: function* () {
           yield matchedRoutes;
