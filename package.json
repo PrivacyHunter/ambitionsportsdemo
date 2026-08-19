@@ -5,10 +5,12 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:dev": "vite build",
     "start": "vite start",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.9.1",
     "@tanstack/react-query": "^5.66.0",
     "@tanstack/react-router": "1.170.18",
     "@tanstack/react-start": "1.168.32",
@@ -17,6 +19,7 @@
     "lucide-react": "^0.475.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-hook-form": "^7.85.0",
     "resend": "^4.1.2",
     "sonner": "^2.0.1",
     "tailwind-merge": "^3.0.1",
