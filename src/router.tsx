@@ -57,14 +57,17 @@ export function getRouter() {
       return store;
     };
 
-    const byRoute = new Map();
-    // Pre-populate byRoute for better compatibility if needed
-    
     return {
       ids: mockStore(() => (getCurrentState().matches || []).map((m: any) => m.routeId)),
       matchesId: mockStore(() => (getCurrentState().matches || []).map((m: any) => m.id || m.routeId)),
       byRoute: {
-        get: getMatchStore
+        get: (routeId: string) => {
+          // If the framework calls byRoute.get(id).get(), we need to handle both
+          const matchStore = getMatchStore(routeId);
+          // Ensure the object returned by byRoute.get(id) also has a .get() method
+          if (!matchStore.get) (matchStore as any).get = () => matchStore.state;
+          return matchStore;
+        }
       },
       matches: mockStore(() => getCurrentState().matches || []),
       location: mockStore(() => getCurrentState().location || { pathname: '/', search: {}, hash: '', state: {} }),
