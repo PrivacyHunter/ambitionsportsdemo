@@ -22,5 +22,9 @@ export const submitInquiry = createServerFn({ method: "POST" })
       return { success: false as const, error: String(result.error) };
     }
 
-    return { success: true as const, data: result.data, mock: (result as any).mock };
+    return { 
+      success: true as const, 
+      data: result.data || null, 
+      mock: (result as any).mock || false 
+    };
   });
