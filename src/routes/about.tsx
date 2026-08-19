@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { motion } from "framer-motion";
-import { Shield, Target, Eye, Gem, Award, Users, Box, Headphones, Upload, CheckCircle2 } from "lucide-react";
+import { Shield, Target, Eye, Gem, Award, Users, Box, Headphones, Upload, CheckCircle2, Globe } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
