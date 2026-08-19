@@ -19,16 +19,18 @@ export function getRouter() {
 
   const router = createTanStackRouter(routerOptions);
 
-  // Force initialization of stores and internal state if missing
-  if (!(router as any).stores) {
+  // Initialize router state for SSR
+  if (isServer) {
     try {
-      router.update(router.options);
+      router.update({
+        ...router.options,
+      });
     } catch (e) {
       // Ignore initial update errors
     }
   }
 
-  // Fallback for stores if still missing
+  // Ensure 'stores' exist for framework compatibility
   if (!(router as any).stores) {
     const mockStore = (getValue: () => any) => ({
       get: getValue,
@@ -44,7 +46,7 @@ export function getRouter() {
 
     if (!Object.getOwnPropertyDescriptor(router, 'state')) {
       Object.defineProperty(router, 'state', {
-        get: () => initialState,
+        get: () => (router as any)._state || initialState,
         configurable: true,
         enumerable: true,
       });
@@ -60,8 +62,7 @@ export function getRouter() {
     };
   }
 
-  // Framework compatibility patch: getMatchedRoutes must return an object with specific keys
-  // AND be iterable as [matchedRoutes, routeParams, foundRoute]
+  // Framework compatibility patch for getMatchedRoutes
   const originalGetMatchedRoutes = router.getMatchedRoutes.bind(router);
 
   router.getMatchedRoutes = (pathname: string) => {
