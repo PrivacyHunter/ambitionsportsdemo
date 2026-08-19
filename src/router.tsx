@@ -12,30 +12,29 @@ export function getRouter() {
     defaultPreloadStaleTime: 0,
   });
 
-  // Ensure 'stores' exists and is properly shaped for matchRoutesLightweight
+  // Critical fix: matchRoutesLightweight in @tanstack/router-core crashes if router.stores is missing.
+  // It is initialized in this.update(), but HMR/SSR entry points often bypass the full lifecycle.
   if (!(router as any).stores) {
-    console.warn('[Router Patch] router.stores is missing, initializing fallback...');
-    const matchesStore = {
-      get: () => router.state.matches || [],
-    };
+    const isServer = typeof document === 'undefined';
     
-    const idsStore = {
-      get: () => (router.state.matches || []).map(m => m.routeId),
-    };
-
-    const byRouteStore = {
-      get: (routeId: string) => ({
-        get: () => (router.state.matches || []).find(m => m.routeId === routeId)
-      })
-    };
+    // Minimal mock of the store structure required by matchRoutesLightweight
+    const mockStore = (getValue: () => any) => ({
+      get: getValue,
+      set: () => {},
+      subscribe: () => () => {},
+    });
 
     (router as any).stores = {
-      matches: matchesStore,
-      ids: idsStore,
-      byRoute: byRouteStore,
+      ids: mockStore(() => (router.state?.matches || []).map((m: any) => m.routeId)),
+      byRoute: {
+        get: (routeId: string) => mockStore(() => (router.state?.matches || []).find((m: any) => m.routeId === routeId))
+      },
+      matches: mockStore(() => router.state?.matches || []),
     };
   }
 
+  // Compatibility patch for TanStack Start v1 framework expecting router.getMatchedRoutes 
+  // to be destructurable as an object but iterable as an array.
   const originalGetMatchedRoutes = router.getMatchedRoutes.bind(router);
 
   router.getMatchedRoutes = (pathname: string) => {
@@ -72,7 +71,6 @@ export function getRouter() {
 
       return result;
     } catch (e) {
-      console.error('Error in getMatchedRoutes patch:', e);
       const emptyResult = {
         matchedRoutes: [],
         routeParams: {},
