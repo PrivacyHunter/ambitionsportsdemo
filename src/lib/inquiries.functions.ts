@@ -22,8 +22,9 @@ export const submitInquiry = createServerFn({ method: "POST" })
     
     const result = await sendInquiryEmail({
       ...data,
-      details: data.details as Record<string, any> | undefined
+      details: data.details as Record<string, any>
     });
+
 
     if (!result.success) {
       return { success: false as const, error: String(result.error) };
