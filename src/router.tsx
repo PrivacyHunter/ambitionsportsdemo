@@ -42,32 +42,37 @@ export function getRouter() {
         return s;
       };
 
-      const initialState = {
-        status: 'idle',
-        matches: [],
-        location: (router as any).latestLocation || { pathname: '/', search: {}, hash: '', state: {} },
+      // Safely access current state without triggering recursion
+      const getCurrentState = () => {
+        try {
+          // Access the underlying state if possible, otherwise use a safe fallback
+          return (target as any)._state || (target as any).state || {
+            status: 'idle',
+            matches: [],
+            location: (target as any).latestLocation || { pathname: '/', search: {}, hash: '', state: {} },
+          };
+        } catch {
+          return {
+            status: 'idle',
+            matches: [],
+            location: { pathname: '/', search: {}, hash: '', state: {} },
+          };
+        }
       };
 
-      // Safely define the state property to avoid 'undefined' reads
-      if (!Object.getOwnPropertyDescriptor(target, 'state')) {
-        Object.defineProperty(target, 'state', {
-          get: () => (router as any)._state || (router as any).state || initialState,
-          configurable: true,
-          enumerable: true,
-        });
-      }
-
       const stores = {
-        ids: mockStore(() => (target.state?.matches || []).map((m: any) => m.routeId)),
+        ids: mockStore(() => (getCurrentState().matches || []).map((m: any) => m.routeId)),
         byRoute: {
           get: (routeId: string) => {
-            const store = mockStore(() => (target.state?.matches || []).find((m: any) => m.routeId === routeId));
+            const store = mockStore(() => (getCurrentState().matches || []).find((m: any) => m.routeId === routeId));
             (store as any).get = store.get;
             return store;
           }
         },
-        matches: mockStore(() => target.state?.matches || []),
-        __store: mockStore(() => target.state),
+        matches: mockStore(() => getCurrentState().matches || []),
+        location: mockStore(() => getCurrentState().location || { pathname: '/', search: {}, hash: '', state: {} }),
+        status: mockStore(() => getCurrentState().status || 'idle'),
+        __store: mockStore(() => getCurrentState()),
       };
 
       target.stores = stores;
