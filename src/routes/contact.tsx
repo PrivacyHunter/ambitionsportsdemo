@@ -146,31 +146,32 @@ function Contact() {
                  <h2 className="text-3xl md:text-5xl font-black uppercase italic tracking-tighter mb-4 leading-none">Global <br /><span className="text-neon-lime">Inquiry Portal</span></h2>
                  <p className="text-muted-foreground mb-12 uppercase font-bold tracking-widest text-xs">Direct line to our manufacturing experts</p>
                  
-                 <form onSubmit={handleSubmit} className="grid md:grid-cols-2 gap-8">
-                    <div className="space-y-3">
-                      <label className="text-[10px] font-black uppercase tracking-[0.3em] text-neon-cyan">Client Name</label>
-                      <input required className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 focus:border-neon-cyan outline-none transition-all focus:bg-white/[0.08]" placeholder="e.g. David Smith" />
-                    </div>
-                    <div className="space-y-3">
-                      <label className="text-[10px] font-black uppercase tracking-[0.3em] text-neon-cyan">Email Address</label>
-                      <input required type="email" className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 focus:border-neon-cyan outline-none transition-all focus:bg-white/[0.08]" placeholder="david@sportsclub.com" />
-                    </div>
-                    <div className="md:col-span-2 space-y-3">
-                      <label className="text-[10px] font-black uppercase tracking-[0.3em] text-neon-cyan">Inquiry Subject</label>
-                      <input required className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 focus:border-neon-cyan outline-none transition-all focus:bg-white/[0.08]" placeholder="e.g. Private Label Manufacturing Inquiry" />
-                    </div>
-                    <div className="md:col-span-2 space-y-3">
-                      <label className="text-[10px] font-black uppercase tracking-[0.3em] text-neon-cyan">Detailed Message</label>
-                      <textarea required rows={6} className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 focus:border-neon-cyan outline-none transition-all focus:bg-white/[0.08]" placeholder="Tell us about your project requirements..." />
-                    </div>
-                    <div className="md:col-span-2 pt-4">
-                      <button type="submit" className="w-full bg-neon-cyan hover:bg-neon-lime text-background font-black uppercase italic py-6 rounded-2xl transition-all shadow-[0_20px_40px_rgba(0,243,255,0.2)] group">
-                        <span className="flex items-center justify-center gap-3">
-                          Send Message <Send className="group-hover:translate-x-2 transition-transform" size={20} />
-                        </span>
-                      </button>
-                    </div>
-                 </form>
+                  <form onSubmit={handleSubmit} className="grid md:grid-cols-2 gap-8">
+                     <div className="space-y-3">
+                       <label className="text-[10px] font-black uppercase tracking-[0.3em] text-neon-cyan">Client Name</label>
+                       <input name="name" required className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 focus:border-neon-cyan outline-none transition-all focus:bg-white/[0.08]" placeholder="e.g. David Smith" />
+                     </div>
+                     <div className="space-y-3">
+                       <label className="text-[10px] font-black uppercase tracking-[0.3em] text-neon-cyan">Email Address</label>
+                       <input name="email" required type="email" className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 focus:border-neon-cyan outline-none transition-all focus:bg-white/[0.08]" placeholder="david@sportsclub.com" />
+                     </div>
+                     <div className="md:col-span-2 space-y-3">
+                       <label className="text-[10px] font-black uppercase tracking-[0.3em] text-neon-cyan">Inquiry Subject</label>
+                       <input name="subject" required className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 focus:border-neon-cyan outline-none transition-all focus:bg-white/[0.08]" placeholder="e.g. Private Label Manufacturing Inquiry" />
+                     </div>
+                     <div className="md:col-span-2 space-y-3">
+                       <label className="text-[10px] font-black uppercase tracking-[0.3em] text-neon-cyan">Detailed Message</label>
+                       <textarea name="message" required rows={6} className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 focus:border-neon-cyan outline-none transition-all focus:bg-white/[0.08]" placeholder="Tell us about your project requirements..." />
+                     </div>
+                     <div className="md:col-span-2 pt-4">
+                       <button type="submit" disabled={isSubmitting} className="w-full bg-neon-cyan hover:bg-neon-lime text-background font-black uppercase italic py-6 rounded-2xl transition-all shadow-[0_20px_40px_rgba(0,243,255,0.2)] group disabled:opacity-50">
+                         <span className="flex items-center justify-center gap-3">
+                           {isSubmitting ? "Sending..." : "Send Message"} <Send className="group-hover:translate-x-2 transition-transform" size={20} />
+                         </span>
+                       </button>
+                     </div>
+                  </form>
+
                </div>
             </div>
 
