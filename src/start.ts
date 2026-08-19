@@ -1,5 +1,5 @@
 import { createStart, createCsrfMiddleware, createMiddleware } from "@tanstack/react-start";
-import { getRouter } from "./router";
+import { createRouter } from "./router";
 import { renderErrorPage } from "./lib/error-page";
 
 const errorMiddleware = createMiddleware().server(async ({ next }) => {
@@ -22,6 +22,6 @@ const csrfMiddleware = createCsrfMiddleware({
 });
 
 export const startInstance = createStart(() => ({
-  router: getRouter(),
+  router: createRouter(),
   requestMiddleware: [errorMiddleware, csrfMiddleware],
 }));
