@@ -21,35 +21,37 @@ export function getRouter() {
 
   // Robust framework compatibility layer for TanStack Start v1
   const injectMockStores = (target: any) => {
-    if (target && !target.stores) {
+    if (!target) return;
+    
+    // Define a safe state getter that provides structure before the framework initializes its stores
+    const getCurrentState = () => {
+      try {
+        const s = (target as any)._state || (target as any).state;
+        if (s) return s;
+      } catch (e) {}
+      
+      return {
+        status: 'idle',
+        matches: [],
+        location: (target as any).latestLocation || { pathname: '/', search: {}, hash: '', state: {} },
+      };
+    };
+
+    if (!target.stores) {
       const mockStore = (getValue: () => any) => {
         const s = {
           get: getValue,
           set: () => {},
           subscribe: () => () => {},
-          state: getValue(),
+          // Define as a getter to ensure it always returns fresh state
+          get state() { return getValue(); }
         };
+        // Framework internals often call store.get() directly
         (s as any).get = s.get;
         return s;
       };
 
-      const getCurrentState = () => {
-        try {
-          return target.state || {
-            status: 'idle',
-            matches: [],
-            location: { pathname: '/', search: {}, hash: '', state: {} },
-          };
-        } catch {
-          return {
-            status: 'idle',
-            matches: [],
-            location: { pathname: '/', search: {}, hash: '', state: {} },
-          };
-        }
-      };
-
-      const stores = {
+      const stores: any = {
         ids: mockStore(() => (getCurrentState().matches || []).map((m: any) => m.routeId)),
         matchesId: mockStore(() => (getCurrentState().matches || []).map((m: any) => m.id || m.routeId)),
         byRoute: {
