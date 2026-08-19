@@ -1,7 +1,5 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env['RESEND_API_KEY']);
-
 export async function sendInquiryEmail(data: {
   name: string;
   email: string;
@@ -9,10 +7,14 @@ export async function sendInquiryEmail(data: {
   message: string;
   details?: Record<string, any>;
 }) {
+  const apiKey = process.env['RESEND_API_KEY'];
+  if (!apiKey) {
+    console.log("MOCK EMAIL (No API Key):", data);
+    return { success: true, mock: true };
+  }
+
+  const resend = new Resend(apiKey);
   const { name, email, subject, message, details } = data;
-  
-  // In a real app, you'd use a verified domain. For testing/demo, we use Resend's onboarding email.
-  // The recipient should ideally be the site owner (sales@ambitionsports.com).
   
   const html = `
     <h2>New Inquiry from Ambition Sports</h2>
@@ -32,7 +34,7 @@ export async function sendInquiryEmail(data: {
   try {
     const response = await resend.emails.send({
       from: 'Ambition Sports <onboarding@resend.dev>',
-      to: 'delivered@resend.dev', // Use Resend testing email or site owner email
+      to: 'delivered@resend.dev',
       replyTo: email,
       subject: `[Website Inquiry] ${subject}`,
       html: html,
