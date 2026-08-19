@@ -2,6 +2,7 @@ import { createStartHandler, defaultRenderHandler } from '@tanstack/react-start/
 import { getRouter } from './router'
 
 const handler = createStartHandler({
+  createRouter: getRouter,
   handler: defaultRenderHandler,
 })
 
