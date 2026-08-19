@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Navbar } from "@/components/Navbar";
+import { Link } from "@tanstack/react-router";
 import { Footer } from "@/components/Footer";
 import { motion } from "framer-motion";
 import { ChevronRight, ArrowRight, Star, Globe, ShieldCheck, Zap, Scissors, Truck } from "lucide-react";
