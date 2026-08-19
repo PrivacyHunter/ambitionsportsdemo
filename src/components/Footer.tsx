@@ -1,0 +1,97 @@
+import { Link } from "@tanstack/react-router";
+import { Facebook, Twitter, Instagram, Linkedin, Send, MapPin, Phone, Mail } from "lucide-react";
+
+export function Footer() {
+  return (
+    <footer className="bg-background border-t border-white/5 pt-20 pb-10 px-4 lg:px-8">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-20">
+        {/* Brand & Inquiry Info */}
+        <div className="space-y-6">
+          <Link to="/" className="flex items-center gap-2">
+            <div className="w-10 h-10 bg-neon-cyan rounded-lg flex items-center justify-center font-black text-background text-2xl">
+              A
+            </div>
+            <span className="text-xl font-black tracking-tighter uppercase italic">
+              Ambition <span className="text-neon-cyan">Sports</span>
+            </span>
+          </Link>
+          <p className="text-muted-foreground text-sm leading-relaxed">
+            Premium custom sportswear and activewear manufacturer based in Sialkot, Pakistan. Delivering high-performance apparel worldwide.
+          </p>
+          <div className="flex gap-4">
+            <SocialIcon icon={<Facebook size={18} />} />
+            <SocialIcon icon={<Twitter size={18} />} />
+            <SocialIcon icon={<Instagram size={18} />} />
+            <SocialIcon icon={<Linkedin size={18} />} />
+          </div>
+        </div>
+
+        {/* Quick Links */}
+        <div>
+          <h4 className="text-lg font-bold uppercase tracking-widest mb-6 text-neon-cyan">Quick Links</h4>
+          <ul className="space-y-4 text-sm font-medium">
+            <li><Link to="/sportswear" className="hover:text-neon-lime transition-colors">Sportswear</Link></li>
+            <li><Link to="/activewear" className="hover:text-neon-lime transition-colors">Activewear</Link></li>
+            <li><Link to="/casual-wear" className="hover:text-neon-lime transition-colors">Casual Wear</Link></li>
+            <li><Link to="/about" className="hover:text-neon-lime transition-colors">About Us</Link></li>
+            <li><Link to="/contact" className="hover:text-neon-lime transition-colors">Contact & Quote</Link></li>
+          </ul>
+        </div>
+
+        {/* Contact Info */}
+        <div>
+          <h4 className="text-lg font-bold uppercase tracking-widest mb-6 text-neon-cyan">Get In Touch</h4>
+          <ul className="space-y-4 text-sm">
+            <li className="flex gap-3 text-muted-foreground">
+              <MapPin size={20} className="text-neon-lime shrink-0" />
+              <span>Industrial Estate, Sialkot, Pakistan 51310</span>
+            </li>
+            <li className="flex gap-3 text-muted-foreground">
+              <Phone size={20} className="text-neon-lime shrink-0" />
+              <span>+92 (300) 123-4567</span>
+            </li>
+            <li className="flex gap-3 text-muted-foreground">
+              <Mail size={20} className="text-neon-lime shrink-0" />
+              <span>sales@ambitionsports.com</span>
+            </li>
+          </ul>
+        </div>
+
+        {/* Newsletter / Form Intro */}
+        <div>
+          <h4 className="text-lg font-bold uppercase tracking-widest mb-6 text-neon-cyan">Newsletter</h4>
+          <p className="text-muted-foreground text-sm mb-6">
+            Subscribe to get latest updates and new product launches.
+          </p>
+          <div className="relative">
+            <input 
+              type="email" 
+              placeholder="Your Email" 
+              className="w-full bg-white/5 border border-white/10 rounded-md py-3 px-4 text-sm focus:outline-none focus:border-neon-cyan transition-colors"
+            />
+            <button className="absolute right-2 top-2 p-1.5 bg-neon-cyan rounded text-background hover:bg-neon-lime transition-all">
+              <Send size={16} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer Bottom */}
+      <div className="max-w-7xl mx-auto border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-muted-foreground uppercase tracking-widest">
+        <p>© 2026 Ambition Sports. All Rights Reserved.</p>
+        <div className="flex gap-6">
+          <a href="#" className="hover:text-neon-cyan">Privacy Policy</a>
+          <a href="#" className="hover:text-neon-cyan">Terms of Service</a>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+function SocialIcon({ icon }: { icon: React.ReactNode }) {
+  return (
+    <a href="#" className="w-9 h-9 border border-white/10 rounded-full flex items-center justify-center text-foreground hover:bg-neon-cyan hover:text-background hover:border-neon-cyan transition-all duration-300">
+      {icon}
+    </a>
+  );
+}
