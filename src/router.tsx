@@ -53,8 +53,12 @@ export function getRouter() {
       },
       matches: createStoreMock(() => getCurrentState().matches || []),
       location: createStoreMock(() => getCurrentState().location || {}),
-      // Crucial: setMatches is expected by loadServerRoute in recent v1 versions
+      status: createStoreMock(() => getCurrentState().status || 'idle'),
+      resolvedLocation: createStoreMock(() => getCurrentState().resolvedLocation || getCurrentState().location || {}),
+      __store: createStoreMock(() => getCurrentState()),
+      // Crucial: setMatches is expected by loadServerRoute and loadClientRoute
       setMatches: (matches: any) => {
+        // Many framework internals expect this to update the underlying state
         if (target.update) target.update({ ...target.options });
       }
     };
@@ -67,6 +71,7 @@ export function getRouter() {
       }
     });
 
+    // Inject into all locations the framework looks
     target.stores = storesProxy;
     target._stores = storesProxy;
     if (target.options) {
@@ -76,9 +81,23 @@ export function getRouter() {
 
   injectStores(router);
 
+  // Wrap the entire router in a Proxy to ensure 'stores' always points to our patch
+  const routerProxy = new Proxy(router, {
+    get(target: any, prop: string, receiver: any) {
+      if (prop === 'stores' || prop === '_stores') {
+        return target.stores;
+      }
+      const val = Reflect.get(target, prop, receiver);
+      if (typeof val === 'function') {
+        return val.bind(target);
+      }
+      return val;
+    }
+  });
+
   // Patch getMatchedRoutes to satisfy TanStack Start's handleServerRoutes destructuring
   const originalGetMatchedRoutes = router.getMatchedRoutes.bind(router);
-  router.getMatchedRoutes = (pathname: string) => {
+  routerProxy.getMatchedRoutes = (pathname: string) => {
     const result = originalGetMatchedRoutes(pathname) as any;
     
     let matchedRoutes = [], routeParams = {}, foundRoute = null;
@@ -105,10 +124,10 @@ export function getRouter() {
   };
 
   if (!isServer) {
-    (window as any).__TSR__ = { router };
+    (window as any).__TSR__ = { router: routerProxy };
   }
 
-  return router;
+  return routerProxy;
 }
 
 declare module "@tanstack/react-router" {
