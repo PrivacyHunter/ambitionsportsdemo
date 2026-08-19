@@ -8,6 +8,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
 import { useState } from "react";
+import { submitInquiry } from "@/lib/inquiries.functions";
+import { useServerFn } from "@tanstack/react-start";
+
 
 const quoteSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -24,22 +27,39 @@ export const Route = createFileRoute("/about")({
 });
 
 function About() {
+  const submitInquiryFn = useServerFn(submitInquiry);
   const [fileName, setFileName] = useState<string | null>(null);
+
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<QuoteFormValues>({
     resolver: zodResolver(quoteSchema),
   });
 
   const onSubmit = async (data: QuoteFormValues) => {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    console.log(data);
-    toast.success("Quote request sent successfully! We will contact you shortly.", {
-      icon: <CheckCircle2 className="text-neon-lime" />,
-      className: "bg-background border-neon-lime/20 text-white"
-    });
-    reset();
-    setFileName(null);
+    try {
+      await submitInquiryFn({
+        data: {
+          name: data.name,
+          email: data.email,
+          subject: `Bulk Quote Request: ${data.sportType}`,
+          message: data.message,
+          details: {
+            sportType: data.sportType,
+            quantity: data.quantity,
+            fileName: fileName || "None"
+          }
+        }
+      });
+      toast.success("Quote request sent successfully! We will contact you shortly.", {
+        icon: <CheckCircle2 className="text-neon-lime" />,
+        className: "bg-background border-neon-lime/20 text-white"
+      });
+      reset();
+      setFileName(null);
+    } catch (error) {
+      toast.error("Failed to submit quote request. Please try again.");
+    }
   };
+
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) {
