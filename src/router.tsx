@@ -3,10 +3,10 @@ import { QueryClient } from "@tanstack/react-query";
 import { routeTree } from "./routeTree.gen";
 
 export function getRouter() {
-  console.log("[Router] getRouter called, isServer:", typeof document === 'undefined');
+  const isServer = typeof document === 'undefined';
+  console.log("[Router] getRouter starting, isServer:", isServer);
 
   const queryClient = new QueryClient();
-  const isServer = typeof document === 'undefined';
 
   const routerOptions: any = {
     routeTree,
@@ -20,6 +20,7 @@ export function getRouter() {
   }
 
   const router = createTanStackRouter(routerOptions);
+  console.log("[Router] instance created");
 
   // Robust framework compatibility layer for TanStack Start v1
   const createMockStores = (target: any) => {
@@ -28,7 +29,6 @@ export function getRouter() {
         get: getValue,
         set: () => {},
         subscribe: (cb: any) => {
-          // Some versions expect a function, some expect { unsubscribe }
           const unsub = () => {};
           (unsub as any).unsubscribe = unsub;
           return unsub as any;
@@ -69,41 +69,41 @@ export function getRouter() {
     };
   };
 
-  // Aggressively inject stores using defineProperty to handle early access by framework internals
-  if (!(router as any).stores) {
-    Object.defineProperty(router, 'stores', {
-      get() {
-        if (!this._injectedStores) {
-          this._injectedStores = createMockStores(this);
-        }
-        return this._injectedStores;
-      },
-      set(v) {
-        this._injectedStores = v;
-      },
-      configurable: true,
-      enumerable: true,
-    });
+  try {
+    console.log("[Router] Injecting stores...");
+    if (!(router as any).stores) {
+      Object.defineProperty(router, 'stores', {
+        get() {
+          if (!this._injectedStores) {
+            this._injectedStores = createMockStores(this);
+          }
+          return this._injectedStores;
+        },
+        set(v) {
+          this._injectedStores = v;
+        },
+        configurable: true,
+        enumerable: true,
+      });
+    }
+
+    (router as any)._stores = (router as any).stores;
+    if (router.options) {
+      (router.options as any).stores = (router as any).stores;
+    }
+    console.log("[Router] Stores injected");
+  } catch (e: any) {
+    console.error("[Router] Store injection failed:", e.message);
   }
 
-  // Also set _stores and options.stores for full coverage
-  (router as any)._stores = (router as any).stores;
-  if (router.options) {
-    (router.options as any).stores = (router as any).stores;
-  }
-
-  // Patch getMatchedRoutes to satisfy TanStack Start's internal destructuring requirements
+  // Patch getMatchedRoutes
   const originalGetMatchedRoutes = router.getMatchedRoutes.bind(router);
   router.getMatchedRoutes = (pathname: string) => {
     try {
       const result = originalGetMatchedRoutes(pathname) as any;
       let matchedRoutes = [], routeParams = {}, foundRoute = null;
-      
-      if (Array.isArray(result)) {
-        [matchedRoutes, routeParams, foundRoute] = result;
-      } else if (result && typeof result === 'object') {
-        ({ matchedRoutes = [], routeParams = {}, foundRoute = null } = result);
-      }
+      if (Array.isArray(result)) [matchedRoutes, routeParams, foundRoute] = result;
+      else if (result && typeof result === 'object') ({ matchedRoutes, routeParams, foundRoute } = result);
       
       const matched = matchedRoutes || [];
       const params = routeParams || {};
@@ -114,9 +114,7 @@ export function getRouter() {
         routeParams: params,
         foundRoute: found,
         [Symbol.iterator]: function* () {
-          yield matched;
-          yield params;
-          yield found;
+          yield matched; yield params; yield found;
         },
       } as any;
     } catch (e) {
@@ -128,12 +126,12 @@ export function getRouter() {
   };
 
   if (!isServer) {
+    console.log("[Router] Attaching to window.__TSR__");
     (window as any).__TSR__ = { router };
   }
 
   return router;
 }
-
 
 declare module "@tanstack/react-router" {
   interface Register {
