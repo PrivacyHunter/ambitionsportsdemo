@@ -63,12 +63,15 @@ function Sportswear() {
     toast.loading(`Processing inquiry for ${productName}...`, { id: "inquiry" });
     try {
       await submitInquiryFn({
-        name: "Quick Inquiry User",
-        email: "customer@example.com",
-        subject: `Product Inquiry: ${productName}`,
-        message: `Interested in bulk order for ${productName}. Please send details.`,
-        details: { productName }
+        data: {
+          name: "Quick Inquiry User",
+          email: "customer@example.com",
+          subject: `Product Inquiry: ${productName}`,
+          message: `Interested in bulk order for ${productName}. Please send details.`,
+          details: { productName }
+        }
       });
+
       toast.success(`Inquiry for ${productName} sent successfully!`, {
         id: "inquiry",
         description: "Our team will contact you with the spec sheet.",
