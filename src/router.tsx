@@ -52,7 +52,7 @@ export function getRouter() {
       });
     }
 
-    (router as any).stores = {
+    const stores = {
       ids: mockStore(() => (router.state?.matches || []).map((m: any) => m.routeId)),
       byRoute: {
         get: (routeId: string) => mockStore(() => (router.state?.matches || []).find((m: any) => m.routeId === routeId))
@@ -60,6 +60,8 @@ export function getRouter() {
       matches: mockStore(() => router.state?.matches || []),
       __store: mockStore(() => router.state),
     };
+    (router as any).stores = stores;
+    (router as any)._stores = stores;
   }
 
   // Framework compatibility patch for getMatchedRoutes
