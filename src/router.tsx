@@ -6,18 +6,22 @@ export function getRouter() {
   const queryClient = new QueryClient();
   const isServer = typeof document === 'undefined';
 
-  const router = createTanStackRouter({
+  const routerOptions: any = {
     routeTree,
     context: { queryClient },
     scrollRestoration: true,
     defaultPreloadStaleTime: 0,
-    history: isServer ? createMemoryHistory() : undefined,
-  });
+  };
+
+  if (isServer) {
+    routerOptions.history = createMemoryHistory();
+  }
+
+  const router = createTanStackRouter(routerOptions);
 
   // Force initialization of stores and internal state if missing
   if (!(router as any).stores) {
     try {
-      // @ts-ignore
       router.update(router.options);
     } catch (e) {
       console.error('[Router] Failed to force update:', e);
