@@ -120,9 +120,9 @@ function Index() {
             <p className="text-muted-foreground text-lg mb-12 max-w-2xl mx-auto uppercase font-bold tracking-widest">
               Ready to create something legendary? Our team is standing by to bring your vision to life.
             </p>
-            <button className="bg-neon-lime text-background hover:bg-white hover:shadow-[0_0_30px_rgba(57,255,20,0.4)] px-12 py-6 rounded-2xl font-black uppercase tracking-widest text-lg transition-all duration-300">
+            <Link to="/quote" className="inline-block bg-neon-lime text-background hover:bg-white hover:shadow-[0_0_30px_rgba(57,255,20,0.4)] px-12 py-6 rounded-2xl font-black uppercase tracking-widest text-lg transition-all duration-300">
               Get A Quote Now
-            </button>
+            </Link>
           </motion.div>
         </section>
       </main>
