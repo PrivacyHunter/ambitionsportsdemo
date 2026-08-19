@@ -76,8 +76,6 @@ export function getRouter() {
     (router as any).options.stores = stores;
   }
 
-  }
-
   // Framework compatibility patch for getMatchedRoutes
   const originalGetMatchedRoutes = router.getMatchedRoutes.bind(router);
 
