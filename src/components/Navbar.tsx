@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
-import { Menu, X, Phone, Mail, Facebook, Instagram, Twitter, Linkedin } from "lucide-react";
+import { Menu, X, Phone, Mail } from "lucide-react";
+import { FaFacebook, FaInstagram, FaTwitter, FaLinkedin } from "react-icons/fa";
 import { cn } from "@/lib/utils";
 
 export function Navbar() {
@@ -43,10 +44,10 @@ export function Navbar() {
           </a>
         </div>
         <div className="flex gap-4">
-          <a href="#" className="text-muted-foreground hover:text-neon-cyan transition-colors"><Facebook size={16} /></a>
-          <a href="#" className="text-muted-foreground hover:text-neon-cyan transition-colors"><Instagram size={16} /></a>
-          <a href="#" className="text-muted-foreground hover:text-neon-cyan transition-colors"><Twitter size={16} /></a>
-          <a href="#" className="text-muted-foreground hover:text-neon-cyan transition-colors"><Linkedin size={16} /></a>
+          <a href="#" className="text-muted-foreground hover:text-neon-cyan transition-colors"><FaFacebook size={16} /></a>
+          <a href="#" className="text-muted-foreground hover:text-neon-cyan transition-colors"><FaInstagram size={16} /></a>
+          <a href="#" className="text-muted-foreground hover:text-neon-cyan transition-colors"><FaTwitter size={16} /></a>
+          <a href="#" className="text-muted-foreground hover:text-neon-cyan transition-colors"><FaLinkedin size={16} /></a>
         </div>
       </div>
 
