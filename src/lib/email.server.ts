@@ -1,0 +1,46 @@
+import { Resend } from 'resend';
+
+const resend = new Resend(process.env['RESEND_API_KEY']);
+
+export async function sendInquiryEmail(data: {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  details?: Record<string, any>;
+}) {
+  const { name, email, subject, message, details } = data;
+  
+  // In a real app, you'd use a verified domain. For testing/demo, we use Resend's onboarding email.
+  // The recipient should ideally be the site owner (sales@ambitionsports.com).
+  
+  const html = `
+    <h2>New Inquiry from Ambition Sports</h2>
+    <p><strong>Name:</strong> ${name}</p>
+    <p><strong>Email:</strong> ${email}</p>
+    <p><strong>Subject:</strong> ${subject}</p>
+    <p><strong>Message:</strong></p>
+    <p>${message}</p>
+    ${details ? `
+      <h3>Additional Details:</h3>
+      <ul>
+        ${Object.entries(details).map(([key, value]) => `<li><strong>${key}:</strong> ${value}</li>`).join('')}
+      </ul>
+    ` : ''}
+  `;
+
+  try {
+    const response = await resend.emails.send({
+      from: 'Ambition Sports <onboarding@resend.dev>',
+      to: 'delivered@resend.dev', // Use Resend testing email or site owner email
+      replyTo: email,
+      subject: `[Website Inquiry] ${subject}`,
+      html: html,
+    });
+    
+    return { success: true, data: response };
+  } catch (error) {
+    console.error('Error sending email:', error);
+    return { success: false, error };
+  }
+}
