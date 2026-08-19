@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Navbar } from "@/components/Navbar";
-import { Link } from "@tanstack/react-router";
 import { Footer } from "@/components/Footer";
+import { HeroSlider } from "@/components/HeroSlider";
+import { FeaturedProducts } from "@/components/FeaturedProducts";
+import { Testimonials } from "@/components/Testimonials";
 import { motion } from "framer-motion";
-import { ChevronRight, ArrowRight, Star, Globe, ShieldCheck, Zap, Scissors, Truck } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { ShieldCheck, Zap, Scissors, Truck, Globe, Award, Factory, Users } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -16,155 +17,116 @@ function Index() {
       <Navbar />
 
       <main>
-        {/* Hero Banner Slider (Simulated with first banner) */}
-        <section className="relative h-[80vh] overflow-hidden flex items-center">
-          <div className="absolute inset-0 z-0">
-             {/* Dynamic background placeholder */}
-             <div className="absolute inset-0 bg-gradient-to-r from-background via-background/40 to-transparent z-10" />
-             <div className="w-full h-full bg-[url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center animate-pulse" />
-          </div>
-          
-          <div className="relative z-10 max-w-7xl mx-auto px-4 lg:px-8 w-full">
-            <motion.div 
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="max-w-2xl"
-            >
-              <h2 className="text-neon-cyan font-black tracking-widest uppercase mb-4 flex items-center gap-2">
-                <span className="w-8 h-[2px] bg-neon-cyan" /> Level Up Your Game
-              </h2>
-              <h1 className="text-5xl md:text-7xl lg:text-8xl font-black uppercase italic leading-[0.9] tracking-tighter mb-8">
-                Premium <br />
-                <span className="text-transparent stroke-text">Custom</span> <br />
-                Sportswear
-              </h1>
-              <div className="flex flex-wrap gap-4">
-                <button className="bg-neon-cyan hover:bg-neon-lime text-background px-8 py-4 rounded font-black uppercase transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(0,243,255,0.4)] flex items-center gap-2">
-                  Shop Now <ArrowRight size={20} />
-                </button>
-                <button className="border-2 border-neon-lime text-neon-lime hover:bg-neon-lime hover:text-background px-8 py-4 rounded font-black uppercase transition-all flex items-center gap-2">
-                  Custom Order
-                </button>
-              </div>
-            </motion.div>
-          </div>
-
-          <div className="absolute bottom-10 right-10 z-10 hidden lg:block">
-            <div className="flex gap-4">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className={cn("w-12 h-1 bg-white/20 transition-all", i === 1 && "w-20 bg-neon-cyan")} />
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Featured Products */}
-        <section className="py-24 px-4 lg:px-8 overflow-hidden">
-          <div className="max-w-7xl mx-auto flex justify-between items-end mb-12">
-            <div>
-              <h3 className="text-neon-lime font-black tracking-widest uppercase mb-2">Exclusive</h3>
-              <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter italic">Featured Apparel</h2>
-            </div>
-            <Link to="/sportswear" className="text-neon-cyan flex items-center gap-2 font-bold uppercase tracking-widest hover:translate-x-2 transition-transform">
-              View All <ChevronRight size={20} />
-            </Link>
-          </div>
-
-          <div className="flex gap-8 overflow-x-auto pb-10 no-scrollbar">
-            {[
-              { name: "Pro Soccer Jersey", price: "$49", tag: "Hot" },
-              { name: "Neon Training Kit", price: "$59", tag: "New" },
-              { name: "Stealth Basketball Kit", price: "$65", tag: "Trending" },
-              { name: "Apex Boxing Gear", price: "$89", tag: "Elite" },
-            ].map((product, idx) => (
-              <motion.div 
-                key={idx}
-                whileHover={{ y: -10 }}
-                className="min-w-[300px] bg-card rounded-xl overflow-hidden border border-white/5 relative group"
-              >
-                <div className="h-80 bg-white/5 flex items-center justify-center p-8 relative">
-                   <div className="w-full h-full bg-white/5 rounded-full blur-3xl absolute scale-50 group-hover:bg-neon-cyan/20 transition-all" />
-                   <div className="w-48 h-48 bg-white/10 rounded-lg group-hover:scale-110 transition-transform duration-500" />
-                   <span className="absolute top-4 right-4 bg-neon-lime text-background px-3 py-1 rounded text-xs font-black uppercase tracking-widest">{product.tag}</span>
-                </div>
-                <div className="p-6">
-                  <h4 className="font-black uppercase tracking-tighter text-xl mb-1">{product.name}</h4>
-                  <p className="text-muted-foreground text-sm mb-4 italic">High-performance sublimation apparel.</p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-neon-cyan font-black text-2xl">{product.price}</span>
-                    <button className="p-2 bg-white/5 rounded-full hover:bg-neon-cyan hover:text-background transition-all">
-                      <ArrowRight size={20} />
-                    </button>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </section>
+        <HeroSlider />
+        
+        <FeaturedProducts />
 
         {/* Facilities Section */}
-        <section className="bg-white/[0.02] py-24 px-4 lg:px-8">
-          <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-20 items-center">
-            <div className="relative">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="h-64 bg-white/5 rounded-xl border border-white/5" />
-                <div className="h-64 bg-white/5 rounded-xl border border-white/5 translate-y-12" />
-                <div className="h-64 bg-white/5 rounded-xl border border-white/5" />
-                <div className="h-64 bg-white/5 rounded-xl border border-white/5 translate-y-12" />
+        <section className="bg-white/[0.02] py-32 px-4 lg:px-8 border-y border-white/5">
+          <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-24 items-center">
+            <div className="relative order-2 lg:order-1">
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-6">
+                  <div className="h-72 bg-[url('https://images.unsplash.com/photo-1558444479-c8498274f9ad?q=80&w=1974&auto=format&fit=crop')] bg-cover bg-center rounded-3xl border border-white/10" />
+                  <div className="h-48 bg-neon-cyan/10 rounded-3xl border border-neon-cyan/20 flex items-center justify-center">
+                    <Factory className="text-neon-cyan w-16 h-16" />
+                  </div>
+                </div>
+                <div className="space-y-6 pt-12">
+                  <div className="h-48 bg-neon-lime/10 rounded-3xl border border-neon-lime/20 flex items-center justify-center">
+                    <Users className="text-neon-lime w-16 h-16" />
+                  </div>
+                  <div className="h-72 bg-[url('https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center rounded-3xl border border-white/10" />
+                </div>
               </div>
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-neon-cyan/20 blur-3xl" />
+              <div className="absolute -top-10 -left-10 w-40 h-40 bg-neon-cyan/20 blur-[100px] pointer-events-none" />
+              <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-neon-lime/20 blur-[100px] pointer-events-none" />
             </div>
-            <div>
-              <h2 className="text-4xl md:text-5xl font-black uppercase italic tracking-tighter mb-8">
-                Built For <span className="text-neon-cyan">Performance</span>
+
+            <div className="order-1 lg:order-2">
+              <h3 className="text-neon-lime font-black tracking-[0.3em] uppercase mb-6 text-sm">Industrial Excellence</h3>
+              <h2 className="text-5xl md:text-7xl font-black uppercase italic tracking-tighter mb-8 leading-[0.9]">
+                Advanced <br /><span className="text-neon-cyan">Facilities</span>
               </h2>
-              <p className="text-muted-foreground text-lg leading-relaxed mb-10">
-                Our state-of-the-art manufacturing facility in Sialkot combines traditional craftsmanship with cutting-edge technology. From sublimation to precision stitching, we control every step to ensure elite quality.
+              <p className="text-muted-foreground text-xl leading-relaxed mb-12">
+                Operating from Sialkot's industrial hub, our facility integrates vertical production lines. We handle everything from high-tech sublimation to precision tailoring under one roof.
               </p>
-              <div className="grid grid-cols-2 gap-8 mb-10">
-                <FacilityItem icon={<ShieldCheck className="text-neon-lime" />} title="ISO Certified" />
-                <FacilityItem icon={<Scissors className="text-neon-lime" />} title="Precision Cutting" />
-                <FacilityItem icon={<Zap className="text-neon-lime" />} title="Sublimation Unit" />
-                <FacilityItem icon={<Truck className="text-neon-lime" />} title="Global Export" />
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-12">
+                <FacilityItem icon={<Award className="text-neon-lime" />} title="ISO 9001:2015" desc="Certified quality management standards." />
+                <FacilityItem icon={<Zap className="text-neon-cyan" />} title="Sublimation Pro" desc="Infinite colors, zero-fade technology." />
+                <FacilityItem icon={<Scissors className="text-neon-lime" />} title="Laser Cutting" desc="Computerized precision fabric cutting." />
+                <FacilityItem icon={<ShieldCheck className="text-neon-cyan" />} title="QC Protocol" desc="Triple-stage quality inspection." />
               </div>
-              <button className="bg-white/5 hover:bg-white/10 px-8 py-4 rounded font-black uppercase tracking-widest transition-all">
-                Explore Our Facility
+
+              <button className="bg-white text-background hover:bg-neon-cyan hover:shadow-[0_0_30px_rgba(0,243,255,0.4)] px-10 py-5 rounded-xl font-black uppercase tracking-widest text-sm transition-all duration-300">
+                Explore Stitching Unit
               </button>
             </div>
           </div>
         </section>
 
-        {/* Work Process */}
-        <section className="py-24 px-4 lg:px-8 max-w-7xl mx-auto text-center">
-          <h2 className="text-4xl font-black uppercase italic mb-20 tracking-tighter">The Ambition <span className="text-neon-lime">Workflow</span></h2>
-          <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-8">
-            <WorkflowStep num="01" title="Mockup" desc="Custom design & 3D mockups." />
-            <WorkflowStep num="02" title="Material" desc="Elite fabric selection." />
-            <WorkflowStep num="03" title="Stitching" desc="High-density precision." />
-            <WorkflowStep num="04" title="Quality" desc="Rigorous QC checks." />
-            <WorkflowStep num="05" title="Shipping" desc="Global doorstep delivery." />
+        {/* How We Build Section */}
+        <section className="py-32 px-4 lg:px-8 max-w-7xl mx-auto text-center">
+          <h3 className="text-neon-cyan font-black tracking-[0.3em] uppercase mb-6 text-sm">The Process</h3>
+          <h2 className="text-5xl md:text-7xl font-black uppercase italic mb-24 tracking-tighter">Manufacturing <span className="text-neon-lime">Workflow</span></h2>
+          
+          <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-12 relative">
+            <div className="hidden lg:block absolute top-12 left-0 w-full h-[2px] bg-white/5 -z-10" />
+            <WorkflowStep num="01" title="Design" desc="Digital mockups & 3D tech packs." />
+            <WorkflowStep num="02" title="Material" desc="Elite performance fabrics selection." />
+            <WorkflowStep num="03" title="Stitching" desc="High-density flatlock precision." />
+            <WorkflowStep num="04" title="QC Check" desc="Rigorous final quality assurance." />
+            <WorkflowStep num="05" title="Shipping" desc="Express global logistics delivery." />
           </div>
         </section>
 
         {/* Worldwide Shipping */}
-        <section className="bg-neon-cyan py-16">
-          <div className="max-w-7xl mx-auto px-4 lg:px-8 flex flex-wrap justify-between items-center gap-10 grayscale brightness-0 opacity-80">
-             <div className="text-background font-black text-2xl tracking-tighter italic">DHL EXPRESS</div>
-             <div className="text-background font-black text-2xl tracking-tighter italic">FEDEX WORLD</div>
-             <div className="text-background font-black text-2xl tracking-tighter italic">UPS GLOBAL</div>
-             <div className="text-background font-black text-2xl tracking-tighter italic">TCS</div>
-             <div className="text-background font-black text-2xl tracking-tighter italic">ARAMEX</div>
+        <section className="bg-neon-cyan py-20 overflow-hidden relative">
+          <div className="absolute inset-0 opacity-10 pointer-events-none">
+            <div className="w-full h-full bg-[url('https://www.transparenttextures.com/patterns/world-map.png')] bg-repeat" />
           </div>
+          <div className="max-w-7xl mx-auto px-4 lg:px-8 relative z-10 flex flex-col lg:flex-row items-center justify-between gap-12">
+            <div className="text-center lg:text-left">
+              <h2 className="text-background font-black text-4xl md:text-5xl uppercase italic tracking-tighter mb-2">We Ship Worldwide</h2>
+              <p className="text-background/80 font-bold uppercase tracking-widest text-sm">Express doorstep delivery via global partners</p>
+            </div>
+            <div className="flex flex-wrap justify-center gap-12 items-center grayscale brightness-0 opacity-90">
+               <div className="text-background font-black text-2xl tracking-tighter italic">DHL EXPRESS</div>
+               <div className="text-background font-black text-2xl tracking-tighter italic">FEDEX</div>
+               <div className="text-background font-black text-2xl tracking-tighter italic">UPS</div>
+               <div className="text-background font-black text-2xl tracking-tighter italic">ARAMEX</div>
+            </div>
+          </div>
+        </section>
+
+        <Testimonials />
+
+        {/* Final CTA / Footer Form Intro */}
+        <section className="py-32 px-4 lg:px-8 text-center bg-background border-t border-white/5">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className="max-w-4xl mx-auto p-12 md:p-20 rounded-[3rem] bg-neon-lime/10 border border-neon-lime/20 relative overflow-hidden"
+          >
+            <div className="absolute top-0 right-0 w-64 h-64 bg-neon-lime/10 blur-[100px] -z-10" />
+            <h2 className="text-5xl md:text-7xl font-black uppercase italic tracking-tighter mb-8 leading-none">
+              Start Your <br /><span className="text-neon-lime">Custom Order</span>
+            </h2>
+            <p className="text-muted-foreground text-lg mb-12 max-w-2xl mx-auto uppercase font-bold tracking-widest">
+              Ready to create something legendary? Our team is standing by to bring your vision to life.
+            </p>
+            <button className="bg-neon-lime text-background hover:bg-white hover:shadow-[0_0_30px_rgba(57,255,20,0.4)] px-12 py-6 rounded-2xl font-black uppercase tracking-widest text-lg transition-all duration-300">
+              Get A Quote Now
+            </button>
+          </motion.div>
         </section>
       </main>
 
       <Footer />
 
       <style>{`
-        .stroke-text {
-          -webkit-text-stroke: 1.5px #fff;
-        }
         .no-scrollbar::-webkit-scrollbar {
           display: none;
         }
@@ -173,23 +135,28 @@ function Index() {
   );
 }
 
-function FacilityItem({ icon, title }: { icon: React.ReactNode, title: string }) {
+function FacilityItem({ icon, title, desc }: { icon: React.ReactNode, title: string, desc: string }) {
   return (
-    <div className="flex items-center gap-3">
-      <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center border border-white/10">
-        {icon}
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10">
+          {icon}
+        </div>
+        <span className="font-black uppercase tracking-wider text-sm">{title}</span>
       </div>
-      <span className="font-bold uppercase tracking-wider text-sm">{title}</span>
+      <p className="text-muted-foreground text-xs font-medium leading-relaxed ml-13">{desc}</p>
     </div>
   );
 }
 
 function WorkflowStep({ num, title, desc }: { num: string, title: string, desc: string }) {
   return (
-    <div className="group">
-      <div className="text-6xl font-black text-white/5 group-hover:text-neon-cyan/20 transition-colors mb-4">{num}</div>
-      <h4 className="font-black uppercase tracking-widest text-lg mb-2">{title}</h4>
-      <p className="text-muted-foreground text-sm">{desc}</p>
+    <div className="group relative">
+      <div className="w-16 h-16 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center mx-auto mb-8 group-hover:bg-neon-lime group-hover:text-background transition-all duration-500 relative z-10">
+        <span className="text-xl font-black">{num}</span>
+      </div>
+      <h4 className="font-black uppercase tracking-widest text-lg mb-3 group-hover:text-neon-lime transition-colors">{title}</h4>
+      <p className="text-muted-foreground text-sm leading-relaxed max-w-[200px] mx-auto">{desc}</p>
     </div>
   );
 }
