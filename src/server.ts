@@ -4,10 +4,9 @@ import { renderErrorPage } from "./lib/error-page";
 const handler = createStartHandler(defaultRenderHandler);
 
 export default {
-  async fetch(request: Request, env: unknown, ctx: unknown) {
+  async fetch(request: Request) {
     try {
-      const response = await handler(request, env, ctx);
-      return response;
+      return await handler(request);
     } catch (error) {
       console.error("SSR Error:", error);
       return new Response(renderErrorPage(), {
