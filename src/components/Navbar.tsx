@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
-import { Menu, X, Phone, Mail, Instagram, Facebook, Twitter } from "lucide-react";
+import { Menu, X, Phone, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function Navbar() {
@@ -42,9 +42,9 @@ export function Navbar() {
           </a>
         </div>
         <div className="flex gap-4">
-          <Facebook size={14} className="hover:text-neon-cyan cursor-pointer transition-colors" />
-          <Instagram size={14} className="hover:text-neon-cyan cursor-pointer transition-colors" />
-          <Twitter size={14} className="hover:text-neon-cyan cursor-pointer transition-colors" />
+          <span className="hover:text-neon-cyan cursor-pointer transition-colors">FB</span>
+          <span className="hover:text-neon-cyan cursor-pointer transition-colors">IG</span>
+          <span className="hover:text-neon-cyan cursor-pointer transition-colors">TW</span>
         </div>
       </div>
 

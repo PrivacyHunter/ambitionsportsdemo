@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Facebook, Twitter, Instagram, Linkedin, Send, MapPin, Phone, Mail } from "lucide-react";
+import { Send, MapPin, Phone, Mail } from "lucide-react";
 
 export function Footer() {
   return (
@@ -19,10 +19,10 @@ export function Footer() {
             Premium custom sportswear and activewear manufacturer based in Sialkot, Pakistan. Delivering high-performance apparel worldwide.
           </p>
           <div className="flex gap-4">
-            <SocialIcon icon={<Facebook size={18} />} />
-            <SocialIcon icon={<Twitter size={18} />} />
-            <SocialIcon icon={<Instagram size={18} />} />
-            <SocialIcon icon={<Linkedin size={18} />} />
+            <SocialIcon label="FB" />
+            <SocialIcon label="TW" />
+            <SocialIcon label="IG" />
+            <SocialIcon label="LI" />
           </div>
         </div>
 
@@ -88,10 +88,10 @@ export function Footer() {
   );
 }
 
-function SocialIcon({ icon }: { icon: React.ReactNode }) {
+function SocialIcon({ label }: { label: string }) {
   return (
-    <a href="#" className="w-9 h-9 border border-white/10 rounded-full flex items-center justify-center text-foreground hover:bg-neon-cyan hover:text-background hover:border-neon-cyan transition-all duration-300">
-      {icon}
+    <a href="#" className="w-9 h-9 border border-white/10 rounded-full flex items-center justify-center text-foreground font-bold text-xs hover:bg-neon-cyan hover:text-background hover:border-neon-cyan transition-all duration-300">
+      {label}
     </a>
   );
 }
