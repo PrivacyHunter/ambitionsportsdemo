@@ -31,11 +31,22 @@ export function getRouter() {
 
   // Compatibility Layer for TanStack Start v1 / Router v1.170+
   const injectStores = (target: any) => {
+    // Provide a safe default state
+    const defaultState = {
+      status: 'idle',
+      matches: [],
+      location: { pathname: '/', search: {}, hash: '', state: {} },
+      redirect: null,
+    };
+
     const getCurrentState = () => {
       try {
-        return target.state || { matches: [], location: {} };
+        // Accessing target.state might trigger store initialization which might fail
+        // So we look at the raw stores if they exist, or fall back to default
+        if (target._state) return target._state;
+        return defaultState;
       } catch (e) {
-        return { matches: [], location: {} };
+        return defaultState;
       }
     };
 
@@ -56,14 +67,11 @@ export function getRouter() {
       status: createStoreMock(() => getCurrentState().status || 'idle'),
       resolvedLocation: createStoreMock(() => getCurrentState().resolvedLocation || getCurrentState().location || {}),
       __store: createStoreMock(() => getCurrentState()),
-      // Crucial: setMatches is expected by loadServerRoute and loadClientRoute
       setMatches: (matches: any) => {
-        // Many framework internals expect this to update the underlying state
         if (target.update) target.update({ ...target.options });
       }
     };
 
-    // Use a proxy to provide fallback stores for any properties accessed by the framework
     const storesProxy = new Proxy(stores, {
       get(t: any, prop: string) {
         if (prop in t) return t[prop];
@@ -71,33 +79,24 @@ export function getRouter() {
       }
     });
 
-    // Inject into all locations the framework looks
     target.stores = storesProxy;
     target._stores = storesProxy;
     if (target.options) {
       target.options.stores = storesProxy;
     }
+
+    // Ensure target.state is always defined and stable
+    Object.defineProperty(target, 'state', {
+      get() { return getCurrentState(); },
+      configurable: true
+    });
   };
 
   injectStores(router);
 
-  // Wrap the entire router in a Proxy to ensure 'stores' always points to our patch
-  const routerProxy = new Proxy(router, {
-    get(target: any, prop: string, receiver: any) {
-      if (prop === 'stores' || prop === '_stores') {
-        return target.stores;
-      }
-      const val = Reflect.get(target, prop, receiver);
-      if (typeof val === 'function') {
-        return val.bind(target);
-      }
-      return val;
-    }
-  });
-
   // Patch getMatchedRoutes to satisfy TanStack Start's handleServerRoutes destructuring
   const originalGetMatchedRoutes = router.getMatchedRoutes.bind(router);
-  routerProxy.getMatchedRoutes = (pathname: string) => {
+  router.getMatchedRoutes = (pathname: string) => {
     const result = originalGetMatchedRoutes(pathname) as any;
     
     let matchedRoutes = [], routeParams = {}, foundRoute = null;
@@ -124,10 +123,10 @@ export function getRouter() {
   };
 
   if (!isServer) {
-    (window as any).__TSR__ = { router: routerProxy };
+    (window as any).__TSR__ = { router };
   }
 
-  return routerProxy;
+  return router;
 }
 
 declare module "@tanstack/react-router" {
