@@ -12,13 +12,13 @@ export function getRouter() {
     defaultPreloadStaleTime: 0,
   });
 
+  // Only patch if we are in a server/dev environment where the framework expectation mismatch occurs
   const originalGetMatchedRoutes = router.getMatchedRoutes.bind(router);
 
-  // Patch getMatchedRoutes to return an object that also behaves like an array
-  // to satisfy @tanstack/start-server-core's internal expectation in dev mode.
   router.getMatchedRoutes = (pathname: string) => {
     const result = originalGetMatchedRoutes(pathname);
     
+    // If it's already an array, check if we need to wrap it for destructuring compatibility
     if (Array.isArray(result)) {
       const [matchedRoutes, routeParams, foundRoute] = result;
       
@@ -28,7 +28,7 @@ export function getRouter() {
         foundRoute,
       };
 
-      // Add iterator support to the WHOLE object so [a, b, c] = getMatchedRoutes() works
+      // Add iterator support to the object so [a, b, c] = getMatchedRoutes() works
       return Object.assign(obj, {
         [Symbol.iterator]: function* () {
           yield matchedRoutes;
