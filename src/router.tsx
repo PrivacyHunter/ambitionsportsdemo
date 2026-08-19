@@ -8,23 +8,22 @@ export function getRouter() {
 
   const queryClient = new QueryClient();
 
-  // Robust framework compatibility layer for TanStack Start v1
-  const createMockStores = (target: any) => {
-    const mockStore = (name: string, getValue: () => any) => {
-      const s = {
-        get: () => getValue(),
-        set: () => {},
-        subscribe: (cb: any) => {
-          const unsub = () => {};
-          (unsub as any).unsubscribe = unsub;
-          return unsub as any;
-        },
-        get state() { return getValue(); }
-      };
-      (s as any).get = s.get;
-      return s;
+  const mockStore = (name: string, getValue: () => any) => {
+    const s = {
+      get: () => getValue(),
+      set: () => {},
+      subscribe: (cb: any) => {
+        const unsub = () => {};
+        (unsub as any).unsubscribe = unsub;
+        return unsub as any;
+      },
+      get state() { return getValue(); }
     };
+    (s as any).get = s.get;
+    return s;
+  };
 
+  const createMockStores = (target: any) => {
     const getCurrentState = () => {
       try {
         const s = target._state || target.state;
@@ -67,14 +66,15 @@ export function getRouter() {
     });
   };
 
-  const storesPlaceholder: any = {};
+  // We define the stores on the PROTOTYPE of the router core instance
+  // because the framework components might be accessing properties that aren't on the instance yet.
+  const routerProto = (createTanStackRouter as any).prototype || {};
   
   const routerOptions: any = {
     routeTree,
     context: { queryClient },
     scrollRestoration: true,
     defaultPreloadStaleTime: 0,
-    stores: storesPlaceholder,
   };
 
   if (isServer) {
@@ -84,17 +84,26 @@ export function getRouter() {
   const router = createTanStackRouter(routerOptions);
   console.log("[Router] instance created");
 
-  // Initialize the placeholder with the real mock stores
-  const realStores = createMockStores(router);
-  Object.assign(storesPlaceholder, realStores);
+  const stores = createMockStores(router);
   
-  // Ensure the router instance also has them directly
-  (router as any).stores = storesPlaceholder;
-  (router as any)._stores = storesPlaceholder;
+  // Inject into all possible locations
+  (router as any).stores = stores;
+  (router as any)._stores = stores;
+  if (router.options) (router.options as any).stores = stores;
 
-  // Patch getMatchedRoutes
+  // Final measure: intercept property access on the router itself
+  const proxyRouter = new Proxy(router, {
+    get(target, prop, receiver) {
+      if (prop === 'stores' || prop === '_stores') return stores;
+      const val = Reflect.get(target, prop, receiver);
+      if (typeof val === 'function') return val.bind(target);
+      return val;
+    }
+  });
+
+  // Patch getMatchedRoutes on the proxy
   const originalGetMatchedRoutes = router.getMatchedRoutes.bind(router);
-  router.getMatchedRoutes = (pathname: string) => {
+  (proxyRouter as any).getMatchedRoutes = (pathname: string) => {
     try {
       const result = originalGetMatchedRoutes(pathname) as any;
       let matchedRoutes = [], routeParams = {}, foundRoute = null;
@@ -123,10 +132,10 @@ export function getRouter() {
 
   if (!isServer) {
     console.log("[Router] Attaching to window.__TSR__");
-    (window as any).__TSR__ = { router };
+    (window as any).__TSR__ = { router: proxyRouter };
   }
 
-  return router;
+  return proxyRouter;
 }
 
 declare module "@tanstack/react-router" {
