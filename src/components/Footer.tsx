@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { Send, MapPin, Phone, Mail, Facebook, Instagram, Twitter, Linkedin } from "lucide-react";
+import { Send, MapPin, Phone, Mail } from "lucide-react";
+import { FaFacebook, FaInstagram, FaTwitter, FaLinkedin } from "react-icons/fa";
 
 export function Footer() {
   return (
@@ -19,10 +20,10 @@ export function Footer() {
             Premium custom sportswear and activewear manufacturer based in Sialkot, Pakistan. Delivering high-performance apparel worldwide.
           </p>
           <div className="flex gap-4">
-            <SocialIcon icon={<Facebook size={18} />} href="#" />
-            <SocialIcon icon={<Instagram size={18} />} href="#" />
-            <SocialIcon icon={<Twitter size={18} />} href="#" />
-            <SocialIcon icon={<Linkedin size={18} />} href="#" />
+            <SocialIcon icon={<FaFacebook size={18} />} href="#" />
+            <SocialIcon icon={<FaInstagram size={18} />} href="#" />
+            <SocialIcon icon={<FaTwitter size={18} />} href="#" />
+            <SocialIcon icon={<FaLinkedin size={18} />} href="#" />
           </div>
         </div>
 
