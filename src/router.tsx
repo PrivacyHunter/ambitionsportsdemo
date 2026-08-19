@@ -24,33 +24,31 @@ export function getRouter() {
     try {
       router.update(router.options);
     } catch (e) {
-      console.error('[Router] Failed to force update:', e);
+      // Ignore initial update errors
     }
   }
 
-  // Double-check and provide a fallback if still missing (compatibility with some Start versions)
+  // Fallback for stores if still missing
   if (!(router as any).stores) {
-    console.warn('[Router Patch] router.stores is STILL missing after update, initializing manual fallback...');
-    
     const mockStore = (getValue: () => any) => ({
       get: getValue,
       set: () => {},
       subscribe: () => () => {},
     });
 
-    // Provide a minimal state that doesn't rely on stores to avoid recursion
     const initialState = {
       status: 'idle',
       matches: [],
       location: (router as any).latestLocation || { pathname: '/', search: {}, hash: '', state: {} },
     };
 
-    // Override the state getter to prevent recursion while initializing stores
-    Object.defineProperty(router, 'state', {
-      get: () => initialState,
-      configurable: true,
-      enumerable: true,
-    });
+    if (!Object.getOwnPropertyDescriptor(router, 'state')) {
+      Object.defineProperty(router, 'state', {
+        get: () => initialState,
+        configurable: true,
+        enumerable: true,
+      });
+    }
 
     (router as any).stores = {
       ids: mockStore(() => (router.state?.matches || []).map((m: any) => m.routeId)),
@@ -62,43 +60,40 @@ export function getRouter() {
     };
   }
 
+  // Framework compatibility patch: getMatchedRoutes must return an object with specific keys
+  // AND be iterable as [matchedRoutes, routeParams, foundRoute]
   const originalGetMatchedRoutes = router.getMatchedRoutes.bind(router);
 
   router.getMatchedRoutes = (pathname: string) => {
     try {
       const result = originalGetMatchedRoutes(pathname);
       
+      let matchedRoutes: any[] = [];
+      let routeParams: Record<string, any> = {};
+      let foundRoute: any = null;
+
       if (Array.isArray(result)) {
-        const [matchedRoutes, routeParams, foundRoute] = result;
-        
-        const patched = {
-          matchedRoutes: matchedRoutes || [],
-          routeParams: routeParams || {},
-          foundRoute: foundRoute || null,
-          [Symbol.iterator]: function* () {
-            yield matchedRoutes || [];
-            yield routeParams || {};
-            yield foundRoute || null;
-          },
-        };
-        
-        return patched as any;
+        [matchedRoutes, routeParams, foundRoute] = result;
+      } else if (result && typeof result === 'object') {
+        matchedRoutes = result.matchedRoutes || [];
+        routeParams = result.routeParams || {};
+        foundRoute = result.foundRoute || null;
       }
 
-      if (result && typeof result === 'object') {
-         if (!(Symbol.iterator in result)) {
-           (result as any)[Symbol.iterator] = function* () {
-              yield (result as any).matchedRoutes || [];
-              yield (result as any).routeParams || {};
-              yield (result as any).foundRoute || null;
-           };
-         }
-         return result;
-      }
-
-      return result;
+      const patched = {
+        matchedRoutes: matchedRoutes || [],
+        routeParams: routeParams || {},
+        foundRoute: foundRoute || null,
+        [Symbol.iterator]: function* () {
+          yield matchedRoutes || [];
+          yield routeParams || {};
+          yield foundRoute || null;
+        },
+      };
+      
+      return patched as any;
     } catch (e) {
-      const emptyResult = {
+      return {
         matchedRoutes: [],
         routeParams: {},
         foundRoute: null,
@@ -107,8 +102,7 @@ export function getRouter() {
           yield {};
           yield null;
         }
-      };
-      return emptyResult as any;
+      } as any;
     }
   };
 
