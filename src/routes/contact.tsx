@@ -4,19 +4,46 @@ import { Footer } from "@/components/Footer";
 import { motion } from "framer-motion";
 import { Phone, Mail, MapPin, Clock, MessageSquare, Send, CheckCircle2, Factory } from "lucide-react";
 import { toast } from "sonner";
+import { submitInquiry } from "@/lib/inquiries.functions";
+import { useServerFn } from "@tanstack/react-start";
+import { useState } from "react";
+
 
 export const Route = createFileRoute("/contact")({
   component: Contact,
 });
 
 function Contact() {
-  const handleSubmit = (e: React.FormEvent) => {
+  const submitInquiryFn = useServerFn(submitInquiry);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    toast.success("Message sent successfully!", {
-      icon: <CheckCircle2 className="text-neon-lime" />,
-      description: "Our international sales team will reach out within 24 hours."
-    });
+    setIsSubmitting(true);
+    const formData = new FormData(e.currentTarget);
+    
+    try {
+      await submitInquiryFn({
+        data: {
+          name: formData.get("name") as string,
+          email: formData.get("email") as string,
+          subject: formData.get("subject") as string,
+          message: formData.get("message") as string,
+        }
+      });
+      
+      toast.success("Message sent successfully!", {
+        icon: <CheckCircle2 className="text-neon-lime" />,
+        description: "Our international sales team will reach out within 24 hours."
+      });
+      (e.target as HTMLFormElement).reset();
+    } catch (error) {
+      toast.error("Failed to send message. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
 
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-neon-cyan selection:text-background">
