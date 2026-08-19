@@ -27,7 +27,6 @@ export function getRouter() {
     const mockStore = (name: string, getValue: () => any) => {
       const s = {
         get: () => {
-          // console.log(`[Router] store.${name}.get() called`);
           return getValue();
         },
         set: () => {},
@@ -64,7 +63,6 @@ export function getRouter() {
       matchesId: mockStore('matchesId', () => (getCurrentState().matches || []).map((m: any) => m.id || m.routeId)),
       byRoute: {
         get: (routeId: string) => {
-          // console.log(`[Router] byRoute.get(${routeId}) called`);
           return getMatchStore(routeId);
         }
       },
@@ -74,7 +72,6 @@ export function getRouter() {
       resolvedLocation: mockStore('resolvedLocation', () => getCurrentState().resolvedLocation || getCurrentState().location),
       __store: mockStore('__store', () => getCurrentState()),
       getMatchStore: (routeId: string) => {
-        // console.log(`[Router] getMatchStore(${routeId}) called`);
         return getMatchStore(routeId);
       },
       setMatches: (matches: any) => {
@@ -82,41 +79,41 @@ export function getRouter() {
       }
     };
 
-    // Use a Proxy to log access and prevent crashes
     return new Proxy(stores, {
       get(targetObj: any, prop: string) {
         if (prop in targetObj) {
           return targetObj[prop];
         }
-        console.warn(`[Router] Accessing missing store property: ${prop}`);
-        // Return a generic mock store to prevent "reading 'get' of undefined"
         return mockStore(prop, () => undefined);
       }
     });
   };
 
   // Aggressively inject stores using defineProperty to handle early access by framework internals
-  if (!(router as any).stores) {
-    Object.defineProperty(router, 'stores', {
-      get() {
-        if (!this._injectedStores) {
-          this._injectedStores = createMockStores(this);
-        }
-        return this._injectedStores;
-      },
-      set(v) {
-        this._injectedStores = v;
-      },
-      configurable: true,
-      enumerable: true,
-    });
-  }
+  const inject = (obj: any) => {
+    if (!obj) return;
+    if (!obj.stores) {
+      Object.defineProperty(obj, 'stores', {
+        get() {
+          if (!this._injectedStores) {
+            this._injectedStores = createMockStores(this);
+          }
+          return this._injectedStores;
+        },
+        set(v) {
+          this._injectedStores = v;
+        },
+        configurable: true,
+        enumerable: true,
+      });
+    }
+    obj._stores = obj.stores;
+  };
 
-  (router as any)._stores = (router as any).stores;
+  inject(router);
   if (router.options) {
-    (router.options as any).stores = (router as any).stores;
+    inject(router.options);
   }
-  console.log("[Router] Stores injected");
 
   // Patch getMatchedRoutes
   const originalGetMatchedRoutes = router.getMatchedRoutes.bind(router);
@@ -150,6 +147,12 @@ export function getRouter() {
   if (!isServer) {
     console.log("[Router] Attaching to window.__TSR__");
     (window as any).__TSR__ = { router };
+    
+    // Attempt to catch very early framework access
+    const originalCreateRouter = (createTanStackRouter as any);
+    if (typeof originalCreateRouter === 'function' && !originalCreateRouter.__patched) {
+       // This is complex as it's an import, but we can try to intercept via window if they use it
+    }
   }
 
   return router;
