@@ -10,33 +10,92 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as ActivewearRouteImport } from './routes/activewear'
+import { Route as CasualWearRouteImport } from './routes/casual-wear'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as SportswearRouteImport } from './routes/sportswear'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ActivewearRoute = ActivewearRouteImport.update({
+  id: '/activewear',
+  path: '/activewear',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CasualWearRoute = CasualWearRouteImport.update({
+  id: '/casual-wear',
+  path: '/casual-wear',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SportswearRoute = SportswearRouteImport.update({
+  id: '/sportswear',
+  path: '/sportswear',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/activewear': typeof ActivewearRoute
+  '/casual-wear': typeof CasualWearRoute
+  '/contact': typeof ContactRoute
+  '/sportswear': typeof SportswearRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/activewear': typeof ActivewearRoute
+  '/casual-wear': typeof CasualWearRoute
+  '/contact': typeof ContactRoute
+  '/sportswear': typeof SportswearRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/activewear': typeof ActivewearRoute
+  '/casual-wear': typeof CasualWearRoute
+  '/contact': typeof ContactRoute
+  '/sportswear': typeof SportswearRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    '/' | '/about' | '/activewear' | '/casual-wear' | '/contact' | '/sportswear'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    '/' | '/about' | '/activewear' | '/casual-wear' | '/contact' | '/sportswear'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/activewear'
+    | '/casual-wear'
+    | '/contact'
+    | '/sportswear'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
+  ActivewearRoute: typeof ActivewearRoute
+  CasualWearRoute: typeof CasualWearRoute
+  ContactRoute: typeof ContactRoute
+  SportswearRoute: typeof SportswearRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +107,51 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/activewear': {
+      id: '/activewear'
+      path: '/activewear'
+      fullPath: '/activewear'
+      preLoaderRoute: typeof ActivewearRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/casual-wear': {
+      id: '/casual-wear'
+      path: '/casual-wear'
+      fullPath: '/casual-wear'
+      preLoaderRoute: typeof CasualWearRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sportswear': {
+      id: '/sportswear'
+      path: '/sportswear'
+      fullPath: '/sportswear'
+      preLoaderRoute: typeof SportswearRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
+  ActivewearRoute: ActivewearRoute,
+  CasualWearRoute: CasualWearRoute,
+  ContactRoute: ContactRoute,
+  SportswearRoute: SportswearRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
