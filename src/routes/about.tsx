@@ -8,6 +8,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
 import { useState } from "react";
+import { submitInquiry } from "@/lib/inquiries.functions";
+import { useServerFn } from "@tanstack/react-start";
+
 
 const quoteSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -24,7 +27,9 @@ export const Route = createFileRoute("/about")({
 });
 
 function About() {
+  const submitInquiryFn = useServerFn(submitInquiry);
   const [fileName, setFileName] = useState<string | null>(null);
+
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<QuoteFormValues>({
     resolver: zodResolver(quoteSchema),
   });
