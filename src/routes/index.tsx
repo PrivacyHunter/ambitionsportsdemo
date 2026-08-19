@@ -13,8 +13,9 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   return (
-    <div className="min-h-screen bg-background text-foreground selection:bg-neon-cyan selection:text-background">
+    <div className="min-h-screen bg-[#020617] text-foreground selection:bg-neon-cyan selection:text-background">
       <Navbar />
+
 
       <main>
         <HeroSlider />
@@ -22,7 +23,8 @@ function Index() {
         <FeaturedProducts />
 
         {/* Facilities Section */}
-        <section className="bg-white/[0.02] py-32 px-4 lg:px-8 border-y border-white/5">
+        <section className="bg-white/[0.01] py-32 px-4 lg:px-8 border-y border-white/5 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(0,243,255,0.03),transparent_70%)]" />
           <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-24 items-center">
             <div className="relative order-2 lg:order-1">
               <div className="grid grid-cols-2 gap-6">
@@ -103,7 +105,8 @@ function Index() {
         <Testimonials />
 
         {/* Final CTA / Footer Form Intro */}
-        <section className="py-32 px-4 lg:px-8 text-center bg-background border-t border-white/5">
+        <section className="py-32 px-4 lg:px-8 text-center bg-[#020617] border-t border-white/5 relative overflow-hidden">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_50%_0%,rgba(57,255,20,0.05),transparent_70%)]" />
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
