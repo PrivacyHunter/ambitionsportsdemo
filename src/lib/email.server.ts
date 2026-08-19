@@ -32,13 +32,15 @@ export async function sendInquiryEmail(data: {
   `;
 
   try {
+    const adminEmail = process.env['ADMIN_EMAIL'] || 'delivered@resend.dev';
     const response = await resend.emails.send({
       from: 'Ambition Sports <onboarding@resend.dev>',
-      to: 'delivered@resend.dev',
+      to: adminEmail,
       replyTo: email,
       subject: `[Website Inquiry] ${subject}`,
       html: html,
     });
+
     
     return { success: true, data: response };
   } catch (error) {

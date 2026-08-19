@@ -2,7 +2,6 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { sendInquiryEmail } from "./email.server";
 
-// Order Status Type
 export type OrderStatus = 'pending' | 'designing' | 'production' | 'quality_check' | 'shipped' | 'delivered';
 
 export const submitQuote = createServerFn({ method: "POST" })
@@ -15,9 +14,27 @@ export const submitQuote = createServerFn({ method: "POST" })
     designNotes: z.string(),
   }).parse(data))
   .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const orderId = `AS-${Math.random().toString(36).substring(2, 11).toUpperCase()}`;
     
-    // Also send an email notification for the quote
+    // 1. Store in database
+    const { error: dbError } = await supabaseAdmin
+      .from('quotes')
+      .insert({
+        tracking_id: orderId,
+        name: data.name,
+        email: data.email,
+        sport_type: data.sportType,
+        quantity: data.quantity,
+        status: 'pending'
+      });
+
+
+    if (dbError) {
+      console.error('Error saving quote:', dbError);
+    }
+
+    // 2. Send email notification
     await sendInquiryEmail({
       name: data.name,
       email: data.email,
@@ -37,13 +54,24 @@ export const submitQuote = createServerFn({ method: "POST" })
 export const getOrderStatus = createServerFn({ method: "GET" })
   .validator((data: unknown) => z.object({ orderId: z.string() }).parse(data))
   .handler(async ({ data }) => {
-    const statuses: OrderStatus[] = ['pending', 'designing', 'production', 'quality_check', 'shipped', 'delivered'];
-    const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    
+    const { data: quote, error } = await supabaseAdmin
+      .from('quotes')
+      .select('tracking_id, status, created_at')
+      .eq('tracking_id', data.orderId)
+      .single();
+
+    if (error || !quote) {
+      throw new Error("Order not found");
+    }
     
     return {
-      orderId: data.orderId,
-      status: randomStatus,
-      updatedAt: new Date().toISOString(),
+      orderId: quote.tracking_id || data.orderId,
+      status: quote.status,
+      updatedAt: quote.created_at,
       estimatedDelivery: "2026-09-15"
     };
+
   });
+

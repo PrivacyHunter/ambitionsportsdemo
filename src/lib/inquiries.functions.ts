@@ -13,6 +13,25 @@ export const submitInquiry = createServerFn({ method: "POST" })
     }).parse(data);
   })
   .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    
+    // 1. Store in database
+    const { error: dbError } = await supabaseAdmin
+      .from('inquiries')
+      .insert({
+        name: data.name,
+        email: data.email,
+        message: data.message,
+        type: data.subject, // Map subject to 'type' column
+        status: 'pending'
+      });
+
+
+    if (dbError) {
+      console.error('Error saving inquiry:', dbError);
+    }
+
+    // 2. Send email
     const result = await sendInquiryEmail({
       ...data,
       details: data.details as Record<string, any>
@@ -28,3 +47,4 @@ export const submitInquiry = createServerFn({ method: "POST" })
       mock: (result as any).mock || false 
     };
   });
+
