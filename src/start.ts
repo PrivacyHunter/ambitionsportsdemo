@@ -24,6 +24,7 @@ const csrfMiddleware = createCsrfMiddleware({
   filter: (ctx) => ctx.handlerType === "serverFn",
 });
 
-export const startInstance = createStart(getRouter, () => ({
+export const startInstance = createStart(() => ({
+  router: getRouter(),
   requestMiddleware: [errorMiddleware, csrfMiddleware],
 }));

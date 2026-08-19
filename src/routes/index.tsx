@@ -16,7 +16,6 @@ function Index() {
     <div className="min-h-screen bg-[#020617] text-foreground selection:bg-neon-cyan selection:text-background">
       <Navbar />
 
-
       <main>
         <HeroSlider />
         
