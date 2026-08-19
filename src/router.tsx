@@ -16,23 +16,22 @@ export function getRouter() {
 
   router.getMatchedRoutes = (pathname: string) => {
     const result = originalGetMatchedRoutes(pathname);
-    if (typeof window === 'undefined') {
-      console.log('[DEBUG] getMatchedRoutes result type:', Array.isArray(result) ? 'Array' : typeof result);
-      if (Array.isArray(result)) {
-        console.log('[DEBUG] getMatchedRoutes array length:', result.length);
-      } else if (result) {
-        console.log('[DEBUG] getMatchedRoutes keys:', Object.keys(result));
-      }
-    }
-
+    
     if (Array.isArray(result)) {
       const [matchedRoutes, routeParams, foundRoute] = result;
+      
+      // We must return an object that HAS these properties for destructuring
+      // AND is iterable for the 'for (const route of matchedRoutes)' loop
+      // which actually iterates over the return value in some versions, 
+      // OR handleServerRoutes expects the object and then iterates matchedRoutes property.
+      
       const obj = {
         matchedRoutes,
         routeParams,
         foundRoute,
       };
 
+      // Add iterator support to the WHOLE object so [a, b, c] = getMatchedRoutes() works
       return Object.assign(obj, {
         [Symbol.iterator]: function* () {
           yield matchedRoutes;
