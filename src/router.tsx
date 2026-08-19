@@ -20,62 +20,67 @@ export function getRouter() {
   const router = createTanStackRouter(routerOptions);
 
   // Robust framework compatibility layer for TanStack Start v1
-  const injectMockStores = (target: any) => {
-    if (!target) return;
-    
-    // Define a safe state getter that provides structure before the framework initializes its stores
+  const createMockStores = (target: any) => {
+    const mockStore = (getValue: () => any) => {
+      const s = {
+        get: getValue,
+        set: () => {},
+        subscribe: () => () => {},
+        get state() { return getValue(); }
+      };
+      (s as any).get = s.get;
+      return s;
+    };
+
     const getCurrentState = () => {
       try {
-        const s = (target as any)._state || (target as any).state;
+        const s = target._state || target.state;
         if (s) return s;
       } catch (e) {}
-      
       return {
         status: 'idle',
         matches: [],
-        location: (target as any).latestLocation || { pathname: '/', search: {}, hash: '', state: {} },
+        location: target.latestLocation || { pathname: '/', search: {}, hash: '', state: {} },
       };
     };
 
-    if (!target.stores) {
-      const mockStore = (getValue: () => any) => {
-        const s = {
-          get: getValue,
-          set: () => {},
-          subscribe: () => () => {},
-          // Define as a getter to ensure it always returns fresh state
-          get state() { return getValue(); }
-        };
-        // Framework internals often call store.get() directly
-        (s as any).get = s.get;
-        return s;
-      };
-
-      const stores: any = {
-        ids: mockStore(() => (getCurrentState().matches || []).map((m: any) => m.routeId)),
-        matchesId: mockStore(() => (getCurrentState().matches || []).map((m: any) => m.id || m.routeId)),
-        byRoute: {
-          get: (routeId: string) => {
-            const store = mockStore(() => (getCurrentState().matches || []).find((m: any) => m.routeId === routeId));
-            (store as any).get = store.get;
-            return store;
-          }
-        },
-        matches: mockStore(() => getCurrentState().matches || []),
-        location: mockStore(() => getCurrentState().location || { pathname: '/', search: {}, hash: '', state: {} }),
-        status: mockStore(() => getCurrentState().status || 'idle'),
-        __store: mockStore(() => getCurrentState()),
-      };
-
-      target.stores = stores;
-      target._stores = stores;
-      if (target.options) {
-        target.options.stores = stores;
-      }
-    }
+    return {
+      ids: mockStore(() => (getCurrentState().matches || []).map((m: any) => m.routeId)),
+      matchesId: mockStore(() => (getCurrentState().matches || []).map((m: any) => m.id || m.routeId)),
+      byRoute: {
+        get: (routeId: string) => {
+          const store = mockStore(() => (getCurrentState().matches || []).find((m: any) => m.routeId === routeId));
+          (store as any).get = store.get;
+          return store;
+        }
+      },
+      matches: mockStore(() => getCurrentState().matches || []),
+      location: mockStore(() => getCurrentState().location || { pathname: '/', search: {}, hash: '', state: {} }),
+      status: mockStore(() => getCurrentState().status || 'idle'),
+      __store: mockStore(() => getCurrentState()),
+    };
   };
 
-  injectMockStores(router);
+  // Aggressively inject stores using defineProperty to handle early access by framework internals
+  Object.defineProperty(router, 'stores', {
+    get() {
+      if (!this._injectedStores) {
+        this._injectedStores = createMockStores(this);
+      }
+      return this._injectedStores;
+    },
+    set(v) {
+      this._injectedStores = v;
+    },
+    configurable: true,
+    enumerable: true,
+  });
+
+  // Also set _stores and options.stores for full coverage
+  (router as any)._stores = (router as any).stores;
+  if (router.options) {
+    router.options.stores = (router as any).stores;
+  }
 
   // Patch getMatchedRoutes to satisfy TanStack Start's internal destructuring requirements
   const originalGetMatchedRoutes = router.getMatchedRoutes.bind(router);
