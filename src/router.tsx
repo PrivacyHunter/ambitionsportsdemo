@@ -25,51 +25,60 @@ export function getRouter() {
     } catch (e) {}
   }
 
-  // Robust framework compatibility layer
-  if (!(router as any).stores) {
-    const mockStore = (getValue: () => any) => {
-      const s = {
-        get: getValue,
-        set: () => {},
-        subscribe: () => () => {},
-        state: getValue(), // Support direct .state access if used by internal stores
+  // Enhanced framework compatibility layer for TanStack Start
+  // This mocks the internal stores and state that the framework expects
+  // to be present during early hydration or SSR cycles.
+  const injectMockStores = (target: any) => {
+    if (target && !target.stores) {
+      const mockStore = (getValue: () => any) => {
+        const s = {
+          get: getValue,
+          set: () => {},
+          subscribe: () => () => {},
+          state: getValue(),
+        };
+        // Some internal framework code calls store.get() directly
+        (s as any).get = s.get;
+        return s;
       };
-      return s;
-    };
 
-    const initialState = {
-      status: 'idle',
-      matches: [],
-      location: (router as any).latestLocation || { pathname: '/', search: {}, hash: '', state: {} },
-    };
+      const initialState = {
+        status: 'idle',
+        matches: [],
+        location: (router as any).latestLocation || { pathname: '/', search: {}, hash: '', state: {} },
+      };
 
-    // Safely define the state property to avoid 'undefined' reads during hydration
-    if (!Object.getOwnPropertyDescriptor(router, 'state')) {
-      Object.defineProperty(router, 'state', {
-        get: () => (router as any)._state || (router as any).state || initialState,
-        configurable: true,
-        enumerable: true,
-      });
+      // Safely define the state property to avoid 'undefined' reads
+      if (!Object.getOwnPropertyDescriptor(target, 'state')) {
+        Object.defineProperty(target, 'state', {
+          get: () => (router as any)._state || (router as any).state || initialState,
+          configurable: true,
+          enumerable: true,
+        });
+      }
+
+      const stores = {
+        ids: mockStore(() => (target.state?.matches || []).map((m: any) => m.routeId)),
+        byRoute: {
+          get: (routeId: string) => {
+            const store = mockStore(() => (target.state?.matches || []).find((m: any) => m.routeId === routeId));
+            (store as any).get = store.get;
+            return store;
+          }
+        },
+        matches: mockStore(() => target.state?.matches || []),
+        __store: mockStore(() => target.state),
+      };
+
+      target.stores = stores;
+      target._stores = stores;
+      if (target.options) {
+        target.options.stores = stores;
+      }
     }
+  };
 
-    const stores = {
-      ids: mockStore(() => (router.state?.matches || []).map((m: any) => m.routeId)),
-      byRoute: {
-        get: (routeId: string) => {
-           const store = mockStore(() => (router.state?.matches || []).find((m: any) => m.routeId === routeId));
-           // Framework internals might call store.get() on the result of byRoute.get(routeId)
-           (store as any).get = store.get;
-           return store;
-        }
-      },
-      matches: mockStore(() => router.state?.matches || []),
-      __store: mockStore(() => router.state),
-    };
-
-    (router as any).stores = stores;
-    (router as any)._stores = stores;
-    (router as any).options.stores = stores;
-  }
+  injectMockStores(router);
 
   const originalGetMatchedRoutes = router.getMatchedRoutes.bind(router);
   router.getMatchedRoutes = (pathname: string) => {
@@ -83,7 +92,8 @@ export function getRouter() {
       const matched = matchedRoutes || [];
       const params = routeParams || {};
       const found = foundRoute || null;
-      return {
+      
+      const resultObj = {
         matchedRoutes: matched,
         routeParams: params,
         foundRoute: found,
@@ -92,7 +102,9 @@ export function getRouter() {
           yield params;
           yield found;
         },
-      } as any;
+      };
+
+      return resultObj as any;
     } catch (e) {
       return {
         matchedRoutes: [], routeParams: {}, foundRoute: null,
