@@ -12,18 +12,29 @@ export function getRouter() {
     defaultPreloadStaleTime: 0,
   });
 
-  // Compatibility patch for TanStack Start v1 framework expecting router.stores
-  (router as any).stores = {
-    matches: {
-      get: () => {
-        try {
-          return router.state.matches || [];
-        } catch (e) {
-          return [];
-        }
-      },
-    },
-  };
+  // Ensure 'stores' exists and is properly shaped for matchRoutesLightweight
+  if (!(router as any).stores) {
+    console.warn('[Router Patch] router.stores is missing, initializing fallback...');
+    const matchesStore = {
+      get: () => router.state.matches || [],
+    };
+    
+    const idsStore = {
+      get: () => (router.state.matches || []).map(m => m.routeId),
+    };
+
+    const byRouteStore = {
+      get: (routeId: string) => ({
+        get: () => (router.state.matches || []).find(m => m.routeId === routeId)
+      })
+    };
+
+    (router as any).stores = {
+      matches: matchesStore,
+      ids: idsStore,
+      byRoute: byRouteStore,
+    };
+  }
 
   const originalGetMatchedRoutes = router.getMatchedRoutes.bind(router);
 
