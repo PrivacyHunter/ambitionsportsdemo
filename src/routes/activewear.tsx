@@ -16,42 +16,42 @@ const products = [
   { 
     name: "Hyper-Stretch Leggings", 
     category: "Gym Wear", 
-    desc: "Squat-proof, 4-way stretch fabric with targeted ventilation zones.",
+    desc: "Engineered with 82% Polyester / 18% Spandex. High-waisted, non-see-through performance fabric.",
     price: "Custom Quote",
     image: "https://images.unsplash.com/photo-1506629082955-511b1aa562c8?q=80&w=1974&auto=format&fit=crop"
   },
   { 
     name: "Nebula Training Hoodie", 
     category: "Athleisure", 
-    desc: "Tech-fleece material providing warmth without the weight.",
+    desc: "Interlock scubba fabric with laser-cut ventilation. Custom heat-seal logo options.",
     price: "Custom Quote",
     image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=1974&auto=format&fit=crop"
   },
   { 
     name: "Flow Compression Tank", 
     category: "Fitness", 
-    desc: "Second-skin fit engineered for maximum airflow and support.",
+    desc: "Micro-mesh side panels for breathability. Advanced compression tech for muscle support.",
     price: "Custom Quote",
     image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=2070&auto=format&fit=crop"
   },
   { 
     name: "Carbon Performance Tracksuit", 
     category: "Teamwear", 
-    desc: "Elite travel and training gear for professional sports clubs.",
+    desc: "Tricot brushed fabric with rib-knit cuffs. Customizable sublimation panels on arms and chest.",
     price: "Custom Quote",
     image: "https://images.unsplash.com/photo-1518310383802-640c2de311b2?q=80&w=2070&auto=format&fit=crop"
   },
   { 
     name: "Pro-Grip Gym Stringer", 
     category: "Bodybuilding", 
-    desc: "Deep-cut aesthetic with high-density branded print.",
+    desc: "Lightweight jersey cotton with deep-cut armholes. Custom Silk-Screen or 3D Puff Print.",
     price: "Custom Quote",
     image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070&auto=format&fit=crop"
   },
   { 
     name: "Vector Tech Joggers", 
     category: "Activewear", 
-    desc: "Water-resistant finish with tapered fit and utility pockets.",
+    desc: "Tapered fit with French Terry lining. Concealed zipper pockets and custom branded drawstrings.",
     price: "Custom Quote",
     image: "https://images.unsplash.com/photo-1505236858219-8359eb29e329?q=80&w=2062&auto=format&fit=crop"
   },

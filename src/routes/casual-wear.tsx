@@ -16,42 +16,42 @@ const products = [
   { 
     name: "Street-Elite Oversized Tee", 
     category: "Streetwear", 
-    desc: "Heavyweight cotton with drop-shoulder fit and high-density screen print.",
+    desc: "240GSM Heavyweight Jersey Cotton. Drop shoulder fit with custom acid-wash or pigment-dye options.",
     price: "Custom Quote",
     image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=2070&auto=format&fit=crop"
   },
   { 
     name: "Urban Performance Polo", 
     category: "Casual", 
-    desc: "Tech-knit polo featuring contrast collars and elite embroidery.",
+    desc: "CVC Pique fabric with contrast tipping on collar. Custom embroidery or rubberized logo printing.",
     price: "Custom Quote",
     image: "https://images.unsplash.com/photo-1626497748470-284d81f9f214?q=80&w=2070&auto=format&fit=crop"
   },
   { 
     name: "Varsity Heritage Jacket", 
     category: "Outerwear", 
-    desc: "Traditional wool body with premium synthetic leather sleeves.",
+    desc: "Melton wool body with high-grade PU leather sleeves. Chenille patches and custom quilted lining.",
     price: "Custom Quote",
     image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=1935&auto=format&fit=crop"
   },
   { 
     name: "Reflective Utility Hoody", 
     category: "Streetwear", 
-    desc: "3M reflective detailing with water-repellent finish.",
+    desc: "Water-repellent fleece with 3M reflective piping. Customizable oversized fit with kangaroo pockets.",
     price: "Custom Quote",
     image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=1974&auto=format&fit=crop"
   },
   { 
     name: "Tech-Chino Shorts", 
     category: "Casual", 
-    desc: "Lightweight stretch fabric with reinforced seams and utility zips.",
+    desc: "Stretch twill fabric with reinforced crotch. Custom branded buttons and hidden utility pockets.",
     price: "Custom Quote",
     image: "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?q=80&w=2070&auto=format&fit=crop"
   },
   { 
     name: "Core Graphic Streetwear Tee", 
     category: "Streetwear", 
-    desc: "Custom acid-wash finish with distressed detailing and signature branding.",
+    desc: "100% Ring-Spun Combed Cotton. Custom distress effects and high-density screen printing.",
     price: "Custom Quote",
     image: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?q=80&w=2070&auto=format&fit=crop"
   },

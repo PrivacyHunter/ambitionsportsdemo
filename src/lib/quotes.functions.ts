@@ -1,11 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { sendInquiryEmail } from "./email.server";
 
 // Order Status Type
 export type OrderStatus = 'pending' | 'designing' | 'production' | 'quality_check' | 'shipped' | 'delivered';
 
 export const submitQuote = createServerFn({ method: "POST" })
-  .inputValidator((data) => z.object({
+  .validator((data: unknown) => z.object({
     name: z.string(),
     email: z.string().email(),
     sportType: z.string(),
@@ -14,16 +15,28 @@ export const submitQuote = createServerFn({ method: "POST" })
     designNotes: z.string(),
   }).parse(data))
   .handler(async ({ data }) => {
-    // In a real app, save to DB
-    const orderId = `AS-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
-    console.log("QUOTE SUBMITTED:", { orderId, ...data });
-    return { success: true, orderId };
+    const orderId = `AS-${Math.random().toString(36).substring(2, 11).toUpperCase()}`;
+    
+    // Also send an email notification for the quote
+    await sendInquiryEmail({
+      name: data.name,
+      email: data.email,
+      subject: `New Custom Quote Request: ${orderId}`,
+      message: data.designNotes,
+      details: {
+        orderId,
+        sportType: data.sportType,
+        quantity: data.quantity,
+        deadline: data.deadline
+      }
+    });
+
+    return { success: true as const, orderId };
   });
 
 export const getOrderStatus = createServerFn({ method: "GET" })
-  .inputValidator((data) => z.object({ orderId: z.string() }).parse(data))
+  .validator((data: unknown) => z.object({ orderId: z.string() }).parse(data))
   .handler(async ({ data }) => {
-    // Mock tracking
     const statuses: OrderStatus[] = ['pending', 'designing', 'production', 'quality_check', 'shipped', 'delivered'];
     const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
     

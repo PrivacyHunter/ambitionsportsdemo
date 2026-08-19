@@ -13,22 +13,18 @@ export const submitInquiry = createServerFn({ method: "POST" })
     }).parse(data);
   })
   .handler(async ({ data }) => {
-    // If no API key is set, we'll just log and return success for the demo
-    if (!process.env['RESEND_API_KEY']) {
-      console.log("MOCK EMAIL SENT:", data);
-      await new Promise(r => setTimeout(r, 1000));
-      return { success: true as const, mock: true as const };
-    }
-    
     const result = await sendInquiryEmail({
       ...data,
       details: data.details as Record<string, any>
     });
 
-
     if (!result.success) {
       return { success: false as const, error: String(result.error) };
     }
 
-    return { success: true as const, data: result.data };
+    return { 
+      success: true as const, 
+      data: result.data || null, 
+      mock: (result as any).mock || false 
+    };
   });

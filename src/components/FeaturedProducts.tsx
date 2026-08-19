@@ -1,14 +1,15 @@
 import { useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Star, Heart } from "lucide-react";
+import { ArrowRight, Star, Heart, Info, ShoppingCart } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 const products = [
-  { name: "Pro Soccer Jersey", price: "$49", tag: "Hot", category: "Sportswear" },
-  { name: "Neon Training Kit", price: "$59", tag: "New", category: "Activewear" },
-  { name: "Stealth Basketball Kit", price: "$65", tag: "Trending", category: "Sportswear" },
-  { name: "Apex Boxing Gear", price: "$89", tag: "Elite", category: "Combat" },
-  { name: "Vector Compression", price: "$45", tag: "Sale", category: "Activewear" },
-  { name: "Street Elite Hoodie", price: "$75", tag: "Limited", category: "Casual" },
+  { name: "Apex Pro Soccer Jersey", price: "Custom Quote", tag: "Hot", category: "Sportswear", image: "https://images.unsplash.com/photo-1543351611-58f69d7c1781?q=80&w=1974&auto=format&fit=crop" },
+  { name: "Hyper-Stretch Leggings", price: "Custom Quote", tag: "New", category: "Activewear", image: "https://images.unsplash.com/photo-1506629082955-511b1aa562c8?q=80&w=1974&auto=format&fit=crop" },
+  { name: "Stealth Basketball Kit", price: "Custom Quote", tag: "Trending", category: "Sportswear", image: "https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=2090&auto=format&fit=crop" },
+  { name: "Nebula Training Hoodie", price: "Custom Quote", tag: "Elite", category: "Activewear", image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=1974&auto=format&fit=crop" },
+  { name: "Vector Compression", price: "Custom Quote", tag: "Sale", category: "Activewear", image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=2070&auto=format&fit=crop" },
+  { name: "Street Elite Hoodie", price: "Custom Quote", tag: "Limited", category: "Casual", image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=1935&auto=format&fit=crop" },
 ];
 
 export function FeaturedProducts() {
@@ -55,9 +56,9 @@ export function FeaturedProducts() {
             Featured <br /><span className="text-neon-lime">Collection</span>
           </h2>
         </div>
-        <button className="text-white border-b-2 border-neon-cyan pb-2 font-black uppercase tracking-widest text-sm hover:text-neon-cyan transition-colors">
+        <Link to="/sportswear" className="text-white border-b-2 border-neon-cyan pb-2 font-black uppercase tracking-widest text-sm hover:text-neon-cyan transition-colors">
           Explore All Gear
-        </button>
+        </Link>
       </div>
 
       <div 
@@ -70,14 +71,14 @@ export function FeaturedProducts() {
             whileHover={{ y: -15 }}
             className="min-w-[320px] md:min-w-[400px] bg-white/[0.02] rounded-3xl overflow-hidden border border-white/5 relative group"
           >
-            <div className="h-[400px] bg-white/[0.03] flex items-center justify-center p-12 relative overflow-hidden">
+            <div className="h-[400px] bg-white/[0.03] flex items-center justify-center relative overflow-hidden">
                <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity z-10" />
                <div className="w-full h-full bg-white/5 rounded-full blur-[100px] absolute scale-50 group-hover:bg-neon-cyan/10 transition-all duration-700" />
                
-               {/* Mock Product Visual */}
-               <div className="w-64 h-64 bg-white/10 rounded-2xl group-hover:scale-110 transition-transform duration-700 flex items-center justify-center border border-white/10 relative z-0">
-                  <Star className="text-white/5 w-24 h-24" />
-               </div>
+               <div 
+                 className="w-full h-full bg-cover bg-center group-hover:scale-110 transition-transform duration-700 opacity-60 group-hover:opacity-100" 
+                 style={{ backgroundImage: `url(${product.image})` }} 
+               />
 
                <div className="absolute top-6 left-6 flex gap-2 z-20">
                   <span className="bg-neon-cyan text-background px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest">{product.tag}</span>
@@ -88,9 +89,9 @@ export function FeaturedProducts() {
                </button>
 
                <div className="absolute bottom-8 left-8 right-8 z-20 translate-y-20 group-hover:translate-y-0 transition-transform duration-500">
-                  <button className="w-full bg-white text-background py-4 rounded-xl font-black uppercase tracking-widest text-xs hover:bg-neon-cyan transition-colors">
-                    Quick View
-                  </button>
+                  <Link to="/quote" className="w-full block text-center bg-white text-background py-4 rounded-xl font-black uppercase tracking-widest text-xs hover:bg-neon-cyan transition-colors">
+                    Request Quote
+                  </Link>
                </div>
             </div>
             
@@ -103,9 +104,9 @@ export function FeaturedProducts() {
                 <span className="text-white font-black text-2xl tracking-tighter">{product.price}</span>
               </div>
               <p className="text-muted-foreground text-sm mb-6 leading-relaxed">High-performance custom apparel engineered for elite athletes.</p>
-              <button className="flex items-center gap-2 text-white font-black uppercase tracking-widest text-[10px] group/btn">
+              <Link to="/quote" className="flex items-center gap-2 text-white font-black uppercase tracking-widest text-[10px] group/btn">
                 Request Spec Sheet <ArrowRight size={14} className="group-hover/btn:translate-x-2 transition-transform" />
-              </button>
+              </Link>
             </div>
           </motion.div>
         ))}

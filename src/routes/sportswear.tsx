@@ -16,42 +16,42 @@ const products = [
   { 
     name: "Apex Pro Soccer Jersey", 
     category: "Performance", 
-    desc: "Vibrant full-sublimation jersey with moisture-wicking technology.",
+    desc: "100% Interlock Polyester with Quick-Dry technology. Full sublimation for infinite design vibrant colors.",
     price: "Custom Quote",
     image: "https://images.unsplash.com/photo-1543351611-58f69d7c1781?q=80&w=1974&auto=format&fit=crop"
   },
   { 
     name: "Elite Basketball Uniform", 
     category: "Teamwear", 
-    desc: "Lightweight, breathable mesh fabric designed for maximum mobility.",
+    desc: "High-density mesh fabric with moisture-wicking properties. Ribbed neck and armholes for durability.",
     price: "Custom Quote",
     image: "https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=2090&auto=format&fit=crop"
   },
   { 
     name: "Velocity Cricket Kit", 
     category: "Teamwear", 
-    desc: "Premium white & colored kits with UV protection and stretch panels.",
+    desc: "Anti-UV performance fabric with side ventilation panels. Reinforced stitching for high-impact play.",
     price: "Custom Quote",
     image: "https://images.unsplash.com/photo-1531415074968-036ba1b575da?q=80&w=2067&auto=format&fit=crop"
   },
   { 
     name: "Stealth Training Jacket", 
     category: "Outerwear", 
-    desc: "Wind-resistant, thermal-lined performance outerwear for elite clubs.",
+    desc: "Soft-shell windbreaker with micro-fleece lining. YKK waterproof zippers and reflective detailing.",
     price: "Custom Quote",
     image: "https://images.unsplash.com/photo-1556817411-31ae72fa3ea0?q=80&w=2070&auto=format&fit=crop"
   },
   { 
     name: "Apex Sublimated Hoodie", 
     category: "Casual Sport", 
-    desc: "Infinite design possibilities with high-density precision stitching.",
+    desc: "Heavyweight 320GSM poly-cotton blend. Precision sublimation that never fades or peels.",
     price: "Custom Quote",
     image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=1974&auto=format&fit=crop"
   },
   { 
     name: "Pro-Tech Soccer Shorts", 
     category: "Performance", 
-    desc: "Anti-friction seams with adaptive fit technology.",
+    desc: "Four-way stretch Spandex-Polyester blend. Anti-chafing flatlock seams for maximum comfort.",
     price: "Custom Quote",
     image: "https://images.unsplash.com/photo-1526676037777-05a232554f75?q=80&w=2070&auto=format&fit=crop"
   },
