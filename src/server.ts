@@ -1,3 +1,7 @@
 import { createStartHandler, defaultRenderHandler } from "@tanstack/react-start/server";
 
-export default createStartHandler(defaultRenderHandler);
+const handler = createStartHandler(defaultRenderHandler);
+
+export default {
+  fetch: handler,
+};
