@@ -3,4 +3,7 @@ import { getRouter } from "./router";
 
 export default createStartHandler({
   handler: defaultRenderHandler,
-})(getRouter);
+})((request: Request) => {
+  const router = getRouter();
+  return router;
+} as any);
