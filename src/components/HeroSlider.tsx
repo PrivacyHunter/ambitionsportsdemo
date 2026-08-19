@@ -7,37 +7,43 @@ const banners = [
   {
     image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=2070&auto=format&fit=crop",
     subtitle: "Premium Custom Gear",
-    title: "Unleash Your\nAmbition",
+    title1: "Unleash Your",
+    title2: "Ambition",
     accent: "text-neon-cyan"
   },
   {
     image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070&auto=format&fit=crop",
     subtitle: "Elite Manufacturing",
-    title: "Precision\nPerformance",
+    title1: "Precision",
+    title2: "Performance",
     accent: "text-neon-lime"
   },
   {
     image: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=2076&auto=format&fit=crop",
     subtitle: "Team Uniforms",
-    title: "One Team\nOne Identity",
+    title1: "One Team",
+    title2: "One Identity",
     accent: "text-white"
   },
   {
     image: "https://images.unsplash.com/photo-1518310383802-640c2de311b2?q=80&w=2070&auto=format&fit=crop",
     subtitle: "Sublimation Specialists",
-    title: "Infinite\nDesign",
+    title1: "Infinite",
+    title2: "Design",
     accent: "text-neon-cyan"
   },
   {
     image: "https://images.unsplash.com/photo-1505236858219-8359eb29e329?q=80&w=2062&auto=format&fit=crop",
     subtitle: "Activewear Revolution",
-    title: "Fit For\nGreatness",
+    title1: "Fit For",
+    title2: "Greatness",
     accent: "text-neon-lime"
   },
   {
     image: "https://images.unsplash.com/photo-1461896704690-474cb88d599a?q=80&w=2070&auto=format&fit=crop",
     subtitle: "Worldwide Shipping",
-    title: "Global\nPerformance",
+    title1: "Global",
+    title2: "Performance",
     accent: "text-white"
   }
 ];
@@ -55,6 +61,8 @@ export function HeroSlider() {
   const next = () => setCurrent((prev) => (prev + 1) % banners.length);
   const prev = () => setCurrent((prev) => (prev - 1 + banners.length) % banners.length);
 
+  const activeBanner = banners[current] || banners[0];
+
   return (
     <section className="relative h-[85vh] w-full overflow-hidden bg-background">
       <AnimatePresence mode="wait">
@@ -69,7 +77,7 @@ export function HeroSlider() {
           <div className="absolute inset-0 bg-gradient-to-r from-background via-background/60 to-transparent z-10" />
           <div 
             className="w-full h-full bg-cover bg-center" 
-            style={{ backgroundImage: `url(${banners[current].image})` }} 
+            style={{ backgroundImage: `url(${activeBanner.image})` }} 
           />
         </motion.div>
       </AnimatePresence>
@@ -89,11 +97,11 @@ export function HeroSlider() {
               animate={{ opacity: 1, y: 0 }}
               className="text-neon-cyan font-black tracking-widest uppercase mb-4 flex items-center gap-3"
             >
-              <span className="w-12 h-[2px] bg-neon-cyan" /> {banners[current].subtitle}
+              <span className="w-12 h-[2px] bg-neon-cyan" /> {activeBanner.subtitle}
             </motion.p>
-            <h1 className="text-6xl md:text-8xl lg:text-9xl font-black uppercase italic leading-[0.85] tracking-tighter mb-10 whitespace-pre-line">
-              {banners[current].title.split('\n')[0]} <br />
-              <span className={banners[current].accent}>{banners[current].title.split('\n')[1]}</span>
+            <h1 className="text-6xl md:text-8xl lg:text-9xl font-black uppercase italic leading-[0.85] tracking-tighter mb-10">
+              {activeBanner.title1} <br />
+              <span className={activeBanner.accent}>{activeBanner.title2}</span>
             </h1>
             <div className="flex flex-wrap gap-6">
               <Link
