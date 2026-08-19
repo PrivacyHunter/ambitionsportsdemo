@@ -12,17 +12,31 @@ export function getRouter() {
     defaultPreloadStaleTime: 0,
   });
 
-  // Critical fix: matchRoutesLightweight in @tanstack/router-core crashes if router.stores is missing.
-  // It is initialized in this.update(), but HMR/SSR entry points often bypass the full lifecycle.
+  // Force initialization of stores and internal state if missing
   if (!(router as any).stores) {
-    const isServer = typeof document === 'undefined';
+    try {
+      router.update(router.options);
+    } catch (e) {
+      console.error('[Router] Failed to force update:', e);
+    }
+  }
+
+  // Double-check and provide a fallback if still missing (compatibility with some Start versions)
+  if (!(router as any).stores) {
+    console.warn('[Router Patch] router.stores is STILL missing after update, initializing manual fallback...');
     
-    // Minimal mock of the store structure required by matchRoutesLightweight
     const mockStore = (getValue: () => any) => ({
       get: getValue,
       set: () => {},
       subscribe: () => () => {},
     });
+
+    // Provide a minimal state that doesn't rely on stores to avoid recursion
+    const initialState = {
+      status: 'idle',
+      matches: [],
+      location: (router as any).latestLocation || { pathname: '/', search: {}, hash: '', state: {} },
+    };
 
     (router as any).stores = {
       ids: mockStore(() => (router.state?.matches || []).map((m: any) => m.routeId)),
@@ -30,11 +44,10 @@ export function getRouter() {
         get: (routeId: string) => mockStore(() => (router.state?.matches || []).find((m: any) => m.routeId === routeId))
       },
       matches: mockStore(() => router.state?.matches || []),
+      __store: mockStore(() => router.state || initialState),
     };
   }
 
-  // Compatibility patch for TanStack Start v1 framework expecting router.getMatchedRoutes 
-  // to be destructurable as an object but iterable as an array.
   const originalGetMatchedRoutes = router.getMatchedRoutes.bind(router);
 
   router.getMatchedRoutes = (pathname: string) => {
