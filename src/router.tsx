@@ -19,9 +19,7 @@ const createStoreMock = (getValue: () => any) => {
 
 export function getRouter() {
   const isServer = typeof document === 'undefined';
-  console.log("[Router] getRouter starting, isServer:", isServer);
   const queryClient = new QueryClient();
-
 
   const router = createTanStackRouter({
     routeTree,
@@ -32,7 +30,6 @@ export function getRouter() {
   });
 
   // Compatibility Layer for TanStack Start v1 / Router v1.170+
-  // The framework accesses router.stores.byRoute.get(id).get()
   const injectStores = (target: any) => {
     const getCurrentState = () => {
       try {
@@ -56,6 +53,10 @@ export function getRouter() {
       },
       matches: createStoreMock(() => getCurrentState().matches || []),
       location: createStoreMock(() => getCurrentState().location || {}),
+      // Crucial: setMatches is expected by loadServerRoute in recent v1 versions
+      setMatches: (matches: any) => {
+        if (target.update) target.update({ ...target.options });
+      }
     };
 
     // Use a proxy to provide fallback stores for any properties accessed by the framework
@@ -75,7 +76,7 @@ export function getRouter() {
 
   injectStores(router);
 
-  // Patch getMatchedRoutes to satisfy TanStack Start's handleServerRoutes
+  // Patch getMatchedRoutes to satisfy TanStack Start's handleServerRoutes destructuring
   const originalGetMatchedRoutes = router.getMatchedRoutes.bind(router);
   router.getMatchedRoutes = (pathname: string) => {
     const result = originalGetMatchedRoutes(pathname) as any;
@@ -91,7 +92,6 @@ export function getRouter() {
     const params = routeParams || {};
     const found = foundRoute || null;
     
-    // Return an object that is both an array (via iterator) and a keyed object
     return {
       matchedRoutes: matched,
       routeParams: params,
