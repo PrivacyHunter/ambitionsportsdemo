@@ -127,8 +127,13 @@ export function getRouter() {
     }
   };
 
+  if (!isServer) {
+    (window as any).__TSR__ = { router };
+  }
+
   return router;
 }
+
 
 declare module "@tanstack/react-router" {
   interface Register {
