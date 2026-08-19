@@ -2,14 +2,15 @@ import { createStartHandler, defaultRenderHandler } from '@tanstack/react-start/
 import { getRouter } from './router'
 
 const handler = createStartHandler({
-  createRouter: getRouter,
   handler: defaultRenderHandler,
 })
 
 export default {
-  fetch: (request: Request) => {
-    console.log(`[SSR] Handling request: ${request.url}`);
-    return handler(request).catch(err => {
+  fetch: async (request: Request) => {
+    try {
+      const response = await handler(request);
+      return response;
+    } catch (err: any) {
       console.error('[SSR] Handler Error:', err);
       return new Response(JSON.stringify({ 
         error: err.message, 
@@ -19,6 +20,6 @@ export default {
         status: 500,
         headers: { 'Content-Type': 'application/json' }
       });
-    });
+    }
   }
 }
