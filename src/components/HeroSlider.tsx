@@ -3,7 +3,15 @@ import { Link } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 
-const banners = [
+interface Banner {
+  image: string;
+  subtitle: string;
+  title1: string;
+  title2: string;
+  accent: string;
+}
+
+const banners: Banner[] = [
   {
     image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=2070&auto=format&fit=crop",
     subtitle: "Premium Custom Gear",
@@ -61,7 +69,7 @@ export function HeroSlider() {
   const next = () => setCurrent((prev) => (prev + 1) % banners.length);
   const prev = () => setCurrent((prev) => (prev - 1 + banners.length) % banners.length);
 
-  const activeBanner = banners[current] || banners[0];
+  const activeBanner = banners[current];
 
   return (
     <section className="relative h-[85vh] w-full overflow-hidden bg-background">
