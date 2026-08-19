@@ -12,6 +12,13 @@ export function getRouter() {
     defaultPreloadStaleTime: 0,
   });
 
+  // Compatibility patch for TanStack Start v1 framework expecting router.stores
+  (router as any).stores = {
+    matches: {
+      get: () => router.state.matches,
+    },
+  };
+
   const originalGetMatchedRoutes = router.getMatchedRoutes.bind(router);
 
   router.getMatchedRoutes = (pathname: string) => {
@@ -34,7 +41,6 @@ export function getRouter() {
       return patched as any;
     }
 
-    // Handle case where it's already an object but needs iterator (or vice versa)
     if (result && typeof result === 'object' && !Array.isArray(result)) {
        (result as any)[Symbol.iterator] = function* () {
           yield (result as any).matchedRoutes;
@@ -45,6 +51,7 @@ export function getRouter() {
 
     return result;
   };
+
 
 
   return router;
