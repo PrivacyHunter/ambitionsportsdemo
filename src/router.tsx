@@ -34,8 +34,18 @@ export function getRouter() {
       return patched as any;
     }
 
+    // Handle case where it's already an object but needs iterator (or vice versa)
+    if (result && typeof result === 'object' && !Array.isArray(result)) {
+       (result as any)[Symbol.iterator] = function* () {
+          yield (result as any).matchedRoutes;
+          yield (result as any).routeParams;
+          yield (result as any).foundRoute;
+       };
+    }
+
     return result;
   };
+
 
   return router;
 }
