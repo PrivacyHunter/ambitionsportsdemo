@@ -12,9 +12,12 @@ export function getRouter() {
     defaultPreloadStaleTime: 0,
   });
 
-  // Debug log to check router structure in SSR
+  // Debugging matches
   if (typeof window === "undefined") {
-    console.log("Router created in SSR, has getMatchedRoutes:", typeof router.getMatchedRoutes);
+    console.log("Router created in SSR");
+    console.log("Route Tree keys:", Object.keys(router.routeTree.children || {}));
+    const matches = router.getMatchedRoutes("/");
+    console.log("Matches for '/':", matches ? Object.keys(matches) : "null");
   }
 
   return router;
