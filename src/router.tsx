@@ -3,6 +3,8 @@ import { QueryClient } from "@tanstack/react-query";
 import { routeTree } from "./routeTree.gen";
 
 export function getRouter() {
+  console.log("[Router] getRouter called, isServer:", typeof document === 'undefined');
+
   const queryClient = new QueryClient();
   const isServer = typeof document === 'undefined';
 
