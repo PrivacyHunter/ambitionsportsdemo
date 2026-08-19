@@ -14,16 +14,13 @@ export function getRouter() {
 
   const originalGetMatchedRoutes = router.getMatchedRoutes.bind(router);
 
+  // Patch getMatchedRoutes to return an object that also behaves like an array
+  // to satisfy @tanstack/start-server-core's internal expectation in dev mode.
   router.getMatchedRoutes = (pathname: string) => {
     const result = originalGetMatchedRoutes(pathname);
     
     if (Array.isArray(result)) {
       const [matchedRoutes, routeParams, foundRoute] = result;
-      
-      // We must return an object that HAS these properties for destructuring
-      // AND is iterable for the 'for (const route of matchedRoutes)' loop
-      // which actually iterates over the return value in some versions, 
-      // OR handleServerRoutes expects the object and then iterates matchedRoutes property.
       
       const obj = {
         matchedRoutes,
