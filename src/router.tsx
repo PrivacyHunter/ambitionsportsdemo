@@ -14,8 +14,6 @@ export function getRouter() {
 
   const originalGetMatchedRoutes = router.getMatchedRoutes.bind(router);
 
-  // Re-applying the patch that previously fixed the 500s in this environment
-  // Ensuring it returns the exact shape expected by the framework.
   router.getMatchedRoutes = (pathname: string) => {
     const result = originalGetMatchedRoutes(pathname);
     
@@ -26,20 +24,14 @@ export function getRouter() {
         matchedRoutes,
         routeParams,
         foundRoute,
-      };
-
-      // Add iterator support to the WHOLE object so [a, b, c] = getMatchedRoutes() works
-      const iterableObj = Object.assign(obj, {
         [Symbol.iterator]: function* () {
           yield matchedRoutes;
           yield routeParams;
           yield foundRoute;
         },
-      });
+      };
 
-      // Also ensure it looks like an array to any Array.isArray checks
-      // (though destructuring usually just needs the iterator)
-      return iterableObj as any;
+      return obj as any;
     }
 
     return result;
