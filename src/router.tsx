@@ -51,50 +51,55 @@ export function getRouter() {
       };
     };
 
+    const getMatchStore = (routeId: string) => {
+      const store = mockStore(() => (getCurrentState().matches || []).find((m: any) => m.routeId === routeId));
+      (store as any).get = store.get;
+      return store;
+    };
+
+    const byRoute = new Map();
+    // Pre-populate byRoute for better compatibility if needed
+    
     return {
       ids: mockStore(() => (getCurrentState().matches || []).map((m: any) => m.routeId)),
       matchesId: mockStore(() => (getCurrentState().matches || []).map((m: any) => m.id || m.routeId)),
       byRoute: {
-        get: (routeId: string) => {
-          const store = mockStore(() => (getCurrentState().matches || []).find((m: any) => m.routeId === routeId));
-          (store as any).get = store.get;
-          return store;
-        }
+        get: getMatchStore
       },
       matches: mockStore(() => getCurrentState().matches || []),
       location: mockStore(() => getCurrentState().location || { pathname: '/', search: {}, hash: '', state: {} }),
       status: mockStore(() => getCurrentState().status || 'idle'),
       resolvedLocation: mockStore(() => getCurrentState().resolvedLocation || getCurrentState().location),
       __store: mockStore(() => getCurrentState()),
+      getMatchStore: getMatchStore,
+      setMatches: (matches: any) => {
+        if (target.update) target.update({ ...target.options });
+      }
     };
   };
 
-  try {
-    console.log("[Router] Injecting stores...");
-    if (!(router as any).stores) {
-      Object.defineProperty(router, 'stores', {
-        get() {
-          if (!this._injectedStores) {
-            this._injectedStores = createMockStores(this);
-          }
-          return this._injectedStores;
-        },
-        set(v) {
-          this._injectedStores = v;
-        },
-        configurable: true,
-        enumerable: true,
-      });
-    }
-
-    (router as any)._stores = (router as any).stores;
-    if (router.options) {
-      (router.options as any).stores = (router as any).stores;
-    }
-    console.log("[Router] Stores injected");
-  } catch (e: any) {
-    console.error("[Router] Store injection failed:", e.message);
+  // Aggressively inject stores using defineProperty to handle early access by framework internals
+  if (!(router as any).stores) {
+    Object.defineProperty(router, 'stores', {
+      get() {
+        if (!this._injectedStores) {
+          this._injectedStores = createMockStores(this);
+        }
+        return this._injectedStores;
+      },
+      set(v) {
+        this._injectedStores = v;
+      },
+      configurable: true,
+      enumerable: true,
+    });
   }
+
+  (router as any)._stores = (router as any).stores;
+  if (router.options) {
+    (router.options as any).stores = (router as any).stores;
+  }
+  console.log("[Router] Stores injected");
 
   // Patch getMatchedRoutes
   const originalGetMatchedRoutes = router.getMatchedRoutes.bind(router);
