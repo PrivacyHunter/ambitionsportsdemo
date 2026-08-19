@@ -89,7 +89,6 @@ export function getRouter() {
     });
   };
 
-  // Aggressively inject stores using defineProperty to handle early access by framework internals
   const inject = (obj: any) => {
     if (!obj) return;
     if (!obj.stores) {
@@ -113,6 +112,13 @@ export function getRouter() {
   inject(router);
   if (router.options) {
     inject(router.options);
+  }
+
+  // Final fallback: Ensure the prototype has it too
+  if (Object.getPrototypeOf(router) && !Object.getPrototypeOf(router).stores) {
+    try {
+      inject(Object.getPrototypeOf(router));
+    } catch (e) {}
   }
 
   // Patch getMatchedRoutes
@@ -147,12 +153,6 @@ export function getRouter() {
   if (!isServer) {
     console.log("[Router] Attaching to window.__TSR__");
     (window as any).__TSR__ = { router };
-    
-    // Attempt to catch very early framework access
-    const originalCreateRouter = (createTanStackRouter as any);
-    if (typeof originalCreateRouter === 'function' && !originalCreateRouter.__patched) {
-       // This is complex as it's an import, but we can try to intercept via window if they use it
-    }
   }
 
   return router;
