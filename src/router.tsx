@@ -24,9 +24,12 @@ export function getRouter() {
 
   // Robust framework compatibility layer for TanStack Start v1
   const createMockStores = (target: any) => {
-    const mockStore = (getValue: () => any) => {
+    const mockStore = (name: string, getValue: () => any) => {
       const s = {
-        get: getValue,
+        get: () => {
+          // console.log(`[Router] store.${name}.get() called`);
+          return getValue();
+        },
         set: () => {},
         subscribe: (cb: any) => {
           const unsub = () => {};
@@ -52,33 +55,44 @@ export function getRouter() {
     };
 
     const getMatchStore = (routeId: string) => {
-      const store = mockStore(() => (getCurrentState().matches || []).find((m: any) => m.routeId === routeId));
-      (store as any).get = store.get;
+      const store = mockStore(`match.${routeId}`, () => (getCurrentState().matches || []).find((m: any) => m.routeId === routeId));
       return store;
     };
 
-    return {
-      ids: mockStore(() => (getCurrentState().matches || []).map((m: any) => m.routeId)),
-      matchesId: mockStore(() => (getCurrentState().matches || []).map((m: any) => m.id || m.routeId)),
+    const stores = {
+      ids: mockStore('ids', () => (getCurrentState().matches || []).map((m: any) => m.routeId)),
+      matchesId: mockStore('matchesId', () => (getCurrentState().matches || []).map((m: any) => m.id || m.routeId)),
       byRoute: {
         get: (routeId: string) => {
-          // If the framework calls byRoute.get(id).get(), we need to handle both
-          const matchStore = getMatchStore(routeId);
-          // Ensure the object returned by byRoute.get(id) also has a .get() method
-          if (!matchStore.get) (matchStore as any).get = () => matchStore.state;
-          return matchStore;
+          // console.log(`[Router] byRoute.get(${routeId}) called`);
+          return getMatchStore(routeId);
         }
       },
-      matches: mockStore(() => getCurrentState().matches || []),
-      location: mockStore(() => getCurrentState().location || { pathname: '/', search: {}, hash: '', state: {} }),
-      status: mockStore(() => getCurrentState().status || 'idle'),
-      resolvedLocation: mockStore(() => getCurrentState().resolvedLocation || getCurrentState().location),
-      __store: mockStore(() => getCurrentState()),
-      getMatchStore: getMatchStore,
+      matches: mockStore('matches', () => getCurrentState().matches || []),
+      location: mockStore('location', () => getCurrentState().location || { pathname: '/', search: {}, hash: '', state: {} }),
+      status: mockStore('status', () => getCurrentState().status || 'idle'),
+      resolvedLocation: mockStore('resolvedLocation', () => getCurrentState().resolvedLocation || getCurrentState().location),
+      __store: mockStore('__store', () => getCurrentState()),
+      getMatchStore: (routeId: string) => {
+        // console.log(`[Router] getMatchStore(${routeId}) called`);
+        return getMatchStore(routeId);
+      },
       setMatches: (matches: any) => {
         if (target.update) target.update({ ...target.options });
       }
     };
+
+    // Use a Proxy to log access and prevent crashes
+    return new Proxy(stores, {
+      get(targetObj: any, prop: string) {
+        if (prop in targetObj) {
+          return targetObj[prop];
+        }
+        console.warn(`[Router] Accessing missing store property: ${prop}`);
+        // Return a generic mock store to prevent "reading 'get' of undefined"
+        return mockStore(prop, () => undefined);
+      }
+    });
   };
 
   // Aggressively inject stores using defineProperty to handle early access by framework internals
