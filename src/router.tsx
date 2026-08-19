@@ -73,6 +73,35 @@ export function getRouter() {
 
   injectStores(router);
 
+  // Patch getMatchedRoutes to satisfy TanStack Start's handleServerRoutes
+  const originalGetMatchedRoutes = router.getMatchedRoutes.bind(router);
+  router.getMatchedRoutes = (pathname: string) => {
+    const result = originalGetMatchedRoutes(pathname) as any;
+    
+    let matchedRoutes = [], routeParams = {}, foundRoute = null;
+    if (Array.isArray(result)) {
+      [matchedRoutes, routeParams, foundRoute] = result;
+    } else if (result && typeof result === 'object') {
+      ({ matchedRoutes, routeParams, foundRoute } = result);
+    }
+    
+    const matched = matchedRoutes || [];
+    const params = routeParams || {};
+    const found = foundRoute || null;
+    
+    // Return an object that is both an array (via iterator) and a keyed object
+    return {
+      matchedRoutes: matched,
+      routeParams: params,
+      foundRoute: found,
+      [Symbol.iterator]: function* () {
+        yield matched;
+        yield params;
+        yield found;
+      },
+    } as any;
+  };
+
   if (!isServer) {
     (window as any).__TSR__ = { router };
   }
