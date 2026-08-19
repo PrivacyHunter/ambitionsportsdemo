@@ -19,15 +19,7 @@ export function getRouter() {
 
   const router = createTanStackRouter(routerOptions);
 
-  if (isServer) {
-    try {
-      router.update({ ...router.options });
-    } catch (e) {}
-  }
-
-  // Enhanced framework compatibility layer for TanStack Start
-  // This mocks the internal stores and state that the framework expects
-  // to be present during early hydration or SSR cycles.
+  // Robust framework compatibility layer for TanStack Start
   const injectMockStores = (target: any) => {
     if (target && !target.stores) {
       const mockStore = (getValue: () => any) => {
@@ -37,19 +29,16 @@ export function getRouter() {
           subscribe: () => () => {},
           state: getValue(),
         };
-        // Some internal framework code calls store.get() directly
         (s as any).get = s.get;
         return s;
       };
 
-      // Safely access current state without triggering recursion
       const getCurrentState = () => {
         try {
-          // Access the underlying state if possible, otherwise use a safe fallback
-          return (target as any)._state || (target as any).state || {
+          return target.state || {
             status: 'idle',
             matches: [],
-            location: (target as any).latestLocation || { pathname: '/', search: {}, hash: '', state: {} },
+            location: { pathname: '/', search: {}, hash: '', state: {} },
           };
         } catch {
           return {
@@ -98,7 +87,7 @@ export function getRouter() {
       const params = routeParams || {};
       const found = foundRoute || null;
       
-      const resultObj = {
+      return {
         matchedRoutes: matched,
         routeParams: params,
         foundRoute: found,
@@ -107,9 +96,7 @@ export function getRouter() {
           yield params;
           yield found;
         },
-      };
-
-      return resultObj as any;
+      } as any;
     } catch (e) {
       return {
         matchedRoutes: [], routeParams: {}, foundRoute: null,
