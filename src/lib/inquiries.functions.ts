@@ -21,10 +21,11 @@ export const submitInquiry = createServerFn({ method: "POST" })
       .insert({
         name: data.name,
         email: data.email,
-        subject: data.subject,
         message: data.message,
-        details: data.details
+        type: data.subject, // Map subject to 'type' column
+        status: 'pending'
       });
+
 
     if (dbError) {
       console.error('Error saving inquiry:', dbError);

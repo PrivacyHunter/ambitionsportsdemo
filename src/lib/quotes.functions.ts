@@ -26,10 +26,9 @@ export const submitQuote = createServerFn({ method: "POST" })
         email: data.email,
         sport_type: data.sportType,
         quantity: data.quantity,
-        deadline: new Date(data.deadline),
-        design_notes: data.designNotes,
         status: 'pending'
       });
+
 
     if (dbError) {
       console.error('Error saving quote:', dbError);
@@ -59,7 +58,7 @@ export const getOrderStatus = createServerFn({ method: "GET" })
     
     const { data: quote, error } = await supabaseAdmin
       .from('quotes')
-      .select('tracking_id, status, updated_at')
+      .select('tracking_id, status, created_at')
       .eq('tracking_id', data.orderId)
       .single();
 
@@ -68,10 +67,11 @@ export const getOrderStatus = createServerFn({ method: "GET" })
     }
     
     return {
-      orderId: quote.tracking_id,
+      orderId: quote.tracking_id || data.orderId,
       status: quote.status,
-      updatedAt: quote.updated_at,
+      updatedAt: quote.created_at,
       estimatedDelivery: "2026-09-15"
     };
+
   });
 
