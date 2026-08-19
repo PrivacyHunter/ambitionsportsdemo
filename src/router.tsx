@@ -30,7 +30,7 @@ export function getRouter() {
     }
   }
 
-  // Ensure 'stores' exist for framework compatibility
+  // Enhanced compatibility layer for internal stores
   if (!(router as any).stores) {
     const mockStore = (getValue: () => any) => ({
       get: getValue,
@@ -44,12 +44,21 @@ export function getRouter() {
       location: (router as any).latestLocation || { pathname: '/', search: {}, hash: '', state: {} },
     };
 
+    // Use a robust state access pattern that doesn't rely on early update()
+    const stateDescriptor = {
+      get: () => {
+        try {
+          return (router as any)._state || (router as any).state || initialState;
+        } catch {
+          return initialState;
+        }
+      },
+      configurable: true,
+      enumerable: true,
+    };
+
     if (!Object.getOwnPropertyDescriptor(router, 'state')) {
-      Object.defineProperty(router, 'state', {
-        get: () => (router as any)._state || initialState,
-        configurable: true,
-        enumerable: true,
-      });
+      Object.defineProperty(router, 'state', stateDescriptor);
     }
 
     const stores = {
@@ -60,8 +69,13 @@ export function getRouter() {
       matches: mockStore(() => router.state?.matches || []),
       __store: mockStore(() => router.state),
     };
+    
+    // Inject into all locations the framework might look
     (router as any).stores = stores;
     (router as any)._stores = stores;
+    (router as any).options.stores = stores;
+  }
+
   }
 
   // Framework compatibility patch for getMatchedRoutes
