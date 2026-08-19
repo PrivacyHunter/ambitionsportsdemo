@@ -10,9 +10,9 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^5.66.0",
-    "@tanstack/react-router": "1.171.24",
-    "@tanstack/react-start": "1.171.24",
-    "@tanstack/router-core": "1.171.24",
+    "@tanstack/react-router": "latest",
+    "@tanstack/react-start": "latest",
+    "@tanstack/router-core": "latest",
     "framer-motion": "^12.4.2",
     "lucide-react": "^0.475.0",
     "react": "^19.0.0",
