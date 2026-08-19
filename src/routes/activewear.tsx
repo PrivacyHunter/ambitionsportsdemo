@@ -4,6 +4,9 @@ import { Footer } from "@/components/Footer";
 import { motion } from "framer-motion";
 import { ArrowRight, Info, Zap, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import { submitInquiry } from "@/lib/inquiries.functions";
+import { useServerFn } from "@tanstack/react-start";
+
 
 export const Route = createFileRoute("/activewear")({
   component: Activewear,
@@ -55,12 +58,28 @@ const products = [
 ];
 
 function Activewear() {
-  const handleInquiry = (productName: string) => {
-    toast.success(`Inquiry for ${productName} registered!`, {
-      description: "Redirecting to quote form...",
-      duration: 3000,
-    });
+  const submitInquiryFn = useServerFn(submitInquiry);
+  const handleInquiry = async (productName: string) => {
+    toast.loading(`Processing inquiry for ${productName}...`, { id: "inquiry" });
+    try {
+      await submitInquiryFn({
+        data: {
+          name: "Quick Inquiry User",
+          email: "customer@example.com",
+          subject: `Activewear Inquiry: ${productName}`,
+          message: `Interested in bulk order for ${productName}. Please send details.`,
+          details: { productName }
+        }
+      });
+      toast.success(`Inquiry for ${productName} sent successfully!`, {
+        id: "inquiry",
+        description: "Our team will contact you with the spec sheet.",
+      });
+    } catch (error) {
+      toast.error("Failed to send inquiry. Please try again.", { id: "inquiry" });
+    }
   };
+
 
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-neon-lime selection:text-background">
