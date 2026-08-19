@@ -20,7 +20,7 @@ export function getRouter() {
     if (Array.isArray(result)) {
       const [matchedRoutes, routeParams, foundRoute] = result;
       
-      const obj = {
+      const patched = {
         matchedRoutes,
         routeParams,
         foundRoute,
@@ -30,8 +30,8 @@ export function getRouter() {
           yield foundRoute;
         },
       };
-
-      return obj as any;
+      
+      return patched as any;
     }
 
     return result;
