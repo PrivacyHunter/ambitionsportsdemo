@@ -19,10 +19,11 @@ export function getRouter() {
   router.getMatchedRoutes = (pathname: string) => {
     const [matchedRoutes, routeParams, foundRoute] = originalGetMatchedRoutes(pathname);
     
+    // Internal compatibility patch for TanStack Start
     if (typeof window === "undefined") {
-      console.log(`[SSR Debug] Patched getMatchedRoutes for: ${pathname}`);
-      console.log(`[SSR Debug] Found ${matchedRoutes?.length || 0} matched routes`);
+      // console.log(`[SSR] Patched getMatchedRoutes for: ${pathname}`);
     }
+
 
     // Return the object shape expected by Start's createStartHandler
     return {
