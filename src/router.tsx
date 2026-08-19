@@ -25,7 +25,12 @@ export function getRouter() {
       const s = {
         get: getValue,
         set: () => {},
-        subscribe: () => () => {},
+        subscribe: (cb: any) => {
+          // Some versions expect a function, some expect { unsubscribe }
+          const unsub = () => {};
+          (unsub as any).unsubscribe = unsub;
+          return unsub as any;
+        },
         get state() { return getValue(); }
       };
       (s as any).get = s.get;
@@ -57,29 +62,32 @@ export function getRouter() {
       matches: mockStore(() => getCurrentState().matches || []),
       location: mockStore(() => getCurrentState().location || { pathname: '/', search: {}, hash: '', state: {} }),
       status: mockStore(() => getCurrentState().status || 'idle'),
+      resolvedLocation: mockStore(() => getCurrentState().resolvedLocation || getCurrentState().location),
       __store: mockStore(() => getCurrentState()),
     };
   };
 
   // Aggressively inject stores using defineProperty to handle early access by framework internals
-  Object.defineProperty(router, 'stores', {
-    get() {
-      if (!this._injectedStores) {
-        this._injectedStores = createMockStores(this);
-      }
-      return this._injectedStores;
-    },
-    set(v) {
-      this._injectedStores = v;
-    },
-    configurable: true,
-    enumerable: true,
-  });
+  if (!(router as any).stores) {
+    Object.defineProperty(router, 'stores', {
+      get() {
+        if (!this._injectedStores) {
+          this._injectedStores = createMockStores(this);
+        }
+        return this._injectedStores;
+      },
+      set(v) {
+        this._injectedStores = v;
+      },
+      configurable: true,
+      enumerable: true,
+    });
+  }
 
   // Also set _stores and options.stores for full coverage
   (router as any)._stores = (router as any).stores;
   if (router.options) {
-    router.options.stores = (router as any).stores;
+    (router.options as any).stores = (router as any).stores;
   }
 
   // Patch getMatchedRoutes to satisfy TanStack Start's internal destructuring requirements
