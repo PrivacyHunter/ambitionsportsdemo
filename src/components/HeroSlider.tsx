@@ -69,7 +69,7 @@ export function HeroSlider() {
   const next = () => setCurrent((prev) => (prev + 1) % banners.length);
   const prev = () => setCurrent((prev) => (prev - 1 + banners.length) % banners.length);
 
-  const activeBanner = banners[current];
+  const activeBanner = banners[current] || banners[0];
 
   return (
     <section className="relative h-[85vh] w-full overflow-hidden bg-background">
@@ -85,7 +85,7 @@ export function HeroSlider() {
           <div className="absolute inset-0 bg-gradient-to-r from-background via-background/60 to-transparent z-10" />
           <div 
             className="w-full h-full bg-cover bg-center" 
-            style={{ backgroundImage: `url(${activeBanner.image})` }} 
+            style={{ backgroundImage: `url(${activeBanner?.image})` }} 
           />
         </motion.div>
       </AnimatePresence>
@@ -105,11 +105,11 @@ export function HeroSlider() {
               animate={{ opacity: 1, y: 0 }}
               className="text-neon-cyan font-black tracking-widest uppercase mb-4 flex items-center gap-3"
             >
-              <span className="w-12 h-[2px] bg-neon-cyan" /> {activeBanner.subtitle}
+              <span className="w-12 h-[2px] bg-neon-cyan" /> {activeBanner?.subtitle}
             </motion.p>
             <h1 className="text-6xl md:text-8xl lg:text-9xl font-black uppercase italic leading-[0.85] tracking-tighter mb-10">
-              {activeBanner.title1} <br />
-              <span className={activeBanner.accent}>{activeBanner.title2}</span>
+              {activeBanner?.title1} <br />
+              <span className={activeBanner?.accent}>{activeBanner?.title2}</span>
             </h1>
             <div className="flex flex-wrap gap-6">
               <Link
