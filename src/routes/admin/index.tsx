@@ -1,7 +1,7 @@
 import { createFileRoute, Link, redirect } from '@tanstack/react-router';
 import { getSession } from '@/lib/auth.functions';
 
-export const Route = createFileRoute('/admin')({
+export const Route = createFileRoute('/admin/')({
   beforeLoad: async () => {
     const session = await getSession();
     // Use /contact as a fallback since /auth doesn't exist yet, or redirect to root
