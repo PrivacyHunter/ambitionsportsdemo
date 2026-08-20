@@ -53,6 +53,8 @@ export const upsertCustomizationVideo = createServerFn({ method: "POST" })
     thumbnail_url: z.string().optional(),
     display_order: z.number().optional(),
     is_published: z.boolean().optional(),
+    captions_url: z.string().optional(),
+    captions_raw: z.string().optional(),
     captions: z.array(z.object({
       start: z.number(),
       end: z.number(),
@@ -61,6 +63,16 @@ export const upsertCustomizationVideo = createServerFn({ method: "POST" })
   }).parse(data))
   .handler(async ({ data }) => {
     const { supabase } = await import("@/integrations/supabase/client");
+    
+    // Cleanup old storage file if video_url changed
+    if (data.id) {
+      const { data: old } = await supabase.from('customization_videos' as any).select('video_url').eq('id', data.id).single();
+      if (old?.video_url && old.video_url !== data.video_url && old.video_url.includes('storage/v1/object/public/studio-assets')) {
+        const path = old.video_url.split('studio-assets/')[1];
+        if (path) await supabase.storage.from('studio-assets').remove([path]);
+      }
+    }
+
     const { error } = await supabase
       .from('customization_videos' as any)
       .upsert({
@@ -76,12 +88,52 @@ export const deleteCustomizationVideo = createServerFn({ method: "POST" })
   .inputValidator((data) => z.object({ id: z.string() }).parse(data))
   .handler(async ({ data }) => {
     const { supabase } = await import("@/integrations/supabase/client");
+    
+    // Cleanup storage
+    const { data: old } = await supabase.from('customization_videos' as any).select('video_url').eq('id', data.id).single();
+    if (old?.video_url && old.video_url.includes('storage/v1/object/public/studio-assets')) {
+      const path = old.video_url.split('studio-assets/')[1];
+      if (path) await supabase.storage.from('studio-assets').remove([path]);
+    }
+
     const { error } = await supabase
       .from('customization_videos' as any)
       .delete()
       .eq('id', data.id);
     
     if (error) throw new Error(error.message);
+    return { success: true };
+  });
+
+export const bulkActionCustomizationVideos = createServerFn({ method: "POST" })
+  .inputValidator((data) => z.object({
+    ids: z.array(z.string()),
+    action: z.enum(['publish', 'unpublish', 'delete'])
+  }).parse(data))
+  .handler(async ({ data }) => {
+    const { supabase } = await import("@/integrations/supabase/client");
+    
+    if (data.action === 'delete') {
+      // Cleanup storage for all
+      const { data: videos } = await supabase.from('customization_videos' as any).select('video_url').in('id', data.ids);
+      const paths = (videos || [])
+        .map(v => v.video_url)
+        .filter(url => url?.includes('storage/v1/object/public/studio-assets'))
+        .map(url => url.split('studio-assets/')[1])
+        .filter(Boolean);
+      
+      if (paths.length > 0) await supabase.storage.from('studio-assets').remove(paths);
+      
+      const { error } = await supabase.from('customization_videos' as any).delete().in('id', data.ids);
+      if (error) throw new Error(error.message);
+    } else {
+      const { error } = await supabase
+        .from('customization_videos' as any)
+        .update({ is_published: data.action === 'publish' } as any)
+        .in('id', data.ids);
+      if (error) throw new Error(error.message);
+    }
+    
     return { success: true };
   });
 

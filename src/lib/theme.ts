@@ -88,9 +88,9 @@ export const DEFAULT_BRANDING: BrandingConfig = {
   footerCreditText: "Crafted by Ambition Sports Studio",
   footerDescription: "Premium custom sportswear and activewear manufacturer based in Sialkot, Pakistan. Delivering high-performance apparel worldwide.",
   showWhatsappButton: true,
-  whatsappNumber: "+923001234567",
-  phone: "+92 (300) 123-4567",
-  email: "sales@ambitionsports.com",
+  whatsappNumber: "+923049893054",
+  phone: "+92 (304) 989-3054",
+  email: "ambitionsports381@gmail.com",
 };
 
 /** CSS custom properties derived from a theme config. */
