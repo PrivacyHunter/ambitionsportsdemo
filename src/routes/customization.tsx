@@ -135,7 +135,7 @@ function CustomizationPage() {
                   <div className={i % 2 === 1 ? 'lg:order-2' : ''}>
                     <div className="flex items-center gap-3 mb-6">
                       <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-[0_0_15px_rgba(212,175,55,0.2)]">
-                        <Icon size={24} />
+                        {Icon && <Icon size={24} />}
                       </div>
                       <h2 className="text-2xl md:text-3xl font-black uppercase italic">{v.title}</h2>
                     </div>
