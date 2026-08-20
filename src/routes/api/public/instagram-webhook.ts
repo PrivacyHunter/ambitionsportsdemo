@@ -29,7 +29,7 @@ export const Route = createFileRoute("/api/public/instagram-webhook")({
       POST: async ({ request }) => {
         const raw = await request.text();
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { fetchMedia, upsertMedia } = await import("@/lib/instagram.functions");
+        const { fetchMedia, upsertMedia } = await import("@/lib/instagram-media.server");
 
         const { data: settings } = await supabaseAdmin
           .from("instagram_settings")

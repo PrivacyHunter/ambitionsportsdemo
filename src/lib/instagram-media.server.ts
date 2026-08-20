@@ -1,5 +1,3 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
-
 /** Converts an Instagram caption into timed WebVTT cues for the chosen subtitle language. */
 export function captionToVtt(caption: string, language = "en"): string {
   const lines = caption

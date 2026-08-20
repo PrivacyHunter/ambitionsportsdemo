@@ -110,6 +110,7 @@ export const mapCaptionToSubtitles = createServerFn({ method: "POST" })
   }).parse(data))
   .handler(async ({ context, data }) => {
     await assertStaff(context.supabase, context.userId);
+    const { captionToVtt } = await import("./instagram-media.server");
     const { data: post } = await context.supabase
       .from("instagram_posts")
       .select("caption")
@@ -131,6 +132,7 @@ export const syncInstagramPosts = createServerFn({ method: "POST" })
   .inputValidator((data: { mediaId?: string } | undefined) => data ?? {})
   .handler(async ({ context, data }) => {
     await assertStaff(context.supabase, context.userId);
+    const { fetchMedia, upsertMedia, adviceFor } = await import("./instagram-media.server");
     const sb = context.supabase as any;
     let settings: any = null;
     try {
@@ -183,6 +185,7 @@ export const retrySyncLog = createServerFn({ method: "POST" })
   .inputValidator((data) => z.object({ logId: z.string() }).parse(data))
   .handler(async ({ context, data }) => {
     await assertStaff(context.supabase, context.userId);
+    const { fetchMedia, upsertMedia, adviceFor } = await import("./instagram-media.server");
     const sb = context.supabase as any;
     const { data: log } = await sb.from("instagram_sync_logs").select("*").eq("id", data.logId).maybeSingle();
     if (!log) throw new Error("Log entry not found");
