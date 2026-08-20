@@ -440,44 +440,6 @@ function ProductsTab({ data, onDone }: { data: Dash; onDone: () => void }) {
               </div>
             );
           }
-  const [diffMode, setDiffMode] = useState(false);
-  const [diffPreset, setDiffPreset] = useState<ThemeConfig | null>(null);
-
-  const themeKeys: (keyof ThemeConfig)[] = [
-    "goldAccent", "cyanAccent", "darkBackground", "lightBackground",
-    "displayFont", "bodyFont", "radius", "sectionSpace", "containerWidth",
-    "glassOpacity", "displayTracking"
-  ];
-
-  const DiffView = ({ oldTheme, newTheme }: { oldTheme: ThemeConfig, newTheme: ThemeConfig }) => (
-    <div className="space-y-4 p-4 glass border border-primary/20 rounded-2xl">
-      <div className="flex justify-between items-center mb-2">
-        <h4 className="text-[10px] font-bold uppercase tracking-widest text-primary">Visual Diff</h4>
-        <button onClick={() => setDiffMode(false)} className="text-[10px] text-muted-foreground hover:text-foreground">Close</button>
-      </div>
-      <div className="grid gap-2">
-        {themeKeys.map(key => {
-          const oldVal = oldTheme[key];
-          const newVal = newTheme[key];
-          if (oldVal === newVal) return null;
-          return (
-            <div key={key} className="grid grid-cols-3 gap-2 text-[10px] items-center border-b border-border/50 pb-2 last:border-0">
-              <span className="font-bold uppercase tracking-tighter opacity-70">{key.replace(/([A-Z])/g, ' $1')}</span>
-              <span className="line-through text-red-500/70 truncate">{String(oldVal)}</span>
-              <span className="text-green-500 font-bold truncate">→ {String(newVal)}</span>
-            </div>
-          );
-        })}
-      </div>
-      <button 
-        onClick={() => { setDraft(newTheme); setDiffMode(false); }}
-        className="w-full mt-2 py-2 rounded-xl bg-primary text-primary-foreground text-[10px] font-bold uppercase"
-      >
-        Apply Changes
-      </button>
-    </div>
-  );
-
   return (
             <label key={key} className="block">
               <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">{label}</span>
