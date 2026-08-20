@@ -188,6 +188,19 @@ function Overview({ data }: { data: Dash }) {
   const countries = new Set(data.tracking.map((t) => t.country).filter(Boolean)).size;
   return (
     <div className="space-y-6">
+      <div className="glass rounded-3xl p-6">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h2 className="text-lg font-extrabold uppercase">System Control</h2>
+            <p className="text-xs text-muted-foreground">Manage site-wide backups and templates.</p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <BackupButton />
+            <RestoreButton />
+          </div>
+        </div>
+      </div>
+
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <Card title="Inquiries" value={data.inquiries.length} />
         <Card title="Quote Requests" value={data.quotes.length} hint={`${data.quotes.filter(q => q.status === 'pending').length} pending`} />
