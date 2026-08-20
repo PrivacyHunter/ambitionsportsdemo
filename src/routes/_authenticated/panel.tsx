@@ -65,17 +65,17 @@ export const Route = createFileRoute("/_authenticated/panel")({
 
 type Tab = "overview" | "inbox" | "products" | "theme" | "branding" | "seo" | "accounts" | "visitors" | "analytics" | "logs";
 
-const TABS: { id: Tab; label: string; icon: any; developerOnly?: boolean }[] = [
+const TABS: { id: Tab; label: string; icon: any; roles?: ("owner" | "admin" | "developer")[] }[] = [
   { id: "overview", label: "Overview", icon: ShieldCheck },
-  { id: "inbox", label: "Inbox", icon: Inbox },
-  { id: "products", label: "Products", icon: Package },
-  { id: "theme", label: "Theme Studio", icon: Palette },
-  { id: "branding", label: "Branding", icon: Settings2 },
-  { id: "seo", label: "SEO Editor", icon: Globe2 },
-  { id: "visitors", label: "Visitors", icon: Globe2 },
-  { id: "analytics", label: "Analytics", icon: BarChart3 },
-  { id: "accounts", label: "Accounts", icon: Users, developerOnly: true },
-  { id: "logs", label: "Logs", icon: Activity, developerOnly: true },
+  { id: "inbox", label: "Inbox", icon: Inbox, roles: ["owner", "admin", "developer"] },
+  { id: "products", label: "Products", icon: Package, roles: ["owner", "admin", "developer"] },
+  { id: "theme", label: "Theme Studio", icon: Palette, roles: ["owner", "admin", "developer"] },
+  { id: "branding", label: "Branding", icon: Settings2, roles: ["owner", "admin", "developer"] },
+  { id: "seo", label: "SEO Editor", icon: Globe2, roles: ["owner", "admin", "developer"] },
+  { id: "visitors", label: "Visitors", icon: Globe2, roles: ["owner", "admin", "developer"] },
+  { id: "analytics", label: "Analytics", icon: BarChart3, roles: ["owner", "admin", "developer"] },
+  { id: "accounts", label: "Accounts", icon: Users, roles: ["developer"] },
+  { id: "logs", label: "Logs", icon: Activity, roles: ["admin", "owner", "developer"] },
 ];
 
 function PanelPage() {
@@ -122,7 +122,7 @@ function PanelPage() {
   }
 
   const role = data!.role;
-  const visibleTabs = TABS.filter((t) => !t.developerOnly || role === "developer");
+  const visibleTabs = TABS.filter((t) => !t.roles || t.roles.includes(role as any));
 
   return (
     <main className="min-h-screen px-4 py-8 sm:px-6 lg:px-10">

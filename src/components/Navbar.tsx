@@ -18,6 +18,20 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const { savedTheme } = useTheme();
+  const [siteMode, setSiteMode] = useState<"business" | "store">("business");
+
+  useEffect(() => {
+    // Check site mode from settings if possible, otherwise default
+    // In a real app we'd query this or get it from ThemeContext
+    const fetchMode = async () => {
+      const settings = await listSettings();
+      if (settings["site_mode"] === "store") setSiteMode("store");
+      else setSiteMode("business");
+    };
+    fetchMode();
+  }, []);
+
   const navLinks = [
     { name: "Home", href: "/" },
     { name: "Sportswear", href: "/sportswear" },
@@ -25,7 +39,7 @@ export function Navbar() {
     { name: "Casual Wear", href: "/casual-wear" },
     { name: "About Us", href: "/about" },
     { name: "Contact Us", href: "/contact" },
-    { name: "Track Order", href: "/track" },
+    ...(siteMode === "store" ? [{ name: "Track Order", href: "/track" }] : []),
   ];
 
   return (
