@@ -51,12 +51,12 @@ export function FeaturedProducts() {
     <section className="py-24 px-4 lg:px-8 bg-background overflow-hidden">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
         <div>
-          <h3 className="text-neon-cyan font-black tracking-[0.2em] uppercase mb-4 text-sm">Most Wanted</h3>
+          <h3 className="text-primary font-black tracking-[0.2em] uppercase mb-4 text-sm">Most Wanted</h3>
           <h2 className="text-5xl md:text-7xl font-black uppercase italic tracking-tighter leading-none">
-            Featured <br /><span className="text-neon-lime">Collection</span>
+            Featured <br /><span className="text-primary">Collection</span>
           </h2>
         </div>
-        <Link to="/sportswear" className="text-white border-b-2 border-neon-cyan pb-2 font-black uppercase tracking-widest text-sm hover:text-neon-cyan transition-colors">
+        <Link to="/sportswear" className="text-white border-b-2 border-primary pb-2 font-black uppercase tracking-widest text-sm hover:text-primary transition-colors">
           Explore All Gear
         </Link>
       </div>
@@ -69,11 +69,11 @@ export function FeaturedProducts() {
           <motion.div 
             key={idx}
             whileHover={{ y: -15 }}
-            className="min-w-[320px] md:min-w-[400px] bg-white/[0.02] rounded-3xl overflow-hidden border border-white/5 relative group"
+            className="min-w-[320px] md:min-w-[400px] bg-surface rounded-3xl overflow-hidden border border-border relative group"
           >
             <div className="h-[400px] bg-white/[0.03] flex items-center justify-center relative overflow-hidden">
                <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity z-10" />
-               <div className="w-full h-full bg-white/5 rounded-full blur-[100px] absolute scale-50 group-hover:bg-neon-cyan/10 transition-all duration-700" />
+               <div className="w-full h-full bg-white/5 rounded-full blur-[100px] absolute scale-50 group-hover:bg-primary/10 transition-all duration-700" />
                
                <div 
                  className="w-full h-full bg-cover bg-center group-hover:scale-110 transition-transform duration-700 opacity-60 group-hover:opacity-100" 
@@ -81,7 +81,7 @@ export function FeaturedProducts() {
                />
 
                <div className="absolute top-6 left-6 flex gap-2 z-20">
-                  <span className="bg-neon-cyan text-background px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest">{product.tag}</span>
+                  <span className="bg-primary text-primary-foreground px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest">{product.tag}</span>
                </div>
                
                <button className="absolute top-6 right-6 p-3 bg-background/50 backdrop-blur-md rounded-full text-white hover:text-red-500 transition-colors z-20">
@@ -89,7 +89,7 @@ export function FeaturedProducts() {
                </button>
 
                <div className="absolute bottom-8 left-8 right-8 z-20 translate-y-20 group-hover:translate-y-0 transition-transform duration-500">
-                  <Link to="/quote" className="w-full block text-center bg-white text-background py-4 rounded-xl font-black uppercase tracking-widest text-xs hover:bg-neon-cyan transition-colors">
+                  <Link to="/quote" className="w-full block text-center bg-primary text-primary-foreground py-4 rounded-xl font-black uppercase tracking-widest text-xs hover:bg-white transition-colors">
                     Request Quote
                   </Link>
                </div>
@@ -98,8 +98,8 @@ export function FeaturedProducts() {
             <div className="p-8">
               <div className="flex justify-between items-start mb-4">
                 <div>
-                  <p className="text-neon-lime text-[10px] font-black uppercase tracking-[0.2em] mb-2">{product.category}</p>
-                  <h4 className="font-black uppercase tracking-tighter text-2xl group-hover:text-neon-cyan transition-colors">{product.name}</h4>
+                  <p className="text-primary text-[10px] font-black uppercase tracking-[0.2em] mb-2">{product.category}</p>
+                  <h4 className="font-black uppercase tracking-tighter text-2xl group-hover:text-primary transition-colors">{product.name}</h4>
                 </div>
                 <span className="text-white font-black text-2xl tracking-tighter">{product.price}</span>
               </div>
