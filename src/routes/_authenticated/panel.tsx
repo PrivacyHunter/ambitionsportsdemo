@@ -1580,7 +1580,6 @@ function LogsTab() {
               </button>
             ))}
           </div>
-        </div>
         <table className="w-full text-left text-xs">
           <thead className="text-[10px] uppercase text-muted-foreground">
             <tr><th className="py-2">User</th><th>Action</th><th>Type</th><th>Details</th><th>Date</th></tr>
