@@ -14,7 +14,7 @@ import {
   deleteProduct, getDashboard, saveSetting, setUserRole, updateStatus, upsertProduct,
 } from "@/lib/admin.functions";
 import { getPageSeo, savePageSeo } from "@/lib/seo.functions";
-import { DEFAULT_BRANDING, DEFAULT_THEME, FONT_PRESETS, type BrandingConfig, type ThemeConfig } from "@/lib/theme";
+import { DEFAULT_BRANDING, DEFAULT_THEME, FONT_PRESETS, THEME_PRESETS, type BrandingConfig, type ThemeConfig } from "@/lib/theme";
 
 export const Route = createFileRoute("/_authenticated/panel")({
   head: () => ({
