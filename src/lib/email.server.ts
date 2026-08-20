@@ -119,3 +119,38 @@ export async function sendOrderConfirmationEmail(data: {
     return { success: false, error };
   }
 }
+
+export async function sendInvitationEmail(data: {
+  email: string;
+  role: string;
+}) {
+  const apiKey = process.env['RESEND_API_KEY'];
+  const { email, role } = data;
+
+  if (!apiKey) {
+    console.log("MOCK INVITATION EMAIL (No API Key):", data);
+    return { success: true, mock: true };
+  }
+
+  const resend = new Resend(apiKey);
+  const html = `
+    <h2>Ambition Sports Access Granted</h2>
+    <p>You have been granted <strong>${role}</strong> access to the Ambition Sports Control Panel.</p>
+    <p>Please log in at <a href="${process.env['SITE_URL'] || 'https://ambitionsports.com'}/auth">ambitionsports.com/auth</a> using your email.</p>
+    <p>If you don't have an account yet, one has been prepared for you. Use the "Forgot Password" flow if you need to set a password.</p>
+  `;
+
+  try {
+    const response = await resend.emails.send({
+      from: 'Ambition Sports <onboarding@resend.dev>',
+      to: email,
+      subject: `Ambition Sports Access: ${role} Role Assigned`,
+      html: html,
+    });
+
+    return { success: true, data: response };
+  } catch (error) {
+    console.error('Error sending invitation email:', error);
+    return { success: false, error };
+  }
+}
