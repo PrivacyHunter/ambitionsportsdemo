@@ -2270,6 +2270,8 @@ function InstagramTab() {
   const updateSettings = useServerFn(updateInstagramSettings);
   const syncPosts = useServerFn(syncInstagramPosts);
   const getLogs = useServerFn(getInstagramLogs);
+  const retryLog = useServerFn(retrySyncLog);
+  const reconnect = useServerFn(reconnectInstagram);
   
   const { data: settings, refetch } = useQuery({
     queryKey: ['instagram-settings'],
@@ -2288,7 +2290,7 @@ function InstagramTab() {
   });
 
   const syncMutation = useMutation({
-    mutationFn: () => syncPosts(),
+    mutationFn: () => syncPosts({ data: {} }),
     onSuccess: () => { 
       toast.success("Posts synced successfully"); 
       refetch(); 
@@ -2296,7 +2298,31 @@ function InstagramTab() {
     }
   });
 
+  const retryMutation = useMutation({
+    mutationFn: (logId: string) => retryLog({ data: { logId } }),
+    onSuccess: () => {
+      toast.success("Retry succeeded — media republished");
+      refetch();
+      queryClient.invalidateQueries({ queryKey: ['instagram-logs'] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Retry failed"),
+  });
+
+  const reconnectMutation = useMutation({
+    mutationFn: (access_token: string) => reconnect({ data: { access_token } }),
+    onSuccess: (res: any) => {
+      toast.success(`Reconnected as @${res?.username ?? 'instagram'}`);
+      setToken("");
+      refetch();
+      queryClient.invalidateQueries({ queryKey: ['instagram-logs'] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Re-authorisation failed"),
+  });
+
   const [token, setToken] = useState("");
+  const [openLog, setOpenLog] = useState<any>(null);
+  const webhookUrl = typeof window !== 'undefined' ? `${window.location.origin}/api/public/instagram-webhook` : '';
+  const tokenExpired = settings?.token_expires_at ? new Date(settings.token_expires_at).getTime() < Date.now() : false;
 
   return (
     <div className="space-y-6">
