@@ -1924,8 +1924,13 @@ function CustomizationTab({ onDone }: { onDone: () => void }) {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {videos?.map((v: any) => (
+        {videos?.filter((v: any) => {
+          const matchesSearch = v.title.toLowerCase().includes(search.toLowerCase()) || v.description?.toLowerCase().includes(search.toLowerCase());
+          const matchesFilter = filterType === 'all' || v.process_type === filterType;
+          return matchesSearch && matchesFilter;
+        }).map((v: any) => (
           <div key={v.id} className={`glass rounded-3xl overflow-hidden flex flex-col border-2 transition-all ${selectedIds.includes(v.id) ? 'border-primary shadow-[0_0_20px_rgba(212,175,55,0.2)]' : 'border-transparent'}`}>
+
             <div className="aspect-video bg-black relative group/vid">
               <video src={v.video_url} className="w-full h-full object-cover opacity-60" muted />
               <div onClick={() => toggleSelection(v.id)} className={`absolute top-2 left-2 p-1.5 rounded-lg backdrop-blur-md border cursor-pointer transition-all z-10 ${selectedIds.includes(v.id) ? 'bg-primary border-primary text-primary-foreground' : 'bg-black/40 border-white/10 text-white/40 opacity-0 group-hover/vid:opacity-100 hover:text-white'}`}>
