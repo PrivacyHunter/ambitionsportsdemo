@@ -1403,7 +1403,7 @@ function AnalyticsDashboard({ data }: { data: Dash }) {
                 dataKey="value"
               >
                 {stats.devices.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length] || "#d4af37"} />
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length] as string} />
                 ))}
               </Pie>
               <ReTooltip contentStyle={{ background: '#080a0f', border: '1px solid #ffffff20', borderRadius: '12px' }} />
