@@ -320,15 +320,22 @@ const EMPTY_PRODUCT = {
   price: 0, stock: 0, images: "", sizes: "", colors: "", is_featured: false, is_active: true,
 };
 
-function SortableImage({ id, url }: { id: string; url: string }) {
+function SortableImage({ id, url, isCover, onSetCover }: { id: string; url: string; isCover: boolean; onSetCover: () => void }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
   const style = { transform: CSS.Transform.toString(transform), transition, zIndex: isDragging ? 10 : 1 };
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="relative w-16 h-16 group cursor-grab active:cursor-grabbing">
-      <img src={url} alt="Product" className="w-full h-full object-cover rounded-lg border border-border" />
-      <div className="absolute top-0 right-0 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
-        <GripVertical size={12} className="text-white drop-shadow-md" />
+    <div ref={setNodeRef} style={style} className="relative w-16 h-16 group cursor-grab active:cursor-grabbing">
+      <img src={url} alt="Product" className={`w-full h-full object-cover rounded-lg border-2 ${isCover ? 'border-primary shadow-[0_0_10px_rgba(212,175,55,0.5)]' : 'border-border'}`} />
+      <div className="absolute top-0 right-0 p-1 opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 rounded-bl-lg">
+        <GripVertical size={12} className="text-white drop-shadow-md" {...attributes} {...listeners} />
       </div>
+      <button 
+        type="button"
+        onClick={(e) => { e.stopPropagation(); onSetCover(); }}
+        className={`absolute bottom-0 left-0 right-0 py-0.5 text-[8px] font-bold uppercase transition-all ${isCover ? 'bg-primary text-primary-foreground opacity-100' : 'bg-black/60 text-white opacity-0 group-hover:opacity-100'}`}
+      >
+        {isCover ? 'Cover' : 'Set Cover'}
+      </button>
     </div>
   );
 }
@@ -516,7 +523,8 @@ function ThemeStudio() {
 
   const saveMutation = useMutation({
     mutationFn: async () => {
-      setHistory(prev => [draft, ...prev.slice(0, 9)]);
+      const log = useServerFn(logAuditAction);
+      await log({ data: { action: "theme_publish", details: { config: draft } } });
       return persist({ data: { key: "theme", value: JSON.stringify(draft) } });
     },
     onSuccess: () => { toast.success("Theme published"); setPreviewOn(false); refresh(); },
@@ -1248,4 +1256,49 @@ function AnalyticsDashboard({ data }: { data: Dash }) {
       </div>
     </div>
   );
+function LogsTab() {
+  const auditLogs = useQuery({ queryKey: ["audit-logs"], queryFn: useServerFn(getAuditLogs) });
+  const emailLogs = useQuery({ queryKey: ["email-logs"], queryFn: useServerFn(getEmailLogs) });
+
+  return (
+    <div className="space-y-8">
+      <div className="glass overflow-x-auto rounded-3xl p-6">
+        <h2 className="mb-4 text-lg font-extrabold uppercase">Audit Logs (Theme Changes)</h2>
+        <table className="w-full text-left text-xs">
+          <thead className="text-[10px] uppercase text-muted-foreground">
+            <tr><th className="py-2">User</th><th>Action</th><th>Details</th><th>Date</th></tr>
+          </thead>
+          <tbody>
+            {auditLogs.data?.map(l => (
+              <tr key={l.id} className="border-t border-border">
+                <td className="py-3">{(l.profiles as any)?.email}</td>
+                <td>{l.action}</td>
+                <td className="font-mono">{JSON.stringify(l.details)}</td>
+                <td>{new Date(l.created_at).toLocaleString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="glass overflow-x-auto rounded-3xl p-6">
+        <h2 className="mb-4 text-lg font-extrabold uppercase">Email Logs (Confirmations)</h2>
+        <table className="w-full text-left text-xs">
+          <thead className="text-[10px] uppercase text-muted-foreground">
+            <tr><th className="py-2">Recipient</th><th>Subject</th><th>Status</th><th>Date</th></tr>
+          </thead>
+          <tbody>
+            {emailLogs.data?.map(l => (
+              <tr key={l.id} className="border-t border-border">
+                <td className="py-3">{l.recipient}</td>
+                <td>{l.subject}</td>
+                <td className={l.status === 'sent' ? 'text-green-500' : 'text-red-500'}>{l.status}</td>
+                <td>{new Date(l.created_at).toLocaleString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
 }
+
