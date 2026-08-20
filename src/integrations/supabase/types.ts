@@ -74,6 +74,96 @@ export type Database = {
         }
         Relationships: []
       }
+      page_content: {
+        Row: {
+          body: string | null
+          id: string
+          image_url: string | null
+          page: string
+          section_key: string
+          sort_order: number
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          body?: string | null
+          id?: string
+          image_url?: string | null
+          page: string
+          section_key: string
+          sort_order?: number
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          body?: string | null
+          id?: string
+          image_url?: string | null
+          page?: string
+          section_key?: string
+          sort_order?: number
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          category: string
+          colors: Json
+          created_at: string
+          currency: string
+          description: string | null
+          id: string
+          images: Json
+          is_active: boolean
+          is_featured: boolean
+          name: string
+          price: number | null
+          sizes: Json
+          slug: string
+          sort_order: number
+          stock: number
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          colors?: Json
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          images?: Json
+          is_active?: boolean
+          is_featured?: boolean
+          name: string
+          price?: number | null
+          sizes?: Json
+          slug: string
+          sort_order?: number
+          stock?: number
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          colors?: Json
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          images?: Json
+          is_active?: boolean
+          is_featured?: boolean
+          name?: string
+          price?: number | null
+          sizes?: Json
+          slug?: string
+          sort_order?: number
+          stock?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -182,7 +272,14 @@ export type Database = {
           device: string | null
           id: string
           ip: string | null
+          latitude: number | null
           location_json: Json | null
+          longitude: number | null
+          os: string | null
+          page_path: string | null
+          postal_code: string | null
+          region: string | null
+          timezone: string | null
           user_id: string | null
         }
         Insert: {
@@ -193,7 +290,14 @@ export type Database = {
           device?: string | null
           id?: string
           ip?: string | null
+          latitude?: number | null
           location_json?: Json | null
+          longitude?: number | null
+          os?: string | null
+          page_path?: string | null
+          postal_code?: string | null
+          region?: string | null
+          timezone?: string | null
           user_id?: string | null
         }
         Update: {
@@ -204,7 +308,14 @@ export type Database = {
           device?: string | null
           id?: string
           ip?: string | null
+          latitude?: number | null
           location_json?: Json | null
+          longitude?: number | null
+          os?: string | null
+          page_path?: string | null
+          postal_code?: string | null
+          region?: string | null
+          timezone?: string | null
           user_id?: string | null
         }
         Relationships: []
@@ -221,6 +332,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_staff: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       app_role: "owner" | "admin" | "developer" | "user"
