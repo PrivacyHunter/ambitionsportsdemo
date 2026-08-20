@@ -22,7 +22,7 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [mode] = useState<"signin">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -37,21 +37,10 @@ function AuthPage() {
     event.preventDefault();
     setBusy(true);
     try {
-      if (mode === "signin") {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        toast.success("Welcome back");
-        navigate({ to: "/panel", replace: true });
-      } else {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { emailRedirectTo: `${window.location.origin}/auth` },
-        });
-        if (error) throw error;
-        toast.success("Account created. Check your inbox to confirm, then sign in.");
-        setMode("signin");
-      }
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      toast.success("Welcome back");
+      navigate({ to: "/panel", replace: true });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Authentication failed");
     } finally {
@@ -73,11 +62,11 @@ function AuthPage() {
             <LockKeyhole size={18} />
           </span>
           <h1 className="min-w-0 truncate text-2xl font-extrabold uppercase sm:text-3xl">
-            {mode === "signin" ? "Staff Access" : "Create Account"}
+            Staff Access
           </h1>
         </div>
         <p className="mt-3 text-sm text-muted-foreground">
-          Roles are granted in the database — the control panel opens only for owner, admin and developer accounts.
+          Enter your credentials to access the internal management tools.
         </p>
 
         <form onSubmit={onSubmit} className="mt-8 space-y-4">
@@ -112,17 +101,9 @@ function AuthPage() {
             className="magnetic flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-extrabold uppercase tracking-widest text-primary-foreground disabled:opacity-60"
           >
             {busy && <Loader2 size={16} className="animate-spin" />}
-            {mode === "signin" ? "Sign In" : "Sign Up"}
+            Sign In
           </button>
         </form>
-
-        <button
-          type="button"
-          onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-          className="mt-6 w-full text-center text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground hover:text-primary"
-        >
-          {mode === "signin" ? "Need an account? Sign up" : "Already registered? Sign in"}
-        </button>
       </div>
     </main>
   );

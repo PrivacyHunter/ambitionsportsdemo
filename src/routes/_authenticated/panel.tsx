@@ -7,7 +7,8 @@ import {
   Eye, EyeOff, Loader2, LogOut, Package, Palette, Save, Settings2,
   ShieldCheck, Users, Globe2, Inbox, History, Download, Upload,
   Search, BarChart3, TrendingUp, MapPin, Smartphone,
-  ArrowRight, GripVertical, Check, Wand2
+  ArrowRight, GripVertical, Check, Wand2, FileJson,
+  Layout, ShoppingBag, FileText, Activity
 } from "lucide-react";
 import { SiGooglechrome as Chrome } from "react-icons/si";
 import {
@@ -40,6 +41,8 @@ import {
 } from "@/lib/admin.functions";
 import { getPageSeo, savePageSeo } from "@/lib/seo.functions";
 import { getSeoBulk, saveSeoBulk, autoGenerateSeo } from "@/lib/seo-bulk.functions";
+import { logAuditAction, getAuditLogs, getEmailLogs } from "@/lib/logs.functions";
+import { applyTemplate } from "@/lib/templates.functions";
 import { DEFAULT_BRANDING, DEFAULT_THEME, FONT_PRESETS, THEME_PRESETS, type BrandingConfig, type ThemeConfig } from "@/lib/theme";
 
 export const Route = createFileRoute("/_authenticated/panel")({
@@ -57,7 +60,7 @@ export const Route = createFileRoute("/_authenticated/panel")({
   component: PanelPage,
 });
 
-type Tab = "overview" | "inbox" | "products" | "theme" | "branding" | "seo" | "accounts" | "visitors" | "analytics";
+type Tab = "overview" | "inbox" | "products" | "theme" | "branding" | "seo" | "accounts" | "visitors" | "analytics" | "logs";
 
 const TABS: { id: Tab; label: string; icon: any; developerOnly?: boolean }[] = [
   { id: "overview", label: "Overview", icon: ShieldCheck },
@@ -69,6 +72,7 @@ const TABS: { id: Tab; label: string; icon: any; developerOnly?: boolean }[] = [
   { id: "visitors", label: "Visitors", icon: Globe2 },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
   { id: "accounts", label: "Accounts", icon: Users, developerOnly: true },
+  { id: "logs", label: "Logs", icon: Activity, developerOnly: true },
 ];
 
 function PanelPage() {
@@ -159,6 +163,7 @@ function PanelPage() {
         {tab === "visitors" && <VisitorsTab data={data!} />}
         { tab === "analytics" && <AnalyticsDashboard data={data!} />}
         { tab === "accounts" && role === "developer" && <AccountsTab data={data!} onDone={() => void refetch()} />}
+        { tab === "logs" && role === "developer" && <LogsTab />}
       </section>
     </main>
   );
@@ -179,11 +184,29 @@ function Card({ title, value, hint }: { title: string; value: string | number; h
 function Overview({ data }: { data: Dash }) {
   const countries = new Set(data.tracking.map((t) => t.country).filter(Boolean)).size;
   return (
-    <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-      <Card title="Inquiries" value={data.inquiries.length} />
-      <Card title="Quote Requests" value={data.quotes.length} />
-      <Card title="Orders" value={data.orders.length} />
-      <Card title="Countries Reached" value={countries} hint={`${data.tracking.length} visits logged`} />
+    <div className="space-y-6">
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <Card title="Inquiries" value={data.inquiries.length} />
+        <Card title="Quote Requests" value={data.quotes.length} hint={`${data.quotes.filter(q => q.status === 'pending').length} pending`} />
+        <Card title="Orders" value={data.orders.length} />
+        <Card title="Countries" value={countries} hint={`${data.tracking.length} visits logged`} />
+      </div>
+
+      <div className="grid gap-5 sm:grid-cols-2">
+        <TemplateCard 
+          title="One-Click Business Site" 
+          description="Transform into a professional manufacturer showcase with optimized branding and service sections."
+          icon={Layout}
+          type="business"
+        />
+        <TemplateCard 
+          title="One-Click Online Store" 
+          description="Launch a full retail setup with sample products, optimized checkout, and high-conversion layouts."
+          icon={ShoppingBag}
+          type="store"
+        />
+      </div>
+
       <div className="glass rounded-3xl p-6 sm:col-span-2 lg:col-span-4">
         <p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground">
           <span className="live-dot inline-block h-2 w-2 rounded-full bg-primary" /> Live catalog
@@ -192,6 +215,44 @@ function Overview({ data }: { data: Dash }) {
           {data.products.length} products published · {data.products.filter((p) => p.is_featured).length} featured
         </p>
       </div>
+    </div>
+  );
+}
+
+function TemplateCard({ title, description, icon: Icon, type }: { title: string, description: string, icon: any, type: 'business' | 'store' }) {
+  const apply = useServerFn(applyTemplate);
+  const mutation = useMutation({
+    mutationFn: () => apply({ data: { type } }),
+    onSuccess: () => {
+      toast.success(`${title} template applied!`);
+      window.location.reload();
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed to apply template"),
+  });
+
+  return (
+    <div className="glass noise rounded-3xl p-6 flex flex-col justify-between items-start gap-4">
+      <div className="space-y-3">
+        <div className="h-10 w-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+          <Icon size={20} />
+        </div>
+        <div>
+          <h3 className="text-sm font-extrabold uppercase tracking-widest">{title}</h3>
+          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{description}</p>
+        </div>
+      </div>
+      <button 
+        onClick={() => {
+          if (confirm("This will update your site branding and settings. Continue?")) {
+            mutation.mutate();
+          }
+        }}
+        disabled={mutation.isPending}
+        className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-primary/30 text-primary text-[10px] font-bold uppercase hover:bg-primary/10 transition-colors flex items-center justify-center gap-2"
+      >
+        {mutation.isPending ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
+        Apply Template
+      </button>
     </div>
   );
 }
@@ -259,15 +320,22 @@ const EMPTY_PRODUCT = {
   price: 0, stock: 0, images: "", sizes: "", colors: "", is_featured: false, is_active: true,
 };
 
-function SortableImage({ id, url }: { id: string; url: string }) {
+function SortableImage({ id, url, isCover, onSetCover }: { id: string; url: string; isCover: boolean; onSetCover: () => void }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
   const style = { transform: CSS.Transform.toString(transform), transition, zIndex: isDragging ? 10 : 1 };
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="relative w-16 h-16 group cursor-grab active:cursor-grabbing">
-      <img src={url} alt="Product" className="w-full h-full object-cover rounded-lg border border-border" />
-      <div className="absolute top-0 right-0 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
-        <GripVertical size={12} className="text-white drop-shadow-md" />
+    <div ref={setNodeRef} style={style} className="relative w-16 h-16 group cursor-grab active:cursor-grabbing">
+      <img src={url} alt="Product" className={`w-full h-full object-cover rounded-lg border-2 ${isCover ? 'border-primary shadow-[0_0_10px_rgba(212,175,55,0.5)]' : 'border-border'}`} />
+      <div className="absolute top-0 right-0 p-1 opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 rounded-bl-lg">
+        <GripVertical size={12} className="text-white drop-shadow-md" {...attributes} {...listeners} />
       </div>
+      <button 
+        type="button"
+        onClick={(e) => { e.stopPropagation(); onSetCover(); }}
+        className={`absolute bottom-0 left-0 right-0 py-0.5 text-[8px] font-bold uppercase transition-all ${isCover ? 'bg-primary text-primary-foreground opacity-100' : 'bg-black/60 text-white opacity-0 group-hover:opacity-100'}`}
+      >
+        {isCover ? 'Cover' : 'Set Cover'}
+      </button>
     </div>
   );
 }
@@ -344,7 +412,17 @@ function ProductsTab({ data, onDone }: { data: Dash; onDone: () => void }) {
                   <SortableContext items={currentImages} strategy={horizontalListSortingStrategy}>
                     <div className="flex flex-wrap gap-2 mb-2">
                       {currentImages.map((img) => (
-                        <SortableImage key={img} id={img} url={img} />
+                        <SortableImage 
+                          key={img} 
+                          id={img} 
+                          url={img} 
+                          isCover={form.images.split(',')[0] === img} 
+                          onSetCover={() => {
+                            const imgs = form.images.split(',').map(s => s.trim()).filter(Boolean);
+                            const next = [img, ...imgs.filter(i => i !== img)];
+                            setForm({ ...form, images: next.join(',') });
+                          }}
+                        />
                       ))}
                     </div>
                   </SortableContext>
@@ -455,7 +533,8 @@ function ThemeStudio() {
 
   const saveMutation = useMutation({
     mutationFn: async () => {
-      setHistory(prev => [draft, ...prev.slice(0, 9)]);
+      const log = useServerFn(logAuditAction);
+      await log({ data: { action: "theme_publish", details: { config: draft } } });
       return persist({ data: { key: "theme", value: JSON.stringify(draft) } });
     },
     onSuccess: () => { toast.success("Theme published"); setPreviewOn(false); refresh(); },
@@ -963,6 +1042,9 @@ function SeoBulkEditor() {
         {filtered.map(item => {
           const currentSeo = updates[item.id] || (item.seo ? JSON.parse(item.seo.body || "{}") : { title: "", description: "", ogImage: "" });
           const hasChanges = !!updates[item.id];
+          const isTitleTooLong = currentSeo.title.length > 60;
+          const isDescTooLong = currentSeo.description.length > 160;
+          const isDescTooShort = currentSeo.description.length > 0 && currentSeo.description.length < 120;
 
           return (
             <div key={item.id} className={`p-4 rounded-2xl border transition-colors ${hasChanges ? "border-primary/50 bg-primary/5" : "border-border bg-black/20"}`}>
@@ -989,16 +1071,19 @@ function SeoBulkEditor() {
                   <input 
                     value={currentSeo.title}
                     onChange={(e) => setUpdates(prev => ({ ...prev, [item.id]: { ...currentSeo, title: e.target.value } }))}
-                    className="mt-1 w-full bg-transparent border border-border/50 rounded-lg px-2 py-1.5 text-xs focus:border-primary outline-none"
+                    className={`mt-1 w-full bg-transparent border rounded-lg px-2 py-1.5 text-xs outline-none focus:border-primary ${isTitleTooLong ? 'border-red-500/50' : 'border-border/50'}`}
                   />
+                  {isTitleTooLong && <p className="text-[8px] text-red-500 mt-0.5">Title is too long ({currentSeo.title.length}/60)</p>}
                 </label>
                 <label className="block">
                   <span className="text-[9px] font-bold uppercase text-muted-foreground">Description</span>
                   <input 
                     value={currentSeo.description}
                     onChange={(e) => setUpdates(prev => ({ ...prev, [item.id]: { ...currentSeo, description: e.target.value } }))}
-                    className="mt-1 w-full bg-transparent border border-border/50 rounded-lg px-2 py-1.5 text-xs focus:border-primary outline-none"
+                    className={`mt-1 w-full bg-transparent border rounded-lg px-2 py-1.5 text-xs outline-none focus:border-primary ${isDescTooLong || isDescTooShort ? 'border-amber-500/50' : 'border-border/50'}`}
                   />
+                  {isDescTooLong && <p className="text-[8px] text-red-500 mt-0.5">Description is too long ({currentSeo.description.length}/160)</p>}
+                  {isDescTooShort && <p className="text-[8px] text-amber-500 mt-0.5">Description is a bit short ({currentSeo.description.length}/120+ recommended)</p>}
                 </label>
                 <label className="block">
                   <span className="text-[9px] font-bold uppercase text-muted-foreground">OG Image</span>
@@ -1069,8 +1154,39 @@ function AnalyticsDashboard({ data }: { data: Dash }) {
 
   const COLORS = ['#d4af37', '#7fe9ff', '#39ff14', '#00f3ff', '#ff00ff'];
 
+  const exportToCsv = () => {
+    const headers = ["When", "Location", "Device", "Browser", "Page"];
+    const rows = filteredData.map(t => [
+      t.created_at ? new Date(t.created_at).toLocaleString() : "",
+      [t.city, t.region, t.country].filter(Boolean).join(", "),
+      `${t.device ?? ""}${t.os ? ` · ${t.os}` : ""}`,
+      t.browser ?? "",
+      t.page_path ?? ""
+    ]);
+    
+    const csvContent = [headers, ...rows].map(e => e.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `ambition-analytics-${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-extrabold uppercase">Visitor Analytics</h2>
+        <button 
+          onClick={exportToCsv}
+          className="flex items-center gap-2 px-4 py-2 rounded-xl border border-primary/30 text-primary text-[10px] font-bold uppercase hover:bg-primary/10 transition-colors"
+        >
+          <FileText size={14} /> Export CSV
+        </button>
+      </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="glass p-6 rounded-3xl">
           <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Filtered Visits</p>
@@ -1188,3 +1304,50 @@ function AnalyticsDashboard({ data }: { data: Dash }) {
     </div>
   );
 }
+
+function LogsTab() {
+  const auditLogs = useQuery({ queryKey: ["audit-logs"], queryFn: useServerFn(getAuditLogs) });
+  const emailLogs = useQuery({ queryKey: ["email-logs"], queryFn: useServerFn(getEmailLogs) });
+
+  return (
+    <div className="space-y-8">
+      <div className="glass overflow-x-auto rounded-3xl p-6">
+        <h2 className="mb-4 text-lg font-extrabold uppercase">Audit Logs (Theme Changes)</h2>
+        <table className="w-full text-left text-xs">
+          <thead className="text-[10px] uppercase text-muted-foreground">
+            <tr><th className="py-2">User</th><th>Action</th><th>Details</th><th>Date</th></tr>
+          </thead>
+          <tbody>
+            {auditLogs.data?.map(l => (
+              <tr key={l.id} className="border-t border-border">
+                <td className="py-3">{(l.profiles as any)?.email}</td>
+                <td>{l.action}</td>
+                <td className="font-mono">{JSON.stringify(l.details)}</td>
+                <td>{new Date(l.created_at).toLocaleString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="glass overflow-x-auto rounded-3xl p-6">
+        <h2 className="mb-4 text-lg font-extrabold uppercase">Email Logs (Confirmations)</h2>
+        <table className="w-full text-left text-xs">
+          <thead className="text-[10px] uppercase text-muted-foreground">
+            <tr><th className="py-2">Recipient</th><th>Subject</th><th>Status</th><th>Date</th></tr>
+          </thead>
+          <tbody>
+            {emailLogs.data?.map(l => (
+              <tr key={l.id} className="border-t border-border">
+                <td className="py-3">{l.recipient}</td>
+                <td>{l.subject}</td>
+                <td className={l.status === 'sent' ? 'text-green-500' : 'text-red-500'}>{l.status}</td>
+                <td>{new Date(l.created_at).toLocaleString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
