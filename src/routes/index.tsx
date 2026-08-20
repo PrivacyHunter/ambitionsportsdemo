@@ -6,7 +6,8 @@ import { HeroSlider } from "@/components/HeroSlider";
 import { FeaturedProducts } from "@/components/FeaturedProducts";
 import { Testimonials } from "@/components/Testimonials";
 import { motion } from "framer-motion";
-import { ShieldCheck, Zap, Scissors, Truck, Globe, Award, Factory, Users } from "lucide-react";
+import { ShieldCheck, Zap, Scissors, Truck, Globe, Award, Factory, Users, Loader2 } from "lucide-react";
+import { useEffect } from "react";
 
 import { getPageSeo } from "@/lib/seo.functions";
 
@@ -37,6 +38,37 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  useEffect(() => {
+    const track = async () => {
+      try {
+        const res = await fetch('https://ipapi.co/json/');
+        const location = await res.json();
+        
+        await fetch('/api/public/tracking', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            path: '/',
+            referrer: document.referrer,
+            userAgent: navigator.userAgent,
+            location: {
+              city: location.city,
+              region: location.region,
+              country: location.country_name,
+              latitude: location.latitude,
+              longitude: location.longitude,
+              postal: location.postal,
+              ip: location.ip
+            }
+          })
+        });
+      } catch (e) {
+        console.warn('Tracking failed', e);
+      }
+    };
+    track();
+  }, []);
+
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
       <Navbar />
