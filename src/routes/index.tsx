@@ -47,8 +47,8 @@ function Index() {
         <FeaturedProducts />
 
         {/* Facilities Section */}
-        <section className="bg-white/[0.01] py-32 px-4 lg:px-8 border-y border-white/5 relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(0,243,255,0.03),transparent_70%)]" />
+        <section className="bg-surface py-32 px-4 lg:px-8 border-y border-border relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,var(--primary),transparent_70%)] opacity-[0.03]" />
           <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-24 items-center">
             <div className="relative order-2 lg:order-1">
               <div className="grid grid-cols-2 gap-6">
@@ -59,14 +59,14 @@ function Index() {
                   </div>
                 </div>
                 <div className="space-y-6 pt-12">
-                  <div className="h-48 bg-neon-lime/10 rounded-3xl border border-neon-lime/20 flex items-center justify-center">
-                    <Users className="text-neon-lime w-16 h-16" />
+                  <div className="h-48 bg-primary/10 rounded-3xl border border-primary/20 flex items-center justify-center">
+                    <Users className="text-primary w-16 h-16" />
                   </div>
                   <div className="h-72 bg-[url('https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center rounded-3xl border border-white/10" />
                 </div>
               </div>
-              <div className="absolute -top-10 -left-10 w-40 h-40 bg-neon-cyan/20 blur-[100px] pointer-events-none" />
-              <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-neon-lime/20 blur-[100px] pointer-events-none" />
+              <div className="absolute -top-10 -left-10 w-40 h-40 bg-primary/20 blur-[100px] pointer-events-none" />
+              <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-primary/20 blur-[100px] pointer-events-none" />
             </div>
 
             <div className="order-1 lg:order-2">
@@ -85,7 +85,7 @@ function Index() {
                 <FacilityItem icon={<ShieldCheck className="text-primary" />} title="QC Protocol" desc="Triple-stage quality inspection." />
               </div>
 
-              <button className="bg-white text-background hover:bg-neon-cyan hover:shadow-[0_0_30px_rgba(0,243,255,0.4)] px-10 py-5 rounded-xl font-black uppercase tracking-widest text-sm transition-all duration-300">
+              <button className="bg-primary text-primary-foreground hover:bg-white hover:shadow-[0_0_30px_rgba(212,175,55,0.4)] px-10 py-5 rounded-xl font-black uppercase tracking-widest text-sm transition-all duration-300">
                 Explore Stitching Unit
               </button>
             </div>
@@ -98,7 +98,7 @@ function Index() {
           <h2 className="text-5xl md:text-7xl font-black uppercase italic mb-24 tracking-tighter">Manufacturing <span className="text-primary">Workflow</span></h2>
           
           <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-12 relative">
-            <div className="hidden lg:block absolute top-12 left-0 w-full h-[2px] bg-white/5 -z-10" />
+            <div className="hidden lg:block absolute top-12 left-0 w-full h-[2px] bg-border -z-10" />
             <WorkflowStep num="01" title="Design" desc="Digital mockups & 3D tech packs." />
             <WorkflowStep num="02" title="Material" desc="Elite performance fabrics selection." />
             <WorkflowStep num="03" title="Stitching" desc="High-density flatlock precision." />
@@ -114,14 +114,14 @@ function Index() {
           </div>
           <div className="max-w-7xl mx-auto px-4 lg:px-8 relative z-10 flex flex-col lg:flex-row items-center justify-between gap-12">
             <div className="text-center lg:text-left">
-              <h2 className="text-background font-black text-4xl md:text-5xl uppercase italic tracking-tighter mb-2">We Ship Worldwide</h2>
-              <p className="text-background/80 font-bold uppercase tracking-widest text-sm">Express doorstep delivery via global partners</p>
+              <h2 className="text-primary-foreground font-black text-4xl md:text-5xl uppercase italic tracking-tighter mb-2">We Ship Worldwide</h2>
+              <p className="text-primary-foreground/80 font-bold uppercase tracking-widest text-sm">Express doorstep delivery via global partners</p>
             </div>
             <div className="flex flex-wrap justify-center gap-12 items-center grayscale brightness-0 opacity-90">
-               <div className="text-background font-black text-2xl tracking-tighter italic">DHL EXPRESS</div>
-               <div className="text-background font-black text-2xl tracking-tighter italic">FEDEX</div>
-               <div className="text-background font-black text-2xl tracking-tighter italic">UPS</div>
-               <div className="text-background font-black text-2xl tracking-tighter italic">ARAMEX</div>
+               <div className="text-primary-foreground font-black text-2xl tracking-tighter italic">DHL EXPRESS</div>
+               <div className="text-primary-foreground font-black text-2xl tracking-tighter italic">FEDEX</div>
+               <div className="text-primary-foreground font-black text-2xl tracking-tighter italic">UPS</div>
+               <div className="text-primary-foreground font-black text-2xl tracking-tighter italic">ARAMEX</div>
             </div>
           </div>
         </section>
