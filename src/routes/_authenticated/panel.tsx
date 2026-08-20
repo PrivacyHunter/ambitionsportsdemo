@@ -2267,10 +2267,17 @@ function InstagramTab() {
   const getSettings = useServerFn(getInstagramSettings);
   const updateSettings = useServerFn(updateInstagramSettings);
   const syncPosts = useServerFn(syncInstagramPosts);
+  const getLogs = useServerFn(getInstagramLogs);
   
   const { data: settings, refetch } = useQuery({
     queryKey: ['instagram-settings'],
     queryFn: () => getSettings(),
+  });
+
+  const { data: logs } = useQuery({
+    queryKey: ['instagram-logs'],
+    queryFn: () => getLogs(),
+    enabled: !!settings?.is_connected
   });
 
   const updateMutation = useMutation({
@@ -2280,7 +2287,11 @@ function InstagramTab() {
 
   const syncMutation = useMutation({
     mutationFn: () => syncPosts(),
-    onSuccess: () => { toast.success("Posts synced successfully"); refetch(); }
+    onSuccess: () => { 
+      toast.success("Posts synced successfully"); 
+      refetch(); 
+      queryClient.invalidateQueries({ queryKey: ['instagram-logs'] });
+    }
   });
 
   const [token, setToken] = useState("");
@@ -2288,14 +2299,25 @@ function InstagramTab() {
   return (
     <div className="space-y-6">
       <div className="glass rounded-[2rem] p-8 border border-white/5">
-        <div className="flex items-center gap-4 mb-6">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] flex items-center justify-center text-white shadow-xl">
-            <Instagram size={32} />
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] flex items-center justify-center text-white shadow-xl">
+              <Instagram size={32} />
+            </div>
+            <div>
+              <h2 className="text-xl font-black uppercase italic">Instagram Studio</h2>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mt-1">Connect your brand's social feed</p>
+            </div>
           </div>
-          <div>
-            <h2 className="text-xl font-black uppercase italic">Instagram Studio</h2>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mt-1">Connect your brand's social feed</p>
-          </div>
+          
+          {settings?.is_connected && (
+            <div className="flex items-center gap-2">
+              <div className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest flex items-center gap-1.5 ${settings.last_sync_status === 'success' ? 'bg-green-500/10 text-green-500 border border-green-500/20' : 'bg-red-500/10 text-red-500 border border-red-500/20'}`}>
+                <div className={`w-1.5 h-1.5 rounded-full ${settings.last_sync_status === 'success' ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
+                {settings.last_sync_status === 'success' ? 'Systems Nominal' : 'Sync Interrupted'}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="grid md:grid-cols-2 gap-8">
@@ -2335,9 +2357,10 @@ function InstagramTab() {
                       Sync Feed Now
                     </button>
                   </div>
-                  <p className="text-[9px] text-muted-foreground text-center uppercase tracking-tighter">
-                    Last synced: {settings.last_sync ? new Date(settings.last_sync).toLocaleString() : 'Never'}
-                  </p>
+                  <div className="flex justify-between items-center text-[9px] text-muted-foreground uppercase font-bold tracking-tighter">
+                    <span>Last Synced</span>
+                    <span>{settings.last_sync ? new Date(settings.last_sync).toLocaleString() : 'Never'}</span>
+                  </div>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -2367,6 +2390,31 @@ function InstagramTab() {
                 </div>
               )}
             </div>
+
+            <div className="p-6 rounded-3xl bg-white/5 border border-white/10">
+              <h3 className="text-xs font-bold uppercase tracking-widest mb-4 flex items-center gap-2">
+                <AlertCircle size={14} className="text-primary" /> Posting Logs
+              </h3>
+              <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
+                {logs?.map((log: any) => (
+                  <div key={log.id} className="p-3 rounded-xl bg-black/20 border border-white/5 flex items-center justify-between group">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className={`w-1.5 h-1.5 rounded-full ${log.status === 'success' ? 'bg-green-500' : 'bg-red-500'}`} />
+                        <p className="text-[10px] font-bold uppercase">{log.message || (log.status === 'success' ? 'Synced Successfully' : 'Sync Failed')}</p>
+                      </div>
+                      <p className="text-[8px] text-muted-foreground mt-0.5">{new Date(log.created_at).toLocaleString()}</p>
+                    </div>
+                    {log.posts_synced > 0 && (
+                      <span className="text-[8px] font-black bg-primary/10 text-primary px-2 py-0.5 rounded-full">+{log.posts_synced} Posts</span>
+                    )}
+                  </div>
+                ))}
+                {(!logs || logs.length === 0) && (
+                  <p className="text-[10px] text-muted-foreground text-center py-8 italic uppercase tracking-widest">No logs available</p>
+                )}
+              </div>
+            </div>
           </div>
 
           <div className="space-y-6">
@@ -2375,6 +2423,18 @@ function InstagramTab() {
                 <Settings2 size={14} className="text-primary" /> Auto-Feed Rules
               </h3>
               <div className="space-y-4">
+                <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
+                  <div className="space-y-0.5">
+                    <span className="text-[10px] font-bold uppercase block">Auto-Publish</span>
+                    <span className="text-[8px] text-muted-foreground uppercase font-medium">Sync new posts every hour</span>
+                  </div>
+                  <button 
+                    onClick={() => updateMutation.mutate({ auto_publish: !settings?.auto_publish })}
+                    className={`w-10 h-5 rounded-full transition-all relative ${settings?.auto_publish ? 'bg-primary/20 border-primary/40' : 'bg-white/10 border-white/20'}`}
+                  >
+                    <div className={`absolute top-1 w-3 h-3 rounded-full transition-all ${settings?.auto_publish ? 'right-1 bg-primary' : 'left-1 bg-white/40'}`} />
+                  </button>
+                </div>
                 <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
                   <span className="text-[10px] font-bold uppercase">Show on Home Page</span>
                   <button className="w-10 h-5 rounded-full bg-primary/20 border border-primary/40 relative">
@@ -2389,7 +2449,7 @@ function InstagramTab() {
                 </div>
                 <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
                   <span className="text-[10px] font-bold uppercase">Filter by Hashtag</span>
-                  <input placeholder="#ambition" className="bg-transparent border-none text-[10px] text-right focus:ring-0 outline-none" />
+                  <input placeholder="#ambition" className="bg-transparent border-none text-[10px] text-right focus:ring-0 outline-none placeholder:text-white/20" />
                 </div>
                 <div className="pt-4 mt-4 border-t border-white/5">
                   <p className="text-[9px] text-muted-foreground leading-relaxed uppercase tracking-tighter">
@@ -2404,5 +2464,6 @@ function InstagramTab() {
     </div>
   );
 }
+
 
 
