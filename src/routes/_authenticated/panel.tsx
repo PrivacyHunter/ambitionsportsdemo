@@ -7,7 +7,8 @@ import {
   Eye, EyeOff, Loader2, LogOut, Package, Palette, Save, Settings2,
   ShieldCheck, Users, Globe2, Inbox, History, Download, Upload,
   Search, BarChart3, TrendingUp, MapPin, Smartphone,
-  ArrowRight, GripVertical, Check, Wand2
+  ArrowRight, GripVertical, Check, Wand2, FileJson,
+  Layout, ShoppingBag, FileText, Activity
 } from "lucide-react";
 import { SiGooglechrome as Chrome } from "react-icons/si";
 import {
@@ -40,6 +41,8 @@ import {
 } from "@/lib/admin.functions";
 import { getPageSeo, savePageSeo } from "@/lib/seo.functions";
 import { getSeoBulk, saveSeoBulk, autoGenerateSeo } from "@/lib/seo-bulk.functions";
+import { logAuditAction, getAuditLogs, getEmailLogs } from "@/lib/logs.functions";
+import { applyTemplate } from "@/lib/templates.functions";
 import { DEFAULT_BRANDING, DEFAULT_THEME, FONT_PRESETS, THEME_PRESETS, type BrandingConfig, type ThemeConfig } from "@/lib/theme";
 
 export const Route = createFileRoute("/_authenticated/panel")({
@@ -57,7 +60,7 @@ export const Route = createFileRoute("/_authenticated/panel")({
   component: PanelPage,
 });
 
-type Tab = "overview" | "inbox" | "products" | "theme" | "branding" | "seo" | "accounts" | "visitors" | "analytics";
+type Tab = "overview" | "inbox" | "products" | "theme" | "branding" | "seo" | "accounts" | "visitors" | "analytics" | "logs";
 
 const TABS: { id: Tab; label: string; icon: any; developerOnly?: boolean }[] = [
   { id: "overview", label: "Overview", icon: ShieldCheck },
@@ -69,6 +72,7 @@ const TABS: { id: Tab; label: string; icon: any; developerOnly?: boolean }[] = [
   { id: "visitors", label: "Visitors", icon: Globe2 },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
   { id: "accounts", label: "Accounts", icon: Users, developerOnly: true },
+  { id: "logs", label: "Logs", icon: Activity, developerOnly: true },
 ];
 
 function PanelPage() {
@@ -159,6 +163,7 @@ function PanelPage() {
         {tab === "visitors" && <VisitorsTab data={data!} />}
         { tab === "analytics" && <AnalyticsDashboard data={data!} />}
         { tab === "accounts" && role === "developer" && <AccountsTab data={data!} onDone={() => void refetch()} />}
+        { tab === "logs" && role === "developer" && <LogsTab />}
       </section>
     </main>
   );
@@ -179,11 +184,29 @@ function Card({ title, value, hint }: { title: string; value: string | number; h
 function Overview({ data }: { data: Dash }) {
   const countries = new Set(data.tracking.map((t) => t.country).filter(Boolean)).size;
   return (
-    <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-      <Card title="Inquiries" value={data.inquiries.length} />
-      <Card title="Quote Requests" value={data.quotes.length} />
-      <Card title="Orders" value={data.orders.length} />
-      <Card title="Countries Reached" value={countries} hint={`${data.tracking.length} visits logged`} />
+    <div className="space-y-6">
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <Card title="Inquiries" value={data.inquiries.length} />
+        <Card title="Quote Requests" value={data.quotes.length} hint={`${data.quotes.filter(q => q.status === 'pending').length} pending`} />
+        <Card title="Orders" value={data.orders.length} />
+        <Card title="Countries" value={countries} hint={`${data.tracking.length} visits logged`} />
+      </div>
+
+      <div className="grid gap-5 sm:grid-cols-2">
+        <TemplateCard 
+          title="One-Click Business Site" 
+          description="Transform into a professional manufacturer showcase with optimized branding and service sections."
+          icon={Layout}
+          type="business"
+        />
+        <TemplateCard 
+          title="One-Click Online Store" 
+          description="Launch a full retail setup with sample products, optimized checkout, and high-conversion layouts."
+          icon={ShoppingBag}
+          type="store"
+        />
+      </div>
+
       <div className="glass rounded-3xl p-6 sm:col-span-2 lg:col-span-4">
         <p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground">
           <span className="live-dot inline-block h-2 w-2 rounded-full bg-primary" /> Live catalog
@@ -192,6 +215,44 @@ function Overview({ data }: { data: Dash }) {
           {data.products.length} products published · {data.products.filter((p) => p.is_featured).length} featured
         </p>
       </div>
+    </div>
+  );
+}
+
+function TemplateCard({ title, description, icon: Icon, type }: { title: string, description: string, icon: any, type: 'business' | 'store' }) {
+  const apply = useServerFn(applyTemplate);
+  const mutation = useMutation({
+    mutationFn: () => apply({ data: { type } }),
+    onSuccess: () => {
+      toast.success(`${title} template applied!`);
+      window.location.reload();
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed to apply template"),
+  });
+
+  return (
+    <div className="glass noise rounded-3xl p-6 flex flex-col justify-between items-start gap-4">
+      <div className="space-y-3">
+        <div className="h-10 w-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+          <Icon size={20} />
+        </div>
+        <div>
+          <h3 className="text-sm font-extrabold uppercase tracking-widest">{title}</h3>
+          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{description}</p>
+        </div>
+      </div>
+      <button 
+        onClick={() => {
+          if (confirm("This will update your site branding and settings. Continue?")) {
+            mutation.mutate();
+          }
+        }}
+        disabled={mutation.isPending}
+        className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-primary/30 text-primary text-[10px] font-bold uppercase hover:bg-primary/10 transition-colors flex items-center justify-center gap-2"
+      >
+        {mutation.isPending ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
+        Apply Template
+      </button>
     </div>
   );
 }
