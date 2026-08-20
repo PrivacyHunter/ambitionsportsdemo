@@ -14,11 +14,12 @@ export const getPageSeo = createServerFn({ method: "GET" })
     );
     const { data: res } = await client
       .from("page_content")
-      .select("content")
-      .eq("section", `seo:${data.path}`)
+      .select("body")
+      .eq("page", "seo")
+      .eq("section_key", data.path)
       .single();
     
-    return res?.content ? JSON.parse(res.content) : null;
+    return res?.body ? JSON.parse(res.body) : null;
   });
 
 export const savePageSeo = createServerFn({ method: "POST" })
@@ -38,11 +39,15 @@ export const savePageSeo = createServerFn({ method: "POST" })
     const { error } = await context.supabase
       .from("page_content")
       .upsert({
-        section: `seo:${data.path}`,
-        content: JSON.stringify(data.seo),
+        page: "seo",
+        section_key: data.path,
+        body: JSON.stringify(data.seo),
         updated_at: new Date().toISOString(),
-      }, { onConflict: "section" });
+      }, { onConflict: "page,section_key" });
     
-    if (error) throw new Error(error.message);
+    if (error) {
+        console.error("SEO save error:", error);
+        throw new Error(error.message);
+    }
     return { ok: true as const };
   });
