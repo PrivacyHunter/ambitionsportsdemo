@@ -26,7 +26,7 @@ export const Route = createFileRoute('/customization')({
 
 function VideoPlayer({ url, title }: { url: string; title: string }) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [isPlaying, setIsPlaying] = useState(true); // Default to true as it autoPlays
+  const [isPlaying, setIsPlaying] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
 
   const togglePlay = () => {
@@ -97,7 +97,7 @@ function CustomizationPage() {
   const getVideosFn = useServerFn(getCustomizationVideos);
   const getSeoFn = useServerFn(getPageSeo);
 
-  const { data: videos } = useQuery({
+  const { data: videos, isLoading } = useQuery({
     queryKey: ['customization-videos'],
     queryFn: () => getVideosFn(),
   });
@@ -110,7 +110,7 @@ function CustomizationPage() {
   const icons = [Palette, Layers, Cpu, Scissors];
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-background">
       <Navbar />
       
       <main className="flex-grow pt-24 pb-20">
@@ -128,7 +128,19 @@ function CustomizationPage() {
           </div>
 
           <div className="space-y-32">
-            {videos?.map((v: any, i: number) => {
+            {isLoading ? (
+               <div className="grid lg:grid-cols-2 gap-12 items-center animate-pulse">
+                 <div className="space-y-6">
+                   <div className="h-10 w-48 bg-white/5 rounded-lg" />
+                   <div className="h-24 w-full bg-white/5 rounded-2xl" />
+                   <div className="flex gap-4">
+                     <div className="h-8 w-24 bg-white/5 rounded-full" />
+                     <div className="h-8 w-24 bg-white/5 rounded-full" />
+                   </div>
+                 </div>
+                 <div className="aspect-video bg-white/5 rounded-[2rem]" />
+               </div>
+            ) : videos?.map((v: any, i: number) => {
               const Icon = icons[i % icons.length];
               return (
                 <div key={v.id} className={`grid lg:grid-cols-2 gap-12 items-center ${i % 2 === 1 ? 'lg:flex-row-reverse' : ''}`}>
