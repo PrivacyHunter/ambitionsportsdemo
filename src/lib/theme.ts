@@ -36,6 +36,29 @@ export const FONT_PRESETS = [
   { label: "Syne / Inter", display: '"Syne", sans-serif', body: '"Inter", sans-serif' },
 ];
 
+export const THEME_PRESETS: Record<string, ThemeConfig> = {
+  luxury: {
+    ...DEFAULT_THEME,
+    goldAccent: "#d4af37",
+    darkBackground: "#080a0f",
+    cyanAccent: "#7fe9ff",
+  },
+  neon: {
+    ...DEFAULT_THEME,
+    goldAccent: "#39ff14",
+    cyanAccent: "#00f3ff",
+    darkBackground: "#020617",
+  },
+  studio: {
+    ...DEFAULT_THEME,
+    goldAccent: "#111111",
+    cyanAccent: "#333333",
+    lightBackground: "#ffffff",
+    defaultMode: "light",
+  },
+};
+
+
 export type BrandingConfig = {
   logoText: string;
   logoUrl: string;
