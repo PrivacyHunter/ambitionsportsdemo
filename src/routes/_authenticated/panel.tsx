@@ -1687,10 +1687,13 @@ function RestoreButton() {
 }
 
 
+import { getCustomizationVideos, upsertCustomizationVideo, deleteCustomizationVideo } from "@/lib/customization.functions";
+
 function CustomizationTab({ onDone }: { onDone: () => void }) {
-  const getVideosFn = useServerFn(require('@/lib/customization.functions').getCustomizationVideos);
-  const upsertVideoFn = useServerFn(require('@/lib/customization.functions').upsertCustomizationVideo);
-  const deleteVideoFn = useServerFn(require('@/lib/customization.functions').deleteCustomizationVideo);
+  const getVideosFn = useServerFn(getCustomizationVideos);
+  const upsertVideoFn = useServerFn(upsertCustomizationVideo);
+  const deleteVideoFn = useServerFn(deleteCustomizationVideo);
+  
   
   const { data: videos, refetch } = useQuery({
     queryKey: ['admin-customization-videos'],
