@@ -1457,14 +1457,6 @@ function LogsTab() {
 
   return (
     <div className="space-y-8">
-      <div className="glass rounded-3xl p-6">
-        <h2 className="mb-4 text-lg font-extrabold uppercase">Backup &amp; Restore</h2>
-        <div className="flex flex-wrap gap-4">
-          <BackupButton />
-          <RestoreButton />
-        </div>
-      </div>
-
       <div className="glass overflow-x-auto rounded-3xl p-6">
         <h2 className="mb-4 text-lg font-extrabold uppercase">Audit Logs (Theme Changes)</h2>
         <table className="w-full text-left text-xs">
