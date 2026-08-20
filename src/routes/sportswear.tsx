@@ -112,7 +112,7 @@ function Sportswear() {
 
 
   return (
-    <div className="min-h-screen bg-background text-foreground selection:bg-neon-cyan selection:text-background">
+    <div className="min-h-screen bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
       <Navbar />
 
       <main>
