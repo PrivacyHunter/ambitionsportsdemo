@@ -214,33 +214,69 @@ export type Database = {
       instagram_settings: {
         Row: {
           access_token: string | null
+          auto_publish: boolean | null
           created_at: string | null
           id: string
           instagram_user_id: string | null
           is_connected: boolean | null
           last_sync: string | null
+          last_sync_error: string | null
+          last_sync_status: string | null
           updated_at: string | null
           username: string | null
         }
         Insert: {
           access_token?: string | null
+          auto_publish?: boolean | null
           created_at?: string | null
           id?: string
           instagram_user_id?: string | null
           is_connected?: boolean | null
           last_sync?: string | null
+          last_sync_error?: string | null
+          last_sync_status?: string | null
           updated_at?: string | null
           username?: string | null
         }
         Update: {
           access_token?: string | null
+          auto_publish?: boolean | null
           created_at?: string | null
           id?: string
           instagram_user_id?: string | null
           is_connected?: boolean | null
           last_sync?: string | null
+          last_sync_error?: string | null
+          last_sync_status?: string | null
           updated_at?: string | null
           username?: string | null
+        }
+        Relationships: []
+      }
+      instagram_sync_logs: {
+        Row: {
+          created_at: string | null
+          id: string
+          message: string | null
+          posts_synced: number | null
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          message?: string | null
+          posts_synced?: number | null
+          status: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          message?: string | null
+          posts_synced?: number | null
+          status?: string
+          user_id?: string | null
         }
         Relationships: []
       }
