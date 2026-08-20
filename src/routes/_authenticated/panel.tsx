@@ -2389,6 +2389,45 @@ function InstagramTab() {
                     <span>Last Synced</span>
                     <span>{settings.last_sync ? new Date(settings.last_sync).toLocaleString() : 'Never'}</span>
                   </div>
+
+                  <div className="pt-4 border-t border-white/5 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Token Status</span>
+                      <span className={`text-[9px] font-black uppercase ${tokenExpired ? 'text-red-500' : 'text-green-500'}`}>
+                        {tokenExpired ? 'Expired — re-auth required' : 'Valid'}
+                      </span>
+                    </div>
+                    <input
+                      type="password"
+                      placeholder="Paste fresh Graph API token to re-authorise..."
+                      className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm"
+                      value={token}
+                      onChange={e => setToken(e.target.value)}
+                    />
+                    <button
+                      onClick={() => reconnectMutation.mutate(token)}
+                      disabled={!token || reconnectMutation.isPending}
+                      className="w-full py-3 rounded-xl bg-primary text-primary-foreground text-[10px] font-black uppercase tracking-[0.2em] disabled:opacity-40"
+                    >
+                      {reconnectMutation.isPending ? 'Re-authorising...' : 'One-Click Reconnect'}
+                    </button>
+                  </div>
+
+                  <div className="pt-4 border-t border-white/5 space-y-2">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Realtime Webhook URL</span>
+                    <div className="flex gap-2">
+                      <input readOnly value={webhookUrl} className="flex-1 bg-black/20 border border-white/10 rounded-xl px-3 py-2 text-[10px]" />
+                      <button
+                        onClick={() => { void navigator.clipboard.writeText(webhookUrl); toast.success("Webhook URL copied"); }}
+                        className="px-3 rounded-xl bg-white/5 border border-white/10 text-[9px] font-black uppercase"
+                      >
+                        Copy
+                      </button>
+                    </div>
+                    <p className="text-[8px] text-muted-foreground uppercase tracking-tighter">
+                      Verify token: <span className="text-primary">{settings.webhook_verify_token ?? '—'}</span> · New posts publish instantly, duplicates are skipped automatically.
+                    </p>
+                  </div>
                 </div>
               ) : (
                 <div className="space-y-4">
