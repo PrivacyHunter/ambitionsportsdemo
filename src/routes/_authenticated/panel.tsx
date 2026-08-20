@@ -426,10 +426,6 @@ function ThemeStudio() {
           </label>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-            {previewOn ? <Eye size={13} /> : <EyeOff size={13} />} Live preview
-          </button>
-        </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
           {colorFields.map(([key, label]) => (
