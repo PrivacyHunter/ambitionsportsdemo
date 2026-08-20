@@ -2118,7 +2118,7 @@ function CustomizationTab({ onDone }: { onDone: () => void }) {
               </button>
               <button 
                 onClick={() => mutation.mutate(editing)}
-                disabled={mutation.isPending || isUploading}
+                disabled={mutation.isPending || isUploading || isUploadingSubtitles}
                 className="flex-grow bg-primary text-primary-foreground py-3 rounded-xl text-xs font-bold uppercase"
               >
                 {mutation.isPending ? 'Saving...' : 'Save Draft / Publish'}
