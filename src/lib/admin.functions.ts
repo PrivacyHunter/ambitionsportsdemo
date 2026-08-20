@@ -107,9 +107,16 @@ export const upsertProduct = createServerFn({ method: "POST" })
   )
   .handler(async ({ context, data }) => {
     await assertStaff(context.supabase, context.userId);
+    const { id, price, ...rest } = data;
+    const row = {
+      ...rest,
+      ...(id ? { id } : {}),
+      ...(price === undefined ? {} : { price }),
+      updated_at: new Date().toISOString(),
+    };
     const { error } = await context.supabase
       .from("products")
-      .upsert({ ...data, updated_at: new Date().toISOString() }, { onConflict: "slug" });
+      .upsert(row, { onConflict: "slug" });
     if (error) throw new Error(error.message);
     return { ok: true as const };
   });

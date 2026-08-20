@@ -10,19 +10,25 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as ActivewearRouteImport } from './routes/activewear'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CasualWearRouteImport } from './routes/casual-wear'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as QuoteRouteImport } from './routes/quote'
 import { Route as SportswearRouteImport } from './routes/sportswear'
 import { Route as TrackRouteImport } from './routes/track'
-import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as AuthenticatedPanelRouteImport } from './routes/_authenticated/panel'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -33,6 +39,11 @@ const AboutRoute = AboutRouteImport.update({
 const ActivewearRoute = ActivewearRouteImport.update({
   id: '/activewear',
   path: '/activewear',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CasualWearRoute = CasualWearRouteImport.update({
@@ -65,48 +76,52 @@ const TrackRoute = TrackRouteImport.update({
   path: '/track',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminIndexRoute = AdminIndexRouteImport.update({
-  id: '/admin/',
-  path: '/admin/',
-  getParentRoute: () => rootRouteImport,
+const AuthenticatedPanelRoute = AuthenticatedPanelRouteImport.update({
+  id: '/panel',
+  path: '/panel',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/activewear': typeof ActivewearRoute
+  '/auth': typeof AuthRoute
   '/casual-wear': typeof CasualWearRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/quote': typeof QuoteRoute
   '/sportswear': typeof SportswearRoute
   '/track': typeof TrackRoute
-  '/admin/': typeof AdminIndexRoute
+  '/panel': typeof AuthenticatedPanelRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/activewear': typeof ActivewearRoute
+  '/auth': typeof AuthRoute
   '/casual-wear': typeof CasualWearRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/quote': typeof QuoteRoute
   '/sportswear': typeof SportswearRoute
   '/track': typeof TrackRoute
-  '/admin': typeof AdminIndexRoute
+  '/panel': typeof AuthenticatedPanelRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/activewear': typeof ActivewearRoute
+  '/auth': typeof AuthRoute
   '/casual-wear': typeof CasualWearRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/quote': typeof QuoteRoute
   '/sportswear': typeof SportswearRoute
   '/track': typeof TrackRoute
-  '/admin/': typeof AdminIndexRoute
+  '/_authenticated/panel': typeof AuthenticatedPanelRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -114,50 +129,55 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/activewear'
+    | '/auth'
     | '/casual-wear'
     | '/checkout'
     | '/contact'
     | '/quote'
     | '/sportswear'
     | '/track'
-    | '/admin/'
+    | '/panel'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
     | '/activewear'
+    | '/auth'
     | '/casual-wear'
     | '/checkout'
     | '/contact'
     | '/quote'
     | '/sportswear'
     | '/track'
-    | '/admin'
+    | '/panel'
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
     | '/about'
     | '/activewear'
+    | '/auth'
     | '/casual-wear'
     | '/checkout'
     | '/contact'
     | '/quote'
     | '/sportswear'
     | '/track'
-    | '/admin/'
+    | '/_authenticated/panel'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
   ActivewearRoute: typeof ActivewearRoute
+  AuthRoute: typeof AuthRoute
   CasualWearRoute: typeof CasualWearRoute
   CheckoutRoute: typeof CheckoutRoute
   ContactRoute: typeof ContactRoute
   QuoteRoute: typeof QuoteRoute
   SportswearRoute: typeof SportswearRoute
   TrackRoute: typeof TrackRoute
-  AdminIndexRoute: typeof AdminIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -167,6 +187,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -181,6 +208,13 @@ declare module '@tanstack/react-router' {
       path: '/activewear'
       fullPath: '/activewear'
       preLoaderRoute: typeof ActivewearRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/casual-wear': {
@@ -225,27 +259,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TrackRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/': {
-      id: '/admin/'
-      path: '/admin'
-      fullPath: '/admin/'
-      preLoaderRoute: typeof AdminIndexRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_authenticated/panel': {
+      id: '/_authenticated/panel'
+      path: '/panel'
+      fullPath: '/panel'
+      preLoaderRoute: typeof AuthenticatedPanelRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedPanelRoute: typeof AuthenticatedPanelRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedPanelRoute: AuthenticatedPanelRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AboutRoute: AboutRoute,
   ActivewearRoute: ActivewearRoute,
+  AuthRoute: AuthRoute,
   CasualWearRoute: CasualWearRoute,
   CheckoutRoute: CheckoutRoute,
   ContactRoute: ContactRoute,
   QuoteRoute: QuoteRoute,
   SportswearRoute: SportswearRoute,
   TrackRoute: TrackRoute,
-  AdminIndexRoute: AdminIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

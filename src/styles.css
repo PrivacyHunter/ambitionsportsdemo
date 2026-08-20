@@ -32,35 +32,92 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-ring-offset-background: var(--background);
-  
+
   --color-neon-cyan: var(--neon-cyan);
   --color-neon-lime: var(--neon-lime);
+  --color-gold: var(--gold);
+  --color-silver: var(--silver);
+  --color-surface: var(--surface);
+  --color-surface-strong: var(--surface-strong);
+  --color-hairline: var(--hairline);
+
+  --font-display: var(--font-display-family);
+  --font-sans: var(--font-body-family);
 }
 
+/* ---------- Luxury Obsidian (default) ---------- */
 :root {
-  --radius: 0.625rem;
-  --background: oklch(0.129 0.042 264.695); /* Deep Obsidian */
-  --foreground: oklch(0.984 0.003 247.858);
-  --card: oklch(0.18 0.04 260);
-  --card-foreground: oklch(0.984 0.003 247.858);
-  --popover: oklch(0.18 0.04 260);
-  --popover-foreground: oklch(0.984 0.003 247.858);
-  --primary: oklch(0.7 0.2 200); /* Cyan-ish primary */
-  --primary-foreground: oklch(0.129 0.042 264.695);
-  --secondary: oklch(0.279 0.041 260.031);
-  --secondary-foreground: oklch(0.984 0.003 247.858);
-  --muted: oklch(0.279 0.041 260.031);
-  --muted-foreground: oklch(0.704 0.04 256.788);
-  --accent: oklch(0.8 0.3 150); /* Lime-ish accent */
-  --accent-foreground: oklch(0.129 0.042 264.695);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.551 0.027 264.364);
+  --radius: 0.9rem;
+  --section-space: 6rem;
 
-  --neon-cyan: #00f3ff;
-  --neon-lime: #39ff14;
+  --font-display-family: "Syne", "Space Grotesk", sans-serif;
+  --font-body-family: "Plus Jakarta Sans", "Inter", sans-serif;
+  --display-tracking: -0.03em;
+
+  --background: #080a0f;
+  --foreground: #f4f7fb;
+  --card: #111622;
+  --card-foreground: #f4f7fb;
+  --popover: #111622;
+  --popover-foreground: #f4f7fb;
+  --primary: #d4af37;
+  --primary-foreground: #0b0f19;
+  --secondary: #1a2130;
+  --secondary-foreground: #f4f7fb;
+  --muted: #161c29;
+  --muted-foreground: #97a3b6;
+  --accent: #7fe9ff;
+  --accent-foreground: #0b0f19;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: rgb(255 255 255 / 10%);
+  --input: rgb(255 255 255 / 14%);
+  --ring: #d4af37;
+
+  --neon-cyan: #7fe9ff;
+  --neon-lime: #d4af37;
+  --gold: #d4af37;
+  --silver: #e2e8f0;
+
+  --surface: rgb(255 255 255 / 3%);
+  --surface-strong: rgb(255 255 255 / 7%);
+  --hairline: rgb(255 255 255 / 10%);
+
+  --elevation: 0 30px 80px -30px rgb(0 0 0 / 80%);
+  --glow: 0 0 40px rgb(212 175 55 / 22%);
+}
+
+/* ---------- Minimalist Studio Light ---------- */
+.light {
+  --background: #ffffff;
+  --foreground: #0b0f19;
+  --card: #f4f6f8;
+  --card-foreground: #0b0f19;
+  --popover: #ffffff;
+  --popover-foreground: #0b0f19;
+  --primary: #b3922c;
+  --primary-foreground: #ffffff;
+  --secondary: #eef1f4;
+  --secondary-foreground: #0b0f19;
+  --muted: #f4f6f8;
+  --muted-foreground: #57606f;
+  --accent: #0e7490;
+  --accent-foreground: #ffffff;
+  --border: rgb(11 15 25 / 10%);
+  --input: rgb(11 15 25 / 14%);
+  --ring: #b3922c;
+
+  --neon-cyan: #0e7490;
+  --neon-lime: #b3922c;
+  --gold: #b3922c;
+  --silver: #64748b;
+
+  --surface: rgb(11 15 25 / 3%);
+  --surface-strong: rgb(11 15 25 / 6%);
+  --hairline: rgb(11 15 25 / 8%);
+
+  --elevation: 0 24px 60px -28px rgb(11 15 25 / 22%);
+  --glow: 0 0 34px rgb(179 146 44 / 18%);
 }
 
 @layer base {
@@ -68,9 +125,116 @@
     border-color: var(--color-border);
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-body-family);
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, .font-display {
+    font-family: var(--font-display-family);
+    letter-spacing: var(--display-tracking);
+  }
+}
+
+/* ---------- Premium surfaces & motion ---------- */
+@utility glass {
+  background: var(--surface);
+  backdrop-filter: blur(18px);
+  border: 1px solid var(--hairline);
+  box-shadow: var(--elevation);
+}
+
+@utility glass-strong {
+  background: var(--surface-strong);
+  backdrop-filter: blur(26px);
+  border: 1px solid var(--hairline);
+  box-shadow: var(--elevation);
+}
+
+@utility gold-text {
+  background: linear-gradient(100deg, var(--gold), var(--silver) 55%, var(--gold));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility hairline {
+  border-color: var(--hairline);
+}
+
+@utility ambient-glow {
+  box-shadow: var(--glow);
+}
+
+@utility magnetic {
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.35s ease;
+  will-change: transform;
+  &:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: var(--glow);
+  }
+}
+
+@utility noise {
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.05;
+    background-image: radial-gradient(currentColor 0.5px, transparent 0.6px);
+    background-size: 4px 4px;
+  }
+}
+
+@utility shimmer {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface-strong);
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, var(--surface-strong), transparent);
+    animation: shimmer-sweep 1.6s infinite;
+  }
+}
+
+@keyframes shimmer-sweep {
+  100% { transform: translateX(100%); }
+}
+
+@keyframes ticker {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@utility ticker-track {
+  display: flex;
+  width: max-content;
+  animation: ticker 32s linear infinite;
+}
+
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(1.35); }
+}
+
+@utility live-dot {
+  animation: live-pulse 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
   }
 }
