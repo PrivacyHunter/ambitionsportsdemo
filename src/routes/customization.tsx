@@ -1,9 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { Palette, Layers, Cpu, Scissors, Play, Pause, Maximize } from 'lucide-react';
+import { Palette, Layers, Cpu, Scissors, Play, Pause, Maximize, Subtitles } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useServerFn } from '@tanstack/react-start';
-import { getCustomizationVideos } from '@/lib/customization.functions';
+import { getCustomizationVideos, trackVideoEngagement } from '@/lib/customization.functions';
 import { getPageSeo } from '@/lib/seo.functions';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
@@ -24,27 +24,51 @@ export const Route = createFileRoute('/customization')({
   component: CustomizationPage,
 });
 
-function VideoPlayer({ url, title }: { url: string; title: string }) {
+function VideoPlayer({ url, title, videoId, captions = [] }: { url: string; title: string; videoId: string; captions?: any[] }) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const trackFn = useServerFn(trackVideoEngagement);
   const [isPlaying, setIsPlaying] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
+  const [showCaptions, setShowCaptions] = useState(true);
+  const [currentCaption, setCurrentCaption] = useState("");
+  const lastTrackedTime = useRef(0);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handleTimeUpdate = () => {
+      const time = video.currentTime;
+      const active = captions.find(c => time >= c.start && time <= c.end);
+      setCurrentCaption(active ? active.text : "");
+
+      // Track watch time every 5 seconds
+      if (Math.floor(time) > lastTrackedTime.current + 5) {
+        trackFn({ data: { video_id: videoId, action: 'watch_time', value: 5 } });
+        lastTrackedTime.current = Math.floor(time);
+      }
+    };
+
+    video.addEventListener('timeupdate', handleTimeUpdate);
+    return () => video.removeEventListener('timeupdate', handleTimeUpdate);
+  }, [captions, videoId]);
 
   const togglePlay = () => {
     if (videoRef.current) {
       if (isPlaying) {
         videoRef.current.pause();
+        trackFn({ data: { video_id: videoId, action: 'pause' } });
       } else {
         videoRef.current.play();
+        trackFn({ data: { video_id: videoId, action: 'play' } });
       }
       setIsPlaying(!isPlaying);
     }
   };
 
   const toggleFullscreen = () => {
-    if (videoRef.current) {
-      if (videoRef.current.requestFullscreen) {
-        videoRef.current.requestFullscreen();
-      }
+    if (videoRef.current?.requestFullscreen) {
+      videoRef.current.requestFullscreen();
     }
   };
 
@@ -68,6 +92,15 @@ function VideoPlayer({ url, title }: { url: string; title: string }) {
         <source src={url} type="video/mp4" />
       </video>
       
+      {/* Captions Overlay */}
+      {showCaptions && currentCaption && (
+        <div className="absolute bottom-16 left-0 right-0 px-8 text-center pointer-events-none">
+          <span className="bg-black/80 backdrop-blur-md px-4 py-2 rounded-lg text-sm md:text-base font-medium text-white shadow-xl inline-block animate-in fade-in slide-in-from-bottom-2 duration-300">
+            {currentCaption}
+          </span>
+        </div>
+      )}
+      
       {/* Overlay Controls */}
       <div className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity duration-300 ${isHovered || !isPlaying ? 'opacity-100' : 'opacity-0'}`}>
         <button 
@@ -78,7 +111,14 @@ function VideoPlayer({ url, title }: { url: string; title: string }) {
         </button>
       </div>
 
-      <div className={`absolute bottom-4 right-4 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+      <div className={`absolute bottom-4 right-4 flex gap-2 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+        <button 
+          onClick={() => setShowCaptions(!showCaptions)}
+          className={`p-2 rounded-lg transition-colors ${showCaptions ? 'bg-primary text-primary-foreground' : 'bg-black/50 text-white hover:bg-black/70'}`}
+          title="Toggle Captions"
+        >
+          <Subtitles size={20} />
+        </button>
         <button 
           onClick={toggleFullscreen}
           className="p-2 rounded-lg bg-black/50 text-white hover:bg-black/70 transition-colors"
@@ -98,8 +138,8 @@ function CustomizationPage() {
   const getSeoFn = useServerFn(getPageSeo);
 
   const { data: videos, isLoading } = useQuery({
-    queryKey: ['customization-videos'],
-    queryFn: () => getVideosFn(),
+    queryKey: ['customization-videos-published'],
+    queryFn: () => getVideosFn({ data: { all: false } }),
   });
 
   const { data: seo } = useQuery({
@@ -165,7 +205,12 @@ function CustomizationPage() {
                   
                   <div className={`relative group ${i % 2 === 1 ? 'lg:order-1' : ''}`}>
                     <div className="absolute -inset-1 bg-gradient-to-r from-primary to-accent rounded-[2rem] blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
-                    <VideoPlayer url={v.video_url} title={v.title} />
+                    <VideoPlayer 
+                      url={v.video_url} 
+                      title={v.title} 
+                      videoId={v.id}
+                      captions={v.captions}
+                    />
                   </div>
                 </div>
               );
