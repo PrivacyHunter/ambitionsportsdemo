@@ -8,7 +8,31 @@ import { submitInquiry } from "@/lib/inquiries.functions";
 import { useServerFn } from "@tanstack/react-start";
 
 
+import { getPageSeo } from "@/lib/seo.functions";
+
 export const Route = createFileRoute("/sportswear")({
+  loader: async ({ context }) => {
+    return context.queryClient.ensureQueryData({
+      queryKey: ["seo", "/sportswear"],
+      queryFn: () => getPageSeo({ data: { path: "/sportswear" } }),
+    });
+  },
+  head: ({ loaderData }) => {
+    const seo = loaderData as any;
+    const title = seo?.title || "Sportswear | Ambition Sports";
+    const description = seo?.description || "Explore our range of professional custom sportswear.";
+    return {
+      title,
+      meta: [
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary_large_image" },
+        ...(seo?.ogImage ? [{ property: "og:image", content: seo.ogImage }] : []),
+      ],
+    };
+  },
   component: Sportswear,
 });
 

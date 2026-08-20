@@ -7,7 +7,31 @@ import { Testimonials } from "@/components/Testimonials";
 import { motion } from "framer-motion";
 import { ShieldCheck, Zap, Scissors, Truck, Globe, Award, Factory, Users } from "lucide-react";
 
+import { getPageSeo } from "@/lib/seo.functions";
+
 export const Route = createFileRoute("/")({
+  loader: async ({ context }) => {
+    return context.queryClient.ensureQueryData({
+      queryKey: ["seo", "/"],
+      queryFn: () => getPageSeo({ data: { path: "/" } }),
+    });
+  },
+  head: ({ loaderData }) => {
+    const seo = loaderData as any;
+    const title = seo?.title || "Ambition Sports | Elite Performance Wear";
+    const description = seo?.description || "High-performance custom sportswear and apparel manufacturer.";
+    return {
+      title,
+      meta: [
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary_large_image" },
+        ...(seo?.ogImage ? [{ property: "og:image", content: seo.ogImage }] : []),
+      ],
+    };
+  },
   component: Index,
 });
 
