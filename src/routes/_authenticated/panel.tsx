@@ -541,6 +541,7 @@ function ThemeStudio() {
   const [previewOn, setPreviewOn] = useState(false);
   const [diffMode, setDiffMode] = useState(false);
   const [diffPreset, setDiffPreset] = useState<ThemeConfig | null>(null);
+  const [localHistory, setLocalHistory] = useState<ThemeConfig[]>([]);
   
   const historyQuery = useQuery({
     queryKey: ["theme-history"],
