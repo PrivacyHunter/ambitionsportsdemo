@@ -1975,11 +1975,37 @@ function CustomizationTab({ onDone }: { onDone: () => void }) {
                   />
                 </div>
                 
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold uppercase text-muted-foreground">Process Type</label>
+                    <select 
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm"
+                      value={editing.process_type || 'general'}
+                      onChange={e => setEditing({...editing, process_type: e.target.value})}
+                    >
+                      <option value="general">General</option>
+                      <option value="sublimation">Sublimation</option>
+                      <option value="embroidery">Embroidery</option>
+                      <option value="heat_transfer">Heat Transfer</option>
+                      <option value="cutting">Cutting</option>
+                    </select>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold uppercase text-muted-foreground">Display Order</label>
+                    <input 
+                      type="number"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm"
+                      value={editing.display_order}
+                      onChange={e => setEditing({...editing, display_order: parseInt(e.target.value)})}
+                    />
+                  </div>
+                </div>
+
                 <div className="space-y-1">
                   <label className="text-[10px] font-bold uppercase text-muted-foreground">Description</label>
                   <textarea 
                     placeholder="Description"
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm min-h-[100px]"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm min-h-[80px]"
                     value={editing.description}
                     onChange={e => setEditing({...editing, description: e.target.value})}
                   />
@@ -2001,31 +2027,91 @@ function CustomizationTab({ onDone }: { onDone: () => void }) {
                   </div>
                 </div>
 
-                <div className="flex gap-4">
-                  <div className="space-y-1 flex-grow">
-                    <label className="text-[10px] font-bold uppercase text-muted-foreground">Display Order</label>
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold uppercase text-muted-foreground">Thumbnail / Cover</label>
+                  <div className="flex gap-2">
                     <input 
-                      type="number"
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm"
-                      value={editing.display_order}
-                      onChange={e => setEditing({...editing, display_order: parseInt(e.target.value)})}
+                      placeholder="Thumbnail URL"
+                      className="flex-grow bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm"
+                      value={editing.thumbnail_url || ''}
+                      onChange={e => setEditing({...editing, thumbnail_url: e.target.value})}
                     />
-                  </div>
-                  <div className="flex items-end pb-3">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input 
-                        type="checkbox"
-                        checked={editing.is_published}
-                        onChange={e => setEditing({...editing, is_published: e.target.checked})}
-                        className="w-4 h-4 accent-primary"
-                      />
-                      <span className="text-[10px] font-bold uppercase tracking-widest">Published</span>
+                    <label className="cursor-pointer bg-white/10 border border-white/10 px-4 py-3 rounded-xl flex items-center justify-center hover:bg-white/20 transition-colors">
+                      <Eye size={16} />
+                      <input type="file" className="hidden" accept="image/*" onChange={async (e) => {
+                         const file = e.target.files?.[0];
+                         if (!file) return;
+                         try {
+                           const path = `thumbnails/${Math.random()}.${file.name.split('.').pop()}`;
+                           await supabase.storage.from('studio-assets').upload(path, file);
+                           const { data: { publicUrl } } = supabase.storage.from('studio-assets').getPublicUrl(path);
+                           setEditing({...editing, thumbnail_url: publicUrl});
+                           toast.success("Thumbnail uploaded");
+                         } catch (err: any) { toast.error(err.message); }
+                      }} />
                     </label>
                   </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input 
+                      type="checkbox"
+                      checked={editing.is_published}
+                      onChange={e => setEditing({...editing, is_published: e.target.checked})}
+                      className="w-4 h-4 accent-primary"
+                    />
+                    <span className="text-[10px] font-bold uppercase tracking-widest">Published</span>
+                  </label>
                 </div>
               </div>
 
               <div className="space-y-4">
+                <div className="glass p-4 rounded-2xl border border-white/5 space-y-4">
+                   <h3 className="text-[10px] font-bold uppercase tracking-widest text-primary flex items-center gap-2">
+                     <Palette size={12} /> Caption Styling
+                   </h3>
+                   <div className="grid grid-cols-2 gap-4">
+                     <div className="space-y-1">
+                       <label className="text-[8px] font-bold uppercase text-muted-foreground">Font Size</label>
+                       <select 
+                         className="w-full bg-black/20 border border-white/10 rounded-lg px-2 py-2 text-[10px]"
+                         value={editing.caption_style?.fontSize || 'text-sm'}
+                         onChange={e => setEditing({...editing, caption_style: {...(editing.caption_style || {}), fontSize: e.target.value}})}
+                       >
+                         <option value="text-[10px]">Tiny</option>
+                         <option value="text-sm">Small</option>
+                         <option value="text-base">Normal</option>
+                         <option value="text-xl">Large</option>
+                         <option value="text-3xl">Extra Large</option>
+                       </select>
+                     </div>
+                     <div className="space-y-1">
+                       <label className="text-[8px] font-bold uppercase text-muted-foreground">Color</label>
+                       <input 
+                         type="color"
+                         className="w-full h-8 bg-black/20 border border-white/10 rounded-lg"
+                         value={editing.caption_style?.color || '#ffffff'}
+                         onChange={e => setEditing({...editing, caption_style: {...(editing.caption_style || {}), color: e.target.value}})}
+                       />
+                     </div>
+                     <div className="space-y-1 col-span-2">
+                       <label className="text-[8px] font-bold uppercase text-muted-foreground">Position</label>
+                       <div className="flex gap-2">
+                         {['top', 'center', 'bottom'].map(pos => (
+                           <button 
+                             key={pos}
+                             onClick={() => setEditing({...editing, caption_style: {...(editing.caption_style || {}), position: pos}})}
+                             className={`flex-1 py-1 rounded border text-[8px] uppercase font-bold transition-all ${editing.caption_style?.position === pos ? 'border-primary bg-primary/10 text-primary' : 'border-white/10 text-muted-foreground'}`}
+                           >
+                             {pos}
+                           </button>
+                         ))}
+                       </div>
+                     </div>
+                   </div>
+                </div>
+
                 <div className="space-y-1">
                   <label className="text-[10px] font-bold uppercase text-muted-foreground flex items-center justify-between">
                     <span>Subtitle File (SRT/VTT)</span>
