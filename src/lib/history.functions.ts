@@ -12,12 +12,12 @@ export const saveThemeVersion = createServerFn({ method: "POST" })
   .handler(async ({ context, data }) => {
     await assertStaff(context.supabase, context.userId);
     const { error } = await context.supabase
-      .from("theme_versions")
+      .from("theme_versions" as any)
       .insert({
         name: data.name,
         config: data.config,
         created_by: context.userId
-      });
+      } as any);
     if (error) throw error;
     return { success: true };
   });
@@ -27,8 +27,8 @@ export const getThemeHistory = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     await assertStaff(context.supabase, context.userId);
     const { data, error } = await context.supabase
-      .from("theme_versions")
-      .select("*, profiles:created_by(email)")
+      .from("theme_versions" as any)
+      .select("*, profiles:created_by(email)" as any)
       .order("created_at", { ascending: false })
       .limit(20);
     if (error) throw error;
@@ -48,8 +48,8 @@ export const scheduleReport = createServerFn({ method: "POST" })
   .handler(async ({ context, data }) => {
     await assertStaff(context.supabase, context.userId);
     const { error } = await context.supabase
-      .from("scheduled_reports")
-      .insert(data);
+      .from("scheduled_reports" as any)
+      .insert(data as any);
     if (error) throw error;
     return { success: true };
   });

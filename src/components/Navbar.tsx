@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 import { Menu, X, Phone, Mail } from "lucide-react";
+import { listSettings } from "@/lib/admin.functions";
 import { FaFacebook, FaInstagram, FaTwitter, FaLinkedin } from "react-icons/fa";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/components/ThemeProvider";
