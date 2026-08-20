@@ -45,7 +45,7 @@ import {
 import { saveThemeVersion, getThemeHistory, scheduleReport } from "@/lib/history.functions";
 import { getPageSeo, savePageSeo } from "@/lib/seo.functions";
 import { getSeoBulk, saveSeoBulk, autoGenerateSeo } from "@/lib/seo-bulk.functions";
-import { logAuditAction, getAuditLogs, getEmailLogs, exportAuditLogs } from "@/lib/logs.functions";
+import { logAuditAction, getAuditLogs, getEmailLogs, exportAuditLogsCsv } from "@/lib/logs.functions";
 import { applyTemplate } from "@/lib/templates.functions";
 import { 
   getCustomizationVideos, 
