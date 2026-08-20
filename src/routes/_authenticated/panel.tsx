@@ -59,7 +59,7 @@ export const Route = createFileRoute("/_authenticated/panel")({
 
 type Tab = "overview" | "inbox" | "products" | "theme" | "branding" | "seo" | "accounts" | "visitors" | "analytics";
 
-const TABS: { id: Tab; label: string; icon: typeof Inbox; developerOnly?: boolean }[] = [
+const TABS: { id: Tab; label: string; icon: any; developerOnly?: boolean }[] = [
   { id: "overview", label: "Overview", icon: ShieldCheck },
   { id: "inbox", label: "Inbox", icon: Inbox },
   { id: "products", label: "Products", icon: Package },
