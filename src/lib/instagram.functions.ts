@@ -76,7 +76,8 @@ export const syncInstagramPosts = createServerFn({ method: "POST" })
         } as any)
         .eq("id", settings.id);
 
-      await context.supabase
+      await (context.supabase as any)
+
         .from("instagram_sync_logs")
         .insert({
           status: 'success',
@@ -87,7 +88,8 @@ export const syncInstagramPosts = createServerFn({ method: "POST" })
 
       return { ok: true };
     } catch (err: any) {
-      await context.supabase
+      await (context.supabase as any)
+
         .from("instagram_sync_logs")
         .insert({
           status: 'error',
@@ -111,7 +113,8 @@ export const getInstagramLogs = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     await assertStaff(context.supabase, context.userId);
-    const { data } = await context.supabase
+    const { data } = await (context.supabase as any)
+
       .from("instagram_sync_logs")
       .select("*")
       .order("created_at", { ascending: false })
