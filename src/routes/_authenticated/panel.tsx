@@ -1858,12 +1858,31 @@ function CustomizationTab({ onDone }: { onDone: () => void }) {
 
   return (
     <div className="space-y-6">
-      <div className="glass rounded-3xl p-6 flex justify-between items-center">
+      <div className="glass rounded-3xl p-6 flex flex-col sm:flex-row justify-between items-center gap-4">
         <div>
           <h2 className="text-lg font-extrabold uppercase">Studio Manager</h2>
           <p className="text-xs text-muted-foreground">Manage manufacturing process videos and descriptions.</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-3 py-2">
+            <Search size={14} className="text-muted-foreground" />
+            <input 
+              placeholder="Search videos..."
+              className="bg-transparent border-none text-xs outline-none w-32 focus:w-48 transition-all"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
+          </div>
+          <select 
+            className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs outline-none"
+            value={filterType}
+            onChange={e => setFilterType(e.target.value)}
+          >
+            <option value="all">All Processes</option>
+            <option value="sublimation">Sublimation</option>
+            <option value="embroidery">Embroidery</option>
+            <option value="heat_transfer">Heat Transfer</option>
+          </select>
           {selectedIds.length > 0 && (
             <div className="flex gap-2 mr-4 border-r border-white/10 pr-4 animate-in slide-in-from-left duration-300">
               <button onClick={() => bulkMutation.mutate('publish')} className="p-2 hover:bg-white/5 rounded-lg text-primary" title="Bulk Publish"><CheckSquare size={16} /></button>
@@ -1872,7 +1891,7 @@ function CustomizationTab({ onDone }: { onDone: () => void }) {
             </div>
           )}
           <button 
-            onClick={() => setEditing({ title: '', description: '', video_url: '', display_order: (videos?.length || 0) + 1, is_published: true, captions: [] })}
+            onClick={() => setEditing({ title: '', description: '', video_url: '', display_order: (videos?.length || 0) + 1, is_published: true, captions: [], process_type: 'general', caption_style: {fontSize: 'text-sm', color: '#ffffff', position: 'bottom'} })}
             className="bg-primary text-primary-foreground px-4 py-2 rounded-xl text-xs font-bold uppercase"
           >
             Add Video
