@@ -1,0 +1,13 @@
+/* Crimson color palette adjustment: soften the intensity */
+@theme {
+  --color-primary: #d31a23; /* Slightly softer crimson */
+  --color-primary-foreground: #ffffff;
+  --color-background: #080a0f;
+  --color-surface: #11141c; /* Slightly more neutral/less harsh obsidian */
+  --color-border: #1e2430;
+}
+
+/* Add subtle gradients to break up the dark areas */
+.bg-surface {
+  background: linear-gradient(180deg, #11141c 0%, #0a0c12 100%);
+}
