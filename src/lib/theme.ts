@@ -46,6 +46,7 @@ export type BrandingConfig = {
   showSocialIcons: boolean;
   showFooterCredit: boolean;
   footerCreditText: string;
+  footerDescription: string;
   showWhatsappButton: boolean;
   whatsappNumber: string;
   phone: string;
@@ -62,10 +63,11 @@ export const DEFAULT_BRANDING: BrandingConfig = {
   showSocialIcons: true,
   showFooterCredit: true,
   footerCreditText: "Crafted by Ambition Sports Studio",
+  footerDescription: "Premium custom sportswear and activewear manufacturer based in Sialkot, Pakistan. Delivering high-performance apparel worldwide.",
   showWhatsappButton: true,
-  whatsappNumber: "+12345678900",
-  phone: "+1 (234) 567-890",
-  email: "info@ambitionsports.com",
+  whatsappNumber: "+923001234567",
+  phone: "+92 (300) 123-4567",
+  email: "sales@ambitionsports.com",
 };
 
 /** CSS custom properties derived from a theme config. */

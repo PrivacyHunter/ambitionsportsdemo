@@ -4,11 +4,35 @@ import { Footer } from "@/components/Footer";
 import { motion } from "framer-motion";
 import { ArrowRight, ShoppingCart, Info, CheckCircle2, Zap } from "lucide-react";
 import { toast } from "sonner";
-import { submitInquiry } from "@/lib/inquiries.functions";
+import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-
+import { submitInquiry } from "@/lib/inquiries.functions";
+import { getPageSeo } from "@/lib/seo.functions";
+import { QuickViewModal } from "@/components/QuickViewModal";
 
 export const Route = createFileRoute("/sportswear")({
+  loader: async ({ context }) => {
+    return context.queryClient.ensureQueryData({
+      queryKey: ["seo", "/sportswear"],
+      queryFn: () => getPageSeo({ data: { path: "/sportswear" } }),
+    });
+  },
+  head: ({ loaderData }) => {
+    const seo = loaderData as any;
+    const title = seo?.title || "Sportswear | Ambition Sports";
+    const description = seo?.description || "Explore our range of professional custom sportswear.";
+    return {
+      title,
+      meta: [
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary_large_image" },
+        ...(seo?.ogImage ? [{ property: "og:image", content: seo.ogImage }] : []),
+      ],
+    };
+  },
   component: Sportswear,
 });
 
@@ -57,8 +81,12 @@ const products = [
   },
 ];
 
+
 function Sportswear() {
   const submitInquiryFn = useServerFn(submitInquiry);
+  const [selectedProduct, setSelectedProduct] = useState<typeof products[0] | null>(null);
+  const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
+
   const handleInquiry = async (productName: string) => {
     toast.loading(`Processing inquiry for ${productName}...`, { id: "inquiry" });
     try {
@@ -82,8 +110,9 @@ function Sportswear() {
   };
 
 
+
   return (
-    <div className="min-h-screen bg-background text-foreground selection:bg-neon-cyan selection:text-background">
+    <div className="min-h-screen bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
       <Navbar />
 
       <main>
@@ -97,21 +126,21 @@ function Sportswear() {
             animate={{ opacity: 1, scale: 1 }}
             className="text-center relative z-10 px-4"
           >
-             <h3 className="text-neon-lime font-black tracking-[0.4em] uppercase mb-4 text-sm">Professional Grade</h3>
+             <h3 className="text-primary font-black tracking-[0.4em] uppercase mb-4 text-sm">Professional Grade</h3>
              <h1 className="text-6xl md:text-9xl font-black uppercase italic tracking-tighter leading-none mb-6">
-               Performance <br /><span className="text-neon-cyan">Sportswear</span>
+               Performance <br /><span className="text-primary">Sportswear</span>
              </h1>
              <div className="flex items-center justify-center gap-4">
-               <div className="h-[2px] w-12 bg-neon-cyan" />
+               <div className="h-[2px] w-12 bg-primary" />
                <p className="text-white font-bold uppercase tracking-widest text-xs">Custom Sublimation Specialists</p>
-               <div className="h-[2px] w-12 bg-neon-cyan" />
+               <div className="h-[2px] w-12 bg-primary" />
              </div>
           </motion.div>
         </section>
 
         {/* Product Grid */}
         <section className="py-32 px-4 lg:px-8 max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-12">
             {products.map((p, i) => (
               <motion.div 
                 key={i}
@@ -120,7 +149,7 @@ function Sportswear() {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
                 whileHover={{ y: -10 }}
-                className="bg-card border border-white/10 rounded-3xl overflow-hidden group flex flex-col h-full"
+                className="bg-card border border-border rounded-3xl overflow-hidden group flex flex-col h-full"
               >
                 <div className="h-80 relative overflow-hidden bg-white/5">
                   <div 
@@ -128,7 +157,7 @@ function Sportswear() {
                     style={{ backgroundImage: `url(${p.image})` }} 
                   />
                   <div className="absolute top-6 right-6">
-                    <span className="bg-neon-cyan text-background px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                    <span className="bg-primary text-primary-foreground px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
                       <Zap size={10} fill="currentColor" /> {p.category}
                     </span>
                   </div>
@@ -136,7 +165,7 @@ function Sportswear() {
                 </div>
 
                 <div className="p-10 flex flex-col flex-grow">
-                  <h3 className="text-2xl font-black uppercase tracking-tighter italic mb-3 group-hover:text-neon-cyan transition-colors leading-tight">{p.name}</h3>
+                  <h3 className="text-2xl font-black uppercase tracking-tighter italic mb-3 group-hover:text-primary transition-colors leading-tight">{p.name}</h3>
                   <p className="text-muted-foreground text-sm leading-relaxed mb-8 flex-grow">{p.desc}</p>
                   
                   <div className="flex items-center justify-between mb-8">
@@ -148,12 +177,15 @@ function Sportswear() {
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
-                    <button className="bg-white/5 hover:bg-white/10 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all border border-white/10 flex items-center justify-center gap-2">
-                      <Info size={14} /> Spec Sheet
+                    <button 
+                      onClick={() => { setSelectedProduct(p); setIsQuickViewOpen(true); }}
+                      className="bg-white/5 hover:bg-white/10 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all border border-white/10 flex items-center justify-center gap-2"
+                    >
+                      <Info size={14} /> Quick View
                     </button>
                     <button 
                       onClick={() => handleInquiry(p.name)}
-                      className="bg-neon-cyan hover:bg-neon-lime text-background py-4 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 transition-all shadow-[0_10px_20px_rgba(0,243,255,0.1)]"
+                      className="bg-primary hover:bg-white text-primary-foreground py-4 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 transition-all shadow-[0_10px_20px_rgba(212,175,55,0.1)]"
                     >
                       Inquire Now <ArrowRight size={14} />
                     </button>
@@ -165,23 +197,29 @@ function Sportswear() {
         </section>
 
         {/* Global Catalog CTA */}
-        <section className="py-24 px-4 bg-neon-cyan relative overflow-hidden">
+        <section className="py-24 px-4 bg-primary relative overflow-hidden">
            <div className="absolute inset-0 bg-background/5 opacity-10 pointer-events-none">
              <div className="w-full h-full bg-[url('https://www.transparenttextures.com/patterns/graphy-dark.png')]" />
            </div>
            <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-12 relative z-10">
               <div className="text-center lg:text-left">
-                <h2 className="text-background font-black text-4xl md:text-5xl uppercase italic tracking-tighter mb-4">Download Our Latest Catalog</h2>
-                <p className="text-background/70 font-bold uppercase tracking-widest text-xs">Explore 500+ designs across all categories</p>
+                 <h2 className="text-primary-foreground font-black text-4xl md:text-5xl uppercase italic tracking-tighter mb-4">Download Our Latest Catalog</h2>
+                 <p className="text-primary-foreground/70 font-bold uppercase tracking-widest text-xs">Explore 500+ designs across all categories</p>
               </div>
-              <button className="bg-background text-neon-cyan hover:text-white px-12 py-6 rounded-2xl font-black uppercase tracking-widest text-sm transition-all shadow-xl">
-                Get PDF Catalog
-              </button>
+               <button className="bg-primary-foreground text-primary hover:bg-white px-12 py-6 rounded-2xl font-black uppercase tracking-widest text-sm transition-all shadow-xl">
+                 Get PDF Catalog
+               </button>
            </div>
         </section>
       </main>
 
       <Footer />
+      <QuickViewModal 
+        product={selectedProduct} 
+        isOpen={isQuickViewOpen} 
+        onClose={() => setIsQuickViewOpen(false)} 
+        onInquire={handleInquiry} 
+      />
     </div>
   );
 }

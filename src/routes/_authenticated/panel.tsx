@@ -13,6 +13,7 @@ import { useTheme } from "@/components/ThemeProvider";
 import {
   deleteProduct, getDashboard, saveSetting, setUserRole, updateStatus, upsertProduct,
 } from "@/lib/admin.functions";
+import { getPageSeo, savePageSeo } from "@/lib/seo.functions";
 import { DEFAULT_BRANDING, DEFAULT_THEME, FONT_PRESETS, type BrandingConfig, type ThemeConfig } from "@/lib/theme";
 
 export const Route = createFileRoute("/_authenticated/panel")({
@@ -30,7 +31,7 @@ export const Route = createFileRoute("/_authenticated/panel")({
   component: PanelPage,
 });
 
-type Tab = "overview" | "inbox" | "products" | "theme" | "branding" | "accounts" | "visitors";
+type Tab = "overview" | "inbox" | "products" | "theme" | "branding" | "seo" | "accounts" | "visitors";
 
 const TABS: { id: Tab; label: string; icon: typeof Inbox; developerOnly?: boolean }[] = [
   { id: "overview", label: "Overview", icon: ShieldCheck },
@@ -38,6 +39,7 @@ const TABS: { id: Tab; label: string; icon: typeof Inbox; developerOnly?: boolea
   { id: "products", label: "Products", icon: Package },
   { id: "theme", label: "Theme Studio", icon: Palette },
   { id: "branding", label: "Branding", icon: Settings2 },
+  { id: "seo", label: "SEO Editor", icon: Globe2 },
   { id: "visitors", label: "Visitors", icon: Globe2 },
   { id: "accounts", label: "Accounts", icon: Users, developerOnly: true },
 ];
@@ -126,6 +128,7 @@ function PanelPage() {
         {tab === "products" && <ProductsTab data={data!} onDone={() => void refetch()} />}
         {tab === "theme" && <ThemeStudio />}
         {tab === "branding" && <BrandingTab />}
+        {tab === "seo" && <SeoTab />}
         {tab === "visitors" && <VisitorsTab data={data!} />}
         {tab === "accounts" && role === "developer" && <AccountsTab data={data!} onDone={() => void refetch()} />}
       </section>
@@ -383,9 +386,49 @@ function ThemeStudio() {
             className={`flex shrink-0 items-center gap-2 rounded-full border px-3 py-2 text-[10px] font-bold uppercase tracking-widest ${
               previewOn ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground"
             }`}>
-            {previewOn ? <Eye size={13} /> : <EyeOff size={13} />} Live preview
+            {previewOn ? <EyeOff size={14} /> : <Eye size={14} />} {previewOn ? "Preview ON" : "Live Preview"}
           </button>
         </div>
+
+        <div className="flex gap-4">
+          <button
+            onClick={() => {
+              const blob = new Blob([JSON.stringify(draft, null, 2)], { type: "application/json" });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = `ambition-theme-${new Date().toISOString().split("T")[0]}.json`;
+              a.click();
+            }}
+            className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-border py-3 text-[10px] font-bold uppercase tracking-widest hover:border-primary"
+          >
+            Export JSON
+          </button>
+          <label className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl border border-border py-3 text-[10px] font-bold uppercase tracking-widest hover:border-primary">
+            Import JSON
+            <input
+              type="file"
+              accept=".json"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (re) => {
+                  try {
+                    const imported = JSON.parse(re.target?.result as string);
+                    setDraft({ ...DEFAULT_THEME, ...imported });
+                    toast.success("Theme imported (click publish to save)");
+                  } catch {
+                    toast.error("Invalid theme file");
+                  }
+                };
+                reader.readAsText(file);
+              }}
+            />
+          </label>
+        </div>
+
 
         <div className="grid gap-4 sm:grid-cols-2">
           {colorFields.map(([key, label]) => (
@@ -628,6 +671,80 @@ function AccountsTab({ data, onDone }: { data: Dash; onDone: () => void }) {
           </select>
         </div>
       ))}
+    </div>
+  );
+}
+
+function SeoTab() {
+  const [path, setPath] = useState("/");
+  const getSeo = useServerFn(getPageSeo);
+  const saveSeo = useServerFn(savePageSeo);
+
+  const { data: seo, refetch } = useQuery({
+    queryKey: ["seo", path],
+    queryFn: () => getSeo({ data: { path } }),
+  });
+
+  const [draft, setDraft] = useState({ title: "", description: "", ogImage: "" });
+
+  useEffect(() => {
+    if (seo) setDraft(seo);
+    else setDraft({ title: "", description: "", ogImage: "" });
+  }, [seo]);
+
+  const { refresh } = useTheme();
+
+  const mutation = useMutation({
+    mutationFn: () => saveSeo({ data: { path, seo: draft } }),
+    onSuccess: () => { 
+      toast.success("SEO updated"); 
+      refetch();
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Save failed"),
+  });
+
+  return (
+    <div className="glass space-y-6 rounded-3xl p-6">
+      <h2 className="text-lg font-extrabold uppercase">SEO &amp; Meta Editor</h2>
+      
+      <label className="block">
+        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Select Page</span>
+        <select value={path} onChange={(e) => setPath(e.target.value)}
+          className="mt-2 w-full rounded-lg border border-border bg-transparent px-3 py-2 text-sm outline-none focus:border-primary">
+          <option value="/">Home</option>
+          <option value="/sportswear">Sportswear</option>
+          <option value="/activewear">Activewear</option>
+          <option value="/casual-wear">Casual Wear</option>
+          <option value="/about">About Us</option>
+          <option value="/contact">Contact</option>
+          <option value="/track">Order Tracking</option>
+        </select>
+      </label>
+
+      <div className="space-y-4">
+        <label className="block">
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Meta Title</span>
+          <input value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })}
+            className="mt-2 w-full rounded-lg border border-border bg-transparent px-3 py-2 text-sm outline-none focus:border-primary" />
+        </label>
+        <label className="block">
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Meta Description</span>
+          <textarea value={draft.description} onChange={(e) => setDraft({ ...draft, description: e.target.value })}
+            rows={3}
+            className="mt-2 w-full rounded-lg border border-border bg-transparent px-3 py-2 text-sm outline-none focus:border-primary" />
+        </label>
+        <label className="block">
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">OG Image URL (Optional)</span>
+          <input value={draft.ogImage} onChange={(e) => setDraft({ ...draft, ogImage: e.target.value })}
+            placeholder="https://..."
+            className="mt-2 w-full rounded-lg border border-border bg-transparent px-3 py-2 text-sm outline-none focus:border-primary" />
+        </label>
+      </div>
+
+      <button onClick={() => mutation.mutate()} disabled={mutation.isPending}
+        className="magnetic flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-xs font-extrabold uppercase tracking-widest text-primary-foreground">
+        {mutation.isPending ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} Save Metadata
+      </button>
     </div>
   );
 }

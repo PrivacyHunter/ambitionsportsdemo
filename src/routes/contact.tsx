@@ -9,7 +9,31 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 
 
+import { getPageSeo } from "@/lib/seo.functions";
+
 export const Route = createFileRoute("/contact")({
+  loader: async ({ context }) => {
+    return context.queryClient.ensureQueryData({
+      queryKey: ["seo", "/contact"],
+      queryFn: () => getPageSeo({ data: { path: "/contact" } }),
+    });
+  },
+  head: ({ loaderData }) => {
+    const seo = loaderData as any;
+    const title = seo?.title || "Contact Us | Ambition Sports";
+    const description = seo?.description || "Get a quote for your custom sportswear project or visit our Sialkot factory.";
+    return {
+      title,
+      meta: [
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary_large_image" },
+        ...(seo?.ogImage ? [{ property: "og:image", content: seo.ogImage }] : []),
+      ],
+    };
+  },
   component: Contact,
 });
 
@@ -46,7 +70,7 @@ function Contact() {
 
 
   return (
-    <div className="min-h-screen bg-background text-foreground selection:bg-neon-cyan selection:text-background">
+    <div className="min-h-screen bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
       <Navbar />
 
       <main>
@@ -60,14 +84,14 @@ function Contact() {
             animate={{ opacity: 1, scale: 1 }}
             className="text-center relative z-10 px-4"
           >
-             <h3 className="text-neon-lime font-black tracking-[0.4em] uppercase mb-4 text-sm">Global Headquarters</h3>
+             <h3 className="text-primary font-black tracking-[0.4em] uppercase mb-4 text-sm">Global Headquarters</h3>
              <h1 className="text-6xl md:text-9xl font-black uppercase italic tracking-tighter leading-none mb-6">
-               Get In <span className="text-neon-cyan">Touch</span>
+               Get In <span className="text-primary">Touch</span>
              </h1>
              <div className="flex items-center justify-center gap-4">
-               <div className="h-[2px] w-12 bg-neon-cyan" />
+               <div className="h-[2px] w-12 bg-primary" />
                <p className="text-white font-bold uppercase tracking-widest text-xs">Direct Manufacturing & Export Inquiries</p>
-               <div className="h-[2px] w-12 bg-neon-cyan" />
+               <div className="h-[2px] w-12 bg-primary" />
              </div>
           </motion.div>
         </section>
@@ -79,19 +103,19 @@ function Contact() {
             <div className="lg:col-span-1 space-y-8">
                <div className="space-y-6">
                  <ContactCard 
-                  icon={<Phone className="text-neon-cyan" size={24} />} 
+                  icon={<Phone className="text-primary" size={24} />} 
                   title="Phone / WhatsApp" 
                   value="+92 (300) 123-4567" 
                   desc="Mon-Sat, 9am-6pm (GMT+5)"
                  />
                  <ContactCard 
-                  icon={<Mail className="text-neon-lime" size={24} />} 
+                  icon={<Mail className="text-primary" size={24} />} 
                   title="Official Email" 
                   value="sales@ambitionsports.com" 
                   desc="For bulk order & dealership inquiries"
                  />
                  <ContactCard 
-                  icon={<MapPin className="text-neon-cyan" size={24} />} 
+                  icon={<MapPin className="text-primary" size={24} />} 
                   title="Factory Location" 
                   value="Industrial Estate, Sialkot, Pakistan" 
                   desc="Visit our state-of-the-art facility"
@@ -108,7 +132,7 @@ function Contact() {
                </motion.a>
 
                <div className="p-8 bg-white/5 border border-white/10 rounded-2xl text-center">
-                  <Clock className="text-neon-lime mx-auto mb-4" size={32} />
+                  <Clock className="text-primary mx-auto mb-4" size={32} />
                   <h4 className="font-black uppercase tracking-widest text-xs mb-2">Operational Hours</h4>
                   <p className="text-muted-foreground text-[10px] font-bold uppercase tracking-widest">Mon - Sat: 09:00 - 18:00</p>
                   <p className="text-muted-foreground text-[10px] font-bold uppercase tracking-widest mt-1 italic">Sunday: Production Maintenance</p>
@@ -131,7 +155,7 @@ function Contact() {
                   </div>
                   <div className="absolute inset-0 pointer-events-none border-[12px] border-background/20 rounded-[2.5rem]" />
                   <div className="absolute top-8 left-8 bg-background/80 backdrop-blur-md p-4 rounded-xl border border-white/10 z-10 flex items-center gap-4">
-                     <div className="w-12 h-12 bg-neon-cyan rounded-lg flex items-center justify-center">
+                     <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
                         <Factory className="text-background" size={24} />
                      </div>
                      <div>
@@ -141,30 +165,30 @@ function Contact() {
                   </div>
                </div>
 
-               <div className="bg-card border border-white/10 p-10 md:p-16 rounded-[3rem] shadow-2xl relative overflow-hidden">
-                 <div className="absolute top-0 right-0 w-64 h-64 bg-neon-lime/5 blur-[100px] -z-10" />
-                 <h2 className="text-3xl md:text-5xl font-black uppercase italic tracking-tighter mb-4 leading-none">Global <br /><span className="text-neon-lime">Inquiry Portal</span></h2>
+               <div className="bg-card border border-border p-10 md:p-16 rounded-[3rem] shadow-2xl relative overflow-hidden">
+                 <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[100px] -z-10" />
+                 <h2 className="text-3xl md:text-5xl font-black uppercase italic tracking-tighter mb-4 leading-none">Global <br /><span className="text-primary">Inquiry Portal</span></h2>
                  <p className="text-muted-foreground mb-12 uppercase font-bold tracking-widest text-xs">Direct line to our manufacturing experts</p>
                  
                   <form onSubmit={handleSubmit} className="grid md:grid-cols-2 gap-8">
                      <div className="space-y-3">
-                       <label className="text-[10px] font-black uppercase tracking-[0.3em] text-neon-cyan">Client Name</label>
-                       <input name="name" required className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 focus:border-neon-cyan outline-none transition-all focus:bg-white/[0.08]" placeholder="e.g. David Smith" />
+                       <label className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Client Name</label>
+                       <input name="name" required className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 focus:border-primary outline-none transition-all focus:bg-white/[0.08]" placeholder="e.g. David Smith" />
                      </div>
                      <div className="space-y-3">
-                       <label className="text-[10px] font-black uppercase tracking-[0.3em] text-neon-cyan">Email Address</label>
-                       <input name="email" required type="email" className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 focus:border-neon-cyan outline-none transition-all focus:bg-white/[0.08]" placeholder="david@sportsclub.com" />
+                       <label className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Email Address</label>
+                       <input name="email" required type="email" className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 focus:border-primary outline-none transition-all focus:bg-white/[0.08]" placeholder="david@sportsclub.com" />
                      </div>
                      <div className="md:col-span-2 space-y-3">
-                       <label className="text-[10px] font-black uppercase tracking-[0.3em] text-neon-cyan">Inquiry Subject</label>
-                       <input name="subject" required className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 focus:border-neon-cyan outline-none transition-all focus:bg-white/[0.08]" placeholder="e.g. Private Label Manufacturing Inquiry" />
+                       <label className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Inquiry Subject</label>
+                       <input name="subject" required className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 focus:border-primary outline-none transition-all focus:bg-white/[0.08]" placeholder="e.g. Private Label Manufacturing Inquiry" />
                      </div>
                      <div className="md:col-span-2 space-y-3">
-                       <label className="text-[10px] font-black uppercase tracking-[0.3em] text-neon-cyan">Detailed Message</label>
-                       <textarea name="message" required rows={6} className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 focus:border-neon-cyan outline-none transition-all focus:bg-white/[0.08]" placeholder="Tell us about your project requirements..." />
+                       <label className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Detailed Message</label>
+                       <textarea name="message" required rows={6} className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 focus:border-primary outline-none transition-all focus:bg-white/[0.08]" placeholder="Tell us about your project requirements..." />
                      </div>
                      <div className="md:col-span-2 pt-4">
-                       <button type="submit" disabled={isSubmitting} className="w-full bg-neon-cyan hover:bg-neon-lime text-background font-black uppercase italic py-6 rounded-2xl transition-all shadow-[0_20px_40px_rgba(0,243,255,0.2)] group disabled:opacity-50">
+                       <button type="submit" disabled={isSubmitting} className="w-full bg-primary hover:bg-white text-primary-foreground font-black uppercase italic py-6 rounded-2xl transition-all shadow-[0_20px_40px_rgba(212,175,55,0.2)] group disabled:opacity-50">
                          <span className="flex items-center justify-center gap-3">
                            {isSubmitting ? "Sending..." : "Send Message"} <Send className="group-hover:translate-x-2 transition-transform" size={20} />
                          </span>
@@ -181,7 +205,7 @@ function Contact() {
         {/* Global Logistics Section */}
         <section className="py-24 border-t border-white/5 bg-white/[0.01]">
            <div className="max-w-7xl mx-auto px-4 lg:px-8 text-center">
-             <h4 className="text-neon-lime font-black tracking-[0.4em] uppercase mb-12 text-xs">Our Global Logistics Partners</h4>
+             <h4 className="text-primary font-black tracking-[0.4em] uppercase mb-12 text-xs">Our Global Logistics Partners</h4>
              <div className="flex flex-wrap justify-center gap-16 items-center opacity-40 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-700">
                 <span className="text-white font-black text-3xl tracking-tighter italic">DHL</span>
                 <span className="text-white font-black text-3xl tracking-tighter italic">FEDEX</span>
@@ -202,10 +226,10 @@ function ContactCard({ icon, title, value, desc }: { icon: React.ReactNode, titl
   return (
     <motion.div 
       whileHover={{ x: 10 }}
-      className="p-8 bg-white/[0.03] border border-white/10 rounded-2xl group hover:border-neon-cyan/40 transition-all shadow-xl relative overflow-hidden"
+      className="p-8 bg-surface border border-border rounded-2xl group hover:border-primary/40 transition-all shadow-xl relative overflow-hidden"
     >
-       <div className="absolute top-0 left-0 w-1 h-0 bg-neon-cyan group-hover:h-full transition-all duration-300" />
-       <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center mb-6 border border-white/10 group-hover:bg-neon-cyan group-hover:text-background transition-all duration-300">{icon}</div>
+       <div className="absolute top-0 left-0 w-1 h-0 bg-primary group-hover:h-full transition-all duration-300" />
+       <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center mb-6 border border-white/10 group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">{icon}</div>
        <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground mb-2 group-hover:text-white transition-colors">{title}</h3>
        <div className="text-xl font-bold mb-2 italic tracking-tighter">{value}</div>
        <div className="text-xs text-muted-foreground font-medium">{desc}</div>
