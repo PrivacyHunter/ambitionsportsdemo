@@ -17,6 +17,7 @@ export type Database = {
       audit_logs: {
         Row: {
           action: string
+          action_type: string | null
           created_at: string | null
           details: Json | null
           id: string
@@ -24,6 +25,7 @@ export type Database = {
         }
         Insert: {
           action: string
+          action_type?: string | null
           created_at?: string | null
           details?: Json | null
           id?: string
@@ -31,6 +33,7 @@ export type Database = {
         }
         Update: {
           action?: string
+          action_type?: string | null
           created_at?: string | null
           details?: Json | null
           id?: string
@@ -289,6 +292,45 @@ export type Database = {
         }
         Relationships: []
       }
+      scheduled_reports: {
+        Row: {
+          columns: Json
+          created_at: string | null
+          date_range_type: string
+          format: string | null
+          frequency: string
+          id: string
+          is_active: boolean | null
+          last_sent_at: string | null
+          name: string
+          recipient_email: string
+        }
+        Insert: {
+          columns: Json
+          created_at?: string | null
+          date_range_type: string
+          format?: string | null
+          frequency: string
+          id?: string
+          is_active?: boolean | null
+          last_sent_at?: string | null
+          name: string
+          recipient_email: string
+        }
+        Update: {
+          columns?: Json
+          created_at?: string | null
+          date_range_type?: string
+          format?: string | null
+          frequency?: string
+          id?: string
+          is_active?: boolean | null
+          last_sent_at?: string | null
+          name?: string
+          recipient_email?: string
+        }
+        Relationships: []
+      }
       site_settings: {
         Row: {
           id: string
@@ -307,6 +349,33 @@ export type Database = {
           key?: string
           updated_at?: string | null
           value?: string | null
+        }
+        Relationships: []
+      }
+      theme_versions: {
+        Row: {
+          config: Json
+          created_at: string | null
+          created_by: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+        }
+        Insert: {
+          config: Json
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+        }
+        Update: {
+          config?: Json
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
         }
         Relationships: []
       }
