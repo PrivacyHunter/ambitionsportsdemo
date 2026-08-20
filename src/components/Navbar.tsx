@@ -69,9 +69,9 @@ export function Navbar() {
               <a href="https://wa.me/923049893054" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-neon-lime transition-colors">
                 <FaFacebook size={16} />
               </a>
-              <a href="#" className="text-muted-foreground hover:text-neon-cyan transition-colors"><FaInstagram size={16} /></a>
-              <a href="#" className="text-muted-foreground hover:text-neon-cyan transition-colors"><FaTwitter size={16} /></a>
-              <a href="#" className="text-muted-foreground hover:text-neon-cyan transition-colors"><FaLinkedin size={16} /></a>
+              <a href="https://wa.me/923049893054" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-neon-cyan transition-colors"><FaInstagram size={16} /></a>
+              <a href="https://wa.me/923049893054" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-neon-cyan transition-colors"><FaTwitter size={16} /></a>
+              <a href="https://wa.me/923049893054" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-neon-cyan transition-colors"><FaLinkedin size={16} /></a>
             </div>
           )}
         </div>
