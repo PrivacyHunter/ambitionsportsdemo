@@ -37,7 +37,7 @@ export function Navbar() {
     { name: "Home", href: "/" },
     { name: "Sportswear", href: "/sportswear" },
     { name: "Activewear", href: "/activewear" },
-    { name: "Casual Wear", href: "/casual-wear" },
+    { name: "Customization", href: "/customization" },
     { name: "About Us", href: "/about" },
     { name: "Contact Us", href: "/contact" },
     ...(siteMode === "store" ? [{ name: "Track Order", href: "/track" }] : []),

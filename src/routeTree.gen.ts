@@ -17,6 +17,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CasualWearRouteImport } from './routes/casual-wear'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as CustomizationRouteImport } from './routes/customization'
 import { Route as QuoteRouteImport } from './routes/quote'
 import { Route as SportswearRouteImport } from './routes/sportswear'
 import { Route as TrackRouteImport } from './routes/track'
@@ -62,6 +63,11 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CustomizationRoute = CustomizationRouteImport.update({
+  id: '/customization',
+  path: '/customization',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const QuoteRoute = QuoteRouteImport.update({
   id: '/quote',
   path: '/quote',
@@ -96,6 +102,7 @@ export interface FileRoutesByFullPath {
   '/casual-wear': typeof CasualWearRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/customization': typeof CustomizationRoute
   '/quote': typeof QuoteRoute
   '/sportswear': typeof SportswearRoute
   '/track': typeof TrackRoute
@@ -110,6 +117,7 @@ export interface FileRoutesByTo {
   '/casual-wear': typeof CasualWearRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/customization': typeof CustomizationRoute
   '/quote': typeof QuoteRoute
   '/sportswear': typeof SportswearRoute
   '/track': typeof TrackRoute
@@ -126,6 +134,7 @@ export interface FileRoutesById {
   '/casual-wear': typeof CasualWearRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/customization': typeof CustomizationRoute
   '/quote': typeof QuoteRoute
   '/sportswear': typeof SportswearRoute
   '/track': typeof TrackRoute
@@ -142,6 +151,7 @@ export interface FileRouteTypes {
     | '/casual-wear'
     | '/checkout'
     | '/contact'
+    | '/customization'
     | '/quote'
     | '/sportswear'
     | '/track'
@@ -156,6 +166,7 @@ export interface FileRouteTypes {
     | '/casual-wear'
     | '/checkout'
     | '/contact'
+    | '/customization'
     | '/quote'
     | '/sportswear'
     | '/track'
@@ -171,6 +182,7 @@ export interface FileRouteTypes {
     | '/casual-wear'
     | '/checkout'
     | '/contact'
+    | '/customization'
     | '/quote'
     | '/sportswear'
     | '/track'
@@ -187,6 +199,7 @@ export interface RootRouteChildren {
   CasualWearRoute: typeof CasualWearRoute
   CheckoutRoute: typeof CheckoutRoute
   ContactRoute: typeof ContactRoute
+  CustomizationRoute: typeof CustomizationRoute
   QuoteRoute: typeof QuoteRoute
   SportswearRoute: typeof SportswearRoute
   TrackRoute: typeof TrackRoute
@@ -251,6 +264,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/customization': {
+      id: '/customization'
+      path: '/customization'
+      fullPath: '/customization'
+      preLoaderRoute: typeof CustomizationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/quote': {
       id: '/quote'
       path: '/quote'
@@ -309,6 +329,7 @@ const rootRouteChildren: RootRouteChildren = {
   CasualWearRoute: CasualWearRoute,
   CheckoutRoute: CheckoutRoute,
   ContactRoute: ContactRoute,
+  CustomizationRoute: CustomizationRoute,
   QuoteRoute: QuoteRoute,
   SportswearRoute: SportswearRoute,
   TrackRoute: TrackRoute,
