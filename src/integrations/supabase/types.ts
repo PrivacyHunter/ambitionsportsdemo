@@ -43,6 +43,7 @@ export type Database = {
       }
       customization_videos: {
         Row: {
+          caption_style: Json | null
           captions: Json | null
           captions_raw: string | null
           captions_url: string | null
@@ -51,6 +52,7 @@ export type Database = {
           display_order: number | null
           id: string
           is_published: boolean | null
+          process_type: string | null
           thumbnail_url: string | null
           title: string
           total_pauses: number | null
@@ -60,6 +62,7 @@ export type Database = {
           video_url: string
         }
         Insert: {
+          caption_style?: Json | null
           captions?: Json | null
           captions_raw?: string | null
           captions_url?: string | null
@@ -68,6 +71,7 @@ export type Database = {
           display_order?: number | null
           id?: string
           is_published?: boolean | null
+          process_type?: string | null
           thumbnail_url?: string | null
           title: string
           total_pauses?: number | null
@@ -77,6 +81,7 @@ export type Database = {
           video_url: string
         }
         Update: {
+          caption_style?: Json | null
           captions?: Json | null
           captions_raw?: string | null
           captions_url?: string | null
@@ -85,6 +90,7 @@ export type Database = {
           display_order?: number | null
           id?: string
           is_published?: boolean | null
+          process_type?: string | null
           thumbnail_url?: string | null
           title?: string
           total_pauses?: number | null
@@ -160,6 +166,81 @@ export type Database = {
           name?: string
           status?: string
           type?: string
+        }
+        Relationships: []
+      }
+      instagram_posts: {
+        Row: {
+          caption: string | null
+          category_target: string | null
+          created_at: string | null
+          id: string
+          is_visible: boolean | null
+          media_type: string | null
+          media_url: string | null
+          page_target: string | null
+          permalink: string | null
+          thumbnail_url: string | null
+          timestamp: string | null
+        }
+        Insert: {
+          caption?: string | null
+          category_target?: string | null
+          created_at?: string | null
+          id: string
+          is_visible?: boolean | null
+          media_type?: string | null
+          media_url?: string | null
+          page_target?: string | null
+          permalink?: string | null
+          thumbnail_url?: string | null
+          timestamp?: string | null
+        }
+        Update: {
+          caption?: string | null
+          category_target?: string | null
+          created_at?: string | null
+          id?: string
+          is_visible?: boolean | null
+          media_type?: string | null
+          media_url?: string | null
+          page_target?: string | null
+          permalink?: string | null
+          thumbnail_url?: string | null
+          timestamp?: string | null
+        }
+        Relationships: []
+      }
+      instagram_settings: {
+        Row: {
+          access_token: string | null
+          created_at: string | null
+          id: string
+          instagram_user_id: string | null
+          is_connected: boolean | null
+          last_sync: string | null
+          updated_at: string | null
+          username: string | null
+        }
+        Insert: {
+          access_token?: string | null
+          created_at?: string | null
+          id?: string
+          instagram_user_id?: string | null
+          is_connected?: boolean | null
+          last_sync?: string | null
+          updated_at?: string | null
+          username?: string | null
+        }
+        Update: {
+          access_token?: string | null
+          created_at?: string | null
+          id?: string
+          instagram_user_id?: string | null
+          is_connected?: boolean | null
+          last_sync?: string | null
+          updated_at?: string | null
+          username?: string | null
         }
         Relationships: []
       }

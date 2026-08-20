@@ -1,8 +1,18 @@
--- Add columns to customization_videos
-ALTER TABLE public.customization_videos 
-ADD COLUMN IF NOT EXISTS caption_style JSONB DEFAULT '{"fontSize": "text-sm", "color": "#ffffff", "position": "bottom"}'::jsonb,
-ADD COLUMN IF NOT EXISTS thumbnail_url TEXT,
-ADD COLUMN IF NOT EXISTS process_type TEXT DEFAULT 'general';
+DO $$
+BEGIN
+    -- Add columns to customization_videos
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'customization_videos' AND column_name = 'caption_style') THEN
+        ALTER TABLE public.customization_videos ADD COLUMN caption_style JSONB DEFAULT '{"fontSize": "text-sm", "color": "#ffffff", "position": "bottom"}'::jsonb;
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'customization_videos' AND column_name = 'thumbnail_url') THEN
+        ALTER TABLE public.customization_videos ADD COLUMN thumbnail_url TEXT;
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'customization_videos' AND column_name = 'process_type') THEN
+        ALTER TABLE public.customization_videos ADD COLUMN process_type TEXT DEFAULT 'general';
+    END IF;
+END $$;
 
 -- Create Instagram Settings
 CREATE TABLE IF NOT EXISTS public.instagram_settings (
@@ -26,8 +36,8 @@ CREATE TABLE IF NOT EXISTS public.instagram_posts (
     thumbnail_url TEXT,
     timestamp TIMESTAMP WITH TIME ZONE,
     is_visible BOOLEAN DEFAULT true,
-    page_target TEXT DEFAULT 'home', -- Which page to show on
-    category_target TEXT, -- Which category to show on
+    page_target TEXT DEFAULT 'home',
+    category_target TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
@@ -42,6 +52,11 @@ GRANT ALL ON public.instagram_posts TO service_role;
 -- RLS
 ALTER TABLE public.instagram_settings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.instagram_posts ENABLE ROW LEVEL SECURITY;
+
+-- Drop existing policies to avoid errors if they exist
+DROP POLICY IF EXISTS "Admins can manage instagram settings" ON public.instagram_settings;
+DROP POLICY IF EXISTS "Public can read visible posts" ON public.instagram_posts;
+DROP POLICY IF EXISTS "Admins can manage posts" ON public.instagram_posts;
 
 CREATE POLICY "Admins can manage instagram settings"
 ON public.instagram_settings

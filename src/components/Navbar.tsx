@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
-import { Menu, X, Phone, Mail } from "lucide-react";
+import { Menu, X, Phone, Mail, Moon, Sun } from "lucide-react";
 import { listSettings } from "@/lib/admin.functions";
-import { FaFacebook, FaInstagram, FaTwitter, FaLinkedin } from "react-icons/fa";
+import { FaFacebook, FaInstagram, FaTwitter, FaLinkedin, FaWhatsapp } from "react-icons/fa";
+
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/components/ThemeProvider";
 
 export function Navbar() {
-  const { branding } = useTheme();
+  const { branding, mode, toggleMode } = useTheme();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -67,11 +68,12 @@ export function Navbar() {
           {branding.showSocialIcons && (
             <div className="flex gap-4">
               <a href="https://wa.me/923049893054" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-neon-lime transition-colors">
-                <FaFacebook size={16} />
+                <FaWhatsapp size={16} />
               </a>
               <a href="https://wa.me/923049893054" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-neon-cyan transition-colors"><FaInstagram size={16} /></a>
               <a href="https://wa.me/923049893054" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-neon-cyan transition-colors"><FaTwitter size={16} /></a>
               <a href="https://wa.me/923049893054" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-neon-cyan transition-colors"><FaLinkedin size={16} /></a>
+
             </div>
           )}
         </div>
@@ -118,7 +120,14 @@ export function Navbar() {
             >
               Get a Quote
             </Link>
+            <button 
+              onClick={toggleMode}
+              className="p-2 hover:bg-white/5 rounded-full transition-colors text-muted-foreground hover:text-primary"
+            >
+              {mode === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
           </div>
+
 
           {/* Mobile Toggle */}
           <button

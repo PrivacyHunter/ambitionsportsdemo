@@ -9,10 +9,10 @@ import {
   Search, BarChart3, TrendingUp, MapPin, Smartphone,
   ArrowRight, GripVertical, Check, Wand2, FileJson,
   Layout, ShoppingBag, FileText, Activity, Mail, Layers, Play, Subtitles, X,
-  Trash2, CheckSquare, Square, DownloadCloud
+  Trash2, CheckSquare, Square, DownloadCloud, RefreshCw, Link, ExternalLink
 } from "lucide-react";
 
-import { SiGooglechrome as Chrome } from "react-icons/si";
+import { SiGooglechrome as Chrome, SiInstagram as Instagram } from "react-icons/si";
 import {
   DndContext,
   closestCenter,
@@ -54,6 +54,11 @@ import {
   getEngagementStats,
   bulkActionCustomizationVideos 
 } from "@/lib/customization.functions";
+import { 
+  getInstagramSettings, 
+  updateInstagramSettings, 
+  syncInstagramPosts 
+} from "@/lib/instagram.functions";
 import { DEFAULT_BRANDING, DEFAULT_THEME, FONT_PRESETS, THEME_PRESETS, type BrandingConfig, type ThemeConfig } from "@/lib/theme";
 
 // PDF export will be handled by dynamic import in AnalyticsDashboard
@@ -73,7 +78,7 @@ export const Route = createFileRoute("/_authenticated/panel")({
   component: PanelPage,
 });
 
-type Tab = "overview" | "inbox" | "products" | "theme" | "branding" | "seo" | "customization" | "visitors" | "analytics" | "accounts" | "logs";
+type Tab = "overview" | "inbox" | "products" | "theme" | "branding" | "seo" | "customization" | "visitors" | "analytics" | "instagram" | "accounts" | "logs";
 
 const TABS: { id: Tab; label: string; icon: any; roles?: ("owner" | "admin" | "developer")[] }[] = [
   { id: "overview", label: "Overview", icon: ShieldCheck },
@@ -85,8 +90,9 @@ const TABS: { id: Tab; label: string; icon: any; roles?: ("owner" | "admin" | "d
   { id: "customization", label: "Studio Manager", icon: Layers, roles: ["owner", "admin", "developer"] },
   { id: "visitors", label: "Visitors", icon: Globe2, roles: ["owner", "admin", "developer"] },
   { id: "analytics", label: "Analytics", icon: BarChart3, roles: ["owner", "admin", "developer"] },
+  { id: "instagram", label: "Instagram", icon: Instagram, roles: ["owner", "admin", "developer"] },
   { id: "accounts", label: "Accounts", icon: Users, roles: ["developer"] },
-  { id: "logs", label: "Logs", icon: Activity, roles: ["admin", "owner", "developer"] },
+  { id: "logs", label: "Logs", icon: Activity, roles: ["developer"] },
 ];
 
 function PanelPage() {
@@ -177,6 +183,7 @@ function PanelPage() {
         {tab === "customization" && <CustomizationTab onDone={() => void refetch()} />}
         {tab === "visitors" && <VisitorsTab data={data!} />}
         { tab === "analytics" && <AnalyticsDashboard data={data!} />}
+        { tab === "instagram" && <InstagramTab />}
         { tab === "accounts" && role === "developer" && <AccountsTab data={data!} onDone={() => void refetch()} />}
         { tab === "logs" && role === "developer" && <LogsTab />}
       </section>
@@ -947,9 +954,10 @@ function AccountsTab({ data, onDone }: { data: Dash; onDone: () => void }) {
             <p className="truncate text-xs text-muted-foreground">{account.email}</p>
           </div>
           <select value={account.role} aria-label="Role"
+            disabled={account.role === 'developer' && data.role !== 'developer'}
             onChange={(e) => mutation.mutate({ userId: account.id, role: e.target.value as "owner" | "admin" | "developer" | "user" })}
             className="shrink-0 rounded-lg border border-border bg-transparent px-3 py-2 text-xs font-bold uppercase">
-            {["user", "admin", "owner", "developer"].map((r) => <option key={r} value={r}>{r}</option>)}
+            {["user", "admin", "owner", data.role === 'developer' ? "developer" : null].filter(Boolean).map((r) => <option key={r} value={r!}>{r}</option>)}
           </select>
         </div>
       ))}
@@ -1743,8 +1751,9 @@ function CustomizationTab({ onDone }: { onDone: () => void }) {
   const [editing, setEditing] = useState<any>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isUploadingSubtitles, setIsUploadingSubtitles] = useState(false);
+  const [search, setSearch] = useState("");
+  const [filterType, setFilterType] = useState("all");
 
-  
   const mutation = useMutation({
     mutationFn: (data: any) => upsertVideoFn({ data }),
     onSuccess: () => {
@@ -1850,12 +1859,31 @@ function CustomizationTab({ onDone }: { onDone: () => void }) {
 
   return (
     <div className="space-y-6">
-      <div className="glass rounded-3xl p-6 flex justify-between items-center">
+      <div className="glass rounded-3xl p-6 flex flex-col sm:flex-row justify-between items-center gap-4">
         <div>
           <h2 className="text-lg font-extrabold uppercase">Studio Manager</h2>
           <p className="text-xs text-muted-foreground">Manage manufacturing process videos and descriptions.</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-3 py-2">
+            <Search size={14} className="text-muted-foreground" />
+            <input 
+              placeholder="Search videos..."
+              className="bg-transparent border-none text-xs outline-none w-32 focus:w-48 transition-all"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
+          </div>
+          <select 
+            className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs outline-none"
+            value={filterType}
+            onChange={e => setFilterType(e.target.value)}
+          >
+            <option value="all">All Processes</option>
+            <option value="sublimation">Sublimation</option>
+            <option value="embroidery">Embroidery</option>
+            <option value="heat_transfer">Heat Transfer</option>
+          </select>
           {selectedIds.length > 0 && (
             <div className="flex gap-2 mr-4 border-r border-white/10 pr-4 animate-in slide-in-from-left duration-300">
               <button onClick={() => bulkMutation.mutate('publish')} className="p-2 hover:bg-white/5 rounded-lg text-primary" title="Bulk Publish"><CheckSquare size={16} /></button>
@@ -1864,7 +1892,7 @@ function CustomizationTab({ onDone }: { onDone: () => void }) {
             </div>
           )}
           <button 
-            onClick={() => setEditing({ title: '', description: '', video_url: '', display_order: (videos?.length || 0) + 1, is_published: true, captions: [] })}
+            onClick={() => setEditing({ title: '', description: '', video_url: '', display_order: (videos?.length || 0) + 1, is_published: true, captions: [], process_type: 'general', caption_style: {fontSize: 'text-sm', color: '#ffffff', position: 'bottom'} })}
             className="bg-primary text-primary-foreground px-4 py-2 rounded-xl text-xs font-bold uppercase"
           >
             Add Video
@@ -1896,8 +1924,13 @@ function CustomizationTab({ onDone }: { onDone: () => void }) {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {videos?.map((v: any) => (
+        {videos?.filter((v: any) => {
+          const matchesSearch = v.title.toLowerCase().includes(search.toLowerCase()) || v.description?.toLowerCase().includes(search.toLowerCase());
+          const matchesFilter = filterType === 'all' || v.process_type === filterType;
+          return matchesSearch && matchesFilter;
+        }).map((v: any) => (
           <div key={v.id} className={`glass rounded-3xl overflow-hidden flex flex-col border-2 transition-all ${selectedIds.includes(v.id) ? 'border-primary shadow-[0_0_20px_rgba(212,175,55,0.2)]' : 'border-transparent'}`}>
+
             <div className="aspect-video bg-black relative group/vid">
               <video src={v.video_url} className="w-full h-full object-cover opacity-60" muted />
               <div onClick={() => toggleSelection(v.id)} className={`absolute top-2 left-2 p-1.5 rounded-lg backdrop-blur-md border cursor-pointer transition-all z-10 ${selectedIds.includes(v.id) ? 'bg-primary border-primary text-primary-foreground' : 'bg-black/40 border-white/10 text-white/40 opacity-0 group-hover/vid:opacity-100 hover:text-white'}`}>
@@ -1967,11 +2000,37 @@ function CustomizationTab({ onDone }: { onDone: () => void }) {
                   />
                 </div>
                 
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold uppercase text-muted-foreground">Process Type</label>
+                    <select 
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm"
+                      value={editing.process_type || 'general'}
+                      onChange={e => setEditing({...editing, process_type: e.target.value})}
+                    >
+                      <option value="general">General</option>
+                      <option value="sublimation">Sublimation</option>
+                      <option value="embroidery">Embroidery</option>
+                      <option value="heat_transfer">Heat Transfer</option>
+                      <option value="cutting">Cutting</option>
+                    </select>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold uppercase text-muted-foreground">Display Order</label>
+                    <input 
+                      type="number"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm"
+                      value={editing.display_order}
+                      onChange={e => setEditing({...editing, display_order: parseInt(e.target.value)})}
+                    />
+                  </div>
+                </div>
+
                 <div className="space-y-1">
                   <label className="text-[10px] font-bold uppercase text-muted-foreground">Description</label>
                   <textarea 
                     placeholder="Description"
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm min-h-[100px]"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm min-h-[80px]"
                     value={editing.description}
                     onChange={e => setEditing({...editing, description: e.target.value})}
                   />
@@ -1993,31 +2052,91 @@ function CustomizationTab({ onDone }: { onDone: () => void }) {
                   </div>
                 </div>
 
-                <div className="flex gap-4">
-                  <div className="space-y-1 flex-grow">
-                    <label className="text-[10px] font-bold uppercase text-muted-foreground">Display Order</label>
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold uppercase text-muted-foreground">Thumbnail / Cover</label>
+                  <div className="flex gap-2">
                     <input 
-                      type="number"
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm"
-                      value={editing.display_order}
-                      onChange={e => setEditing({...editing, display_order: parseInt(e.target.value)})}
+                      placeholder="Thumbnail URL"
+                      className="flex-grow bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm"
+                      value={editing.thumbnail_url || ''}
+                      onChange={e => setEditing({...editing, thumbnail_url: e.target.value})}
                     />
-                  </div>
-                  <div className="flex items-end pb-3">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input 
-                        type="checkbox"
-                        checked={editing.is_published}
-                        onChange={e => setEditing({...editing, is_published: e.target.checked})}
-                        className="w-4 h-4 accent-primary"
-                      />
-                      <span className="text-[10px] font-bold uppercase tracking-widest">Published</span>
+                    <label className="cursor-pointer bg-white/10 border border-white/10 px-4 py-3 rounded-xl flex items-center justify-center hover:bg-white/20 transition-colors">
+                      <Eye size={16} />
+                      <input type="file" className="hidden" accept="image/*" onChange={async (e) => {
+                         const file = e.target.files?.[0];
+                         if (!file) return;
+                         try {
+                           const path = `thumbnails/${Math.random()}.${file.name.split('.').pop()}`;
+                           await supabase.storage.from('studio-assets').upload(path, file);
+                           const { data: { publicUrl } } = supabase.storage.from('studio-assets').getPublicUrl(path);
+                           setEditing({...editing, thumbnail_url: publicUrl});
+                           toast.success("Thumbnail uploaded");
+                         } catch (err: any) { toast.error(err.message); }
+                      }} />
                     </label>
                   </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input 
+                      type="checkbox"
+                      checked={editing.is_published}
+                      onChange={e => setEditing({...editing, is_published: e.target.checked})}
+                      className="w-4 h-4 accent-primary"
+                    />
+                    <span className="text-[10px] font-bold uppercase tracking-widest">Published</span>
+                  </label>
                 </div>
               </div>
 
               <div className="space-y-4">
+                <div className="glass p-4 rounded-2xl border border-white/5 space-y-4">
+                   <h3 className="text-[10px] font-bold uppercase tracking-widest text-primary flex items-center gap-2">
+                     <Palette size={12} /> Caption Styling
+                   </h3>
+                   <div className="grid grid-cols-2 gap-4">
+                     <div className="space-y-1">
+                       <label className="text-[8px] font-bold uppercase text-muted-foreground">Font Size</label>
+                       <select 
+                         className="w-full bg-black/20 border border-white/10 rounded-lg px-2 py-2 text-[10px]"
+                         value={editing.caption_style?.fontSize || 'text-sm'}
+                         onChange={e => setEditing({...editing, caption_style: {...(editing.caption_style || {}), fontSize: e.target.value}})}
+                       >
+                         <option value="text-[10px]">Tiny</option>
+                         <option value="text-sm">Small</option>
+                         <option value="text-base">Normal</option>
+                         <option value="text-xl">Large</option>
+                         <option value="text-3xl">Extra Large</option>
+                       </select>
+                     </div>
+                     <div className="space-y-1">
+                       <label className="text-[8px] font-bold uppercase text-muted-foreground">Color</label>
+                       <input 
+                         type="color"
+                         className="w-full h-8 bg-black/20 border border-white/10 rounded-lg"
+                         value={editing.caption_style?.color || '#ffffff'}
+                         onChange={e => setEditing({...editing, caption_style: {...(editing.caption_style || {}), color: e.target.value}})}
+                       />
+                     </div>
+                     <div className="space-y-1 col-span-2">
+                       <label className="text-[8px] font-bold uppercase text-muted-foreground">Position</label>
+                       <div className="flex gap-2">
+                         {['top', 'center', 'bottom'].map(pos => (
+                           <button 
+                             key={pos}
+                             onClick={() => setEditing({...editing, caption_style: {...(editing.caption_style || {}), position: pos}})}
+                             className={`flex-1 py-1 rounded border text-[8px] uppercase font-bold transition-all ${editing.caption_style?.position === pos ? 'border-primary bg-primary/10 text-primary' : 'border-white/10 text-muted-foreground'}`}
+                           >
+                             {pos}
+                           </button>
+                         ))}
+                       </div>
+                     </div>
+                   </div>
+                </div>
+
                 <div className="space-y-1">
                   <label className="text-[10px] font-bold uppercase text-muted-foreground flex items-center justify-between">
                     <span>Subtitle File (SRT/VTT)</span>
@@ -2130,4 +2249,147 @@ function CustomizationTab({ onDone }: { onDone: () => void }) {
     </div>
   );
 }
+
+function InstagramTab() {
+  const getSettings = useServerFn(getInstagramSettings);
+  const updateSettings = useServerFn(updateInstagramSettings);
+  const syncPosts = useServerFn(syncInstagramPosts);
+  
+  const { data: settings, refetch } = useQuery({
+    queryKey: ['instagram-settings'],
+    queryFn: () => getSettings(),
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: (data: any) => updateSettings({ data }),
+    onSuccess: () => { toast.success("Instagram settings updated"); refetch(); }
+  });
+
+  const syncMutation = useMutation({
+    mutationFn: () => syncPosts(),
+    onSuccess: () => { toast.success("Posts synced successfully"); refetch(); }
+  });
+
+  const [token, setToken] = useState("");
+
+  return (
+    <div className="space-y-6">
+      <div className="glass rounded-[2rem] p-8 border border-white/5">
+        <div className="flex items-center gap-4 mb-6">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] flex items-center justify-center text-white shadow-xl">
+            <Instagram size={32} />
+          </div>
+          <div>
+            <h2 className="text-xl font-black uppercase italic">Instagram Studio</h2>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mt-1">Connect your brand's social feed</p>
+          </div>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-8">
+          <div className="space-y-6">
+            <div className="p-6 rounded-3xl bg-white/5 border border-white/10">
+              <h3 className="text-xs font-bold uppercase tracking-widest mb-4 flex items-center gap-2">
+                <Link size={14} className="text-primary" /> Connection Status
+              </h3>
+              
+              {settings?.is_connected ? (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-4 rounded-2xl bg-primary/10 border border-primary/20">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+                        <Check size={20} />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold">Connected as @{settings.username}</p>
+                        <p className="text-[10px] text-muted-foreground uppercase font-bold">Linked to Ambition Sports</p>
+                      </div>
+                    </div>
+                    <button 
+                      onClick={() => updateMutation.mutate({ is_connected: false })}
+                      className="text-[10px] font-bold uppercase text-red-500 hover:underline"
+                    >
+                      Disconnect
+                    </button>
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={() => syncMutation.mutate()}
+                      disabled={syncMutation.isPending}
+                      className="flex-1 py-3 rounded-xl bg-white/5 border border-white/10 text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-white/10 transition-all"
+                    >
+                      {syncMutation.isPending ? <RefreshCw size={14} className="animate-spin" /> : <RefreshCw size={14} />}
+                      Sync Feed Now
+                    </button>
+                  </div>
+                  <p className="text-[9px] text-muted-foreground text-center uppercase tracking-tighter">
+                    Last synced: {settings.last_sync ? new Date(settings.last_sync).toLocaleString() : 'Never'}
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Link your Instagram Business account to automatically display your latest posts and reels on your website.
+                  </p>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase text-muted-foreground">Access Token</label>
+                    <input 
+                      type="password"
+                      placeholder="Enter Graph API Token..."
+                      className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm"
+                      value={token}
+                      onChange={e => setToken(e.target.value)}
+                    />
+                  </div>
+                  <button 
+                    onClick={() => updateMutation.mutate({ access_token: token, is_connected: true, username: 'ambitionsports' })}
+                    disabled={updateMutation.isPending || !token}
+                    className="w-full py-4 rounded-xl bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(212,175,55,0.3)] hover:scale-[1.02] transition-all"
+                  >
+                    {updateMutation.isPending ? 'Connecting...' : 'Connect Instagram'}
+                  </button>
+                  <a href="https://developers.facebook.com/" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 text-[9px] font-bold uppercase text-muted-foreground hover:text-white transition-colors">
+                    <ExternalLink size={10} /> How to get a token?
+                  </a>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <div className="p-6 rounded-3xl bg-white/5 border border-white/10 h-full">
+              <h3 className="text-xs font-bold uppercase tracking-widest mb-4 flex items-center gap-2">
+                <Settings2 size={14} className="text-primary" /> Auto-Feed Rules
+              </h3>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
+                  <span className="text-[10px] font-bold uppercase">Show on Home Page</span>
+                  <button className="w-10 h-5 rounded-full bg-primary/20 border border-primary/40 relative">
+                    <div className="absolute right-1 top-1 w-3 h-3 rounded-full bg-primary" />
+                  </button>
+                </div>
+                <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
+                  <span className="text-[10px] font-bold uppercase">Show on Shop Pages</span>
+                  <button className="w-10 h-5 rounded-full bg-white/10 border border-white/20 relative">
+                    <div className="absolute left-1 top-1 w-3 h-3 rounded-full bg-white/40" />
+                  </button>
+                </div>
+                <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
+                  <span className="text-[10px] font-bold uppercase">Filter by Hashtag</span>
+                  <input placeholder="#ambition" className="bg-transparent border-none text-[10px] text-right focus:ring-0 outline-none" />
+                </div>
+                <div className="pt-4 mt-4 border-t border-white/5">
+                  <p className="text-[9px] text-muted-foreground leading-relaxed uppercase tracking-tighter">
+                    Posts will be cached for 24 hours to ensure elite page performance. You can force a sync anytime from the connection panel.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 
