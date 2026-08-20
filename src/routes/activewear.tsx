@@ -4,11 +4,36 @@ import { Footer } from "@/components/Footer";
 import { motion } from "framer-motion";
 import { ArrowRight, Info, Zap, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
-import { submitInquiry } from "@/lib/inquiries.functions";
+import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { submitInquiry } from "@/lib/inquiries.functions";
+import { getPageSeo } from "@/lib/seo.functions";
+import { QuickViewModal } from "@/components/QuickViewModal";
 
 
 export const Route = createFileRoute("/activewear")({
+  loader: async ({ context }) => {
+    return context.queryClient.ensureQueryData({
+      queryKey: ["seo", "/activewear"],
+      queryFn: () => getPageSeo({ data: { path: "/activewear" } }),
+    });
+  },
+  head: ({ loaderData }) => {
+    const seo = loaderData as any;
+    const title = seo?.title || "Activewear | Ambition Sports";
+    const description = seo?.description || "High-performance custom gym and fitness apparel.";
+    return {
+      title,
+      meta: [
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary_large_image" },
+        ...(seo?.ogImage ? [{ property: "og:image", content: seo.ogImage }] : []),
+      ],
+    };
+  },
   component: Activewear,
 });
 
@@ -59,6 +84,9 @@ const products = [
 
 function Activewear() {
   const submitInquiryFn = useServerFn(submitInquiry);
+  const [selectedProduct, setSelectedProduct] = useState<typeof products[0] | null>(null);
+  const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
+
   const handleInquiry = async (productName: string) => {
     toast.loading(`Processing inquiry for ${productName}...`, { id: "inquiry" });
     try {
@@ -79,6 +107,7 @@ function Activewear() {
       toast.error("Failed to send inquiry. Please try again.", { id: "inquiry" });
     }
   };
+
 
 
   return (
@@ -147,8 +176,11 @@ function Activewear() {
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
-                    <button className="bg-white/5 hover:bg-white/10 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all border border-white/10 flex items-center justify-center gap-2 text-white">
-                      <Info size={14} /> Spec Sheet
+                    <button 
+                      onClick={() => { setSelectedProduct(p); setIsQuickViewOpen(true); }}
+                      className="bg-white/5 hover:bg-white/10 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all border border-white/10 flex items-center justify-center gap-2 text-white"
+                    >
+                      <Info size={14} /> Quick View
                     </button>
                     <button 
                       onClick={() => handleInquiry(p.name)}
@@ -181,6 +213,12 @@ function Activewear() {
       </main>
 
       <Footer />
+      <QuickViewModal 
+        product={selectedProduct} 
+        isOpen={isQuickViewOpen} 
+        onClose={() => setIsQuickViewOpen(false)} 
+        onInquire={handleInquiry} 
+      />
     </div>
   );
 }
