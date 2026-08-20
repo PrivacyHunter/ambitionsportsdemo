@@ -95,7 +95,7 @@ function Index() {
                   </div>
                 </div>
                 <div className="space-y-6 pt-12">
-                  <div className="h-48 bg-primary/10 rounded-3xl border border-primary/20 flex items-center justify-center">
+                  <div className="h-48 bg-primary/5 dark:bg-primary/10 rounded-3xl border border-primary/10 dark:border-primary/20 flex items-center justify-center">
                     <Users className="text-primary w-16 h-16" />
                   </div>
                   <div className="h-72 bg-[url('https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center rounded-3xl border border-white/10" />
