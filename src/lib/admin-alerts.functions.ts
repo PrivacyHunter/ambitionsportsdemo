@@ -6,10 +6,9 @@ import { assertDeveloper } from "./admin.server";
 export const getAlertSettings = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    // Fallback if column doesn't exist yet
     const { data } = await context.supabase.from("site_settings").select("*");
-    const settings = data?.find(s => s.key === 'alert_thresholds');
-    if (settings) return JSON.parse(settings.value);
+    const settings = data?.find((s: any) => s.key === 'alert_thresholds');
+    if (settings && settings.value) return JSON.parse(settings.value);
     
     return { failure_rate_pct: 10, latency_ms: 5000, notification_email: "" };
   });
@@ -39,6 +38,5 @@ export const updateAlertSettings = createServerFn({ method: "POST" })
 export const getAuditLogs = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    // audit logs need to be created in DB or use a different approach
     return [];
   });
