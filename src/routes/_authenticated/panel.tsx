@@ -13,6 +13,7 @@ import { useTheme } from "@/components/ThemeProvider";
 import {
   deleteProduct, getDashboard, saveSetting, setUserRole, updateStatus, upsertProduct,
 } from "@/lib/admin.functions";
+import { getPageSeo, savePageSeo } from "@/lib/seo.functions";
 import { DEFAULT_BRANDING, DEFAULT_THEME, FONT_PRESETS, type BrandingConfig, type ThemeConfig } from "@/lib/theme";
 
 export const Route = createFileRoute("/_authenticated/panel")({
@@ -30,7 +31,7 @@ export const Route = createFileRoute("/_authenticated/panel")({
   component: PanelPage,
 });
 
-type Tab = "overview" | "inbox" | "products" | "theme" | "branding" | "accounts" | "visitors";
+type Tab = "overview" | "inbox" | "products" | "theme" | "branding" | "seo" | "accounts" | "visitors";
 
 const TABS: { id: Tab; label: string; icon: typeof Inbox; developerOnly?: boolean }[] = [
   { id: "overview", label: "Overview", icon: ShieldCheck },
@@ -38,6 +39,7 @@ const TABS: { id: Tab; label: string; icon: typeof Inbox; developerOnly?: boolea
   { id: "products", label: "Products", icon: Package },
   { id: "theme", label: "Theme Studio", icon: Palette },
   { id: "branding", label: "Branding", icon: Settings2 },
+  { id: "seo", label: "SEO Editor", icon: Globe2 },
   { id: "visitors", label: "Visitors", icon: Globe2 },
   { id: "accounts", label: "Accounts", icon: Users, developerOnly: true },
 ];
@@ -126,6 +128,7 @@ function PanelPage() {
         {tab === "products" && <ProductsTab data={data!} onDone={() => void refetch()} />}
         {tab === "theme" && <ThemeStudio />}
         {tab === "branding" && <BrandingTab />}
+        {tab === "seo" && <SeoTab />}
         {tab === "visitors" && <VisitorsTab data={data!} />}
         {tab === "accounts" && role === "developer" && <AccountsTab data={data!} onDone={() => void refetch()} />}
       </section>
