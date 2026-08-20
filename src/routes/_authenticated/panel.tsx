@@ -1132,7 +1132,7 @@ function AnalyticsDashboard({ data }: { data: Dash }) {
                 <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
                   <div 
                     className="h-full bg-primary transition-all duration-1000" 
-                    style={{ width: `${(p.value / stats.pages[0].value) * 100}%` }}
+                    style={{ width: `${stats.pages[0] ? (p.value / stats.pages[0].value) * 100 : 0}%` }}
                   />
                 </div>
               </div>
@@ -1154,7 +1154,7 @@ function AnalyticsDashboard({ data }: { data: Dash }) {
                 dataKey="value"
               >
                 {stats.devices.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length] || "#d4af37"} />
                 ))}
               </Pie>
               <ReTooltip contentStyle={{ background: '#080a0f', border: '1px solid #ffffff20', borderRadius: '12px' }} />
