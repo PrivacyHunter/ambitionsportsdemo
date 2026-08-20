@@ -24,6 +24,7 @@ import { Route as TrackRouteImport } from './routes/track'
 import { Route as AuthenticatedPanelRouteImport } from './routes/_authenticated/panel'
 import { Route as ApiPublicInstagramWebhookRouteImport } from './routes/api/public/instagram-webhook'
 import { Route as ApiPublicTrackingRouteImport } from './routes/api/public/tracking'
+import { Route as ApiPublicWebhookRouteImport } from './routes/api/public/webhook'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -100,6 +101,11 @@ const ApiPublicTrackingRoute = ApiPublicTrackingRouteImport.update({
   path: '/api/public/tracking',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicWebhookRoute = ApiPublicWebhookRouteImport.update({
+  id: '/api/public/webhook',
+  path: '/api/public/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -116,6 +122,7 @@ export interface FileRoutesByFullPath {
   '/panel': typeof AuthenticatedPanelRoute
   '/api/public/instagram-webhook': typeof ApiPublicInstagramWebhookRoute
   '/api/public/tracking': typeof ApiPublicTrackingRoute
+  '/api/public/webhook': typeof ApiPublicWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -132,6 +139,7 @@ export interface FileRoutesByTo {
   '/panel': typeof AuthenticatedPanelRoute
   '/api/public/instagram-webhook': typeof ApiPublicInstagramWebhookRoute
   '/api/public/tracking': typeof ApiPublicTrackingRoute
+  '/api/public/webhook': typeof ApiPublicWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -150,6 +158,7 @@ export interface FileRoutesById {
   '/_authenticated/panel': typeof AuthenticatedPanelRoute
   '/api/public/instagram-webhook': typeof ApiPublicInstagramWebhookRoute
   '/api/public/tracking': typeof ApiPublicTrackingRoute
+  '/api/public/webhook': typeof ApiPublicWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -168,6 +177,7 @@ export interface FileRouteTypes {
     | '/panel'
     | '/api/public/instagram-webhook'
     | '/api/public/tracking'
+    | '/api/public/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -184,6 +194,7 @@ export interface FileRouteTypes {
     | '/panel'
     | '/api/public/instagram-webhook'
     | '/api/public/tracking'
+    | '/api/public/webhook'
   id:
     | '__root__'
     | '/'
@@ -201,6 +212,7 @@ export interface FileRouteTypes {
     | '/_authenticated/panel'
     | '/api/public/instagram-webhook'
     | '/api/public/tracking'
+    | '/api/public/webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -218,6 +230,7 @@ export interface RootRouteChildren {
   TrackRoute: typeof TrackRoute
   ApiPublicInstagramWebhookRoute: typeof ApiPublicInstagramWebhookRoute
   ApiPublicTrackingRoute: typeof ApiPublicTrackingRoute
+  ApiPublicWebhookRoute: typeof ApiPublicWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -327,6 +340,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicTrackingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/webhook': {
+      id: '/api/public/webhook'
+      path: '/api/public/webhook'
+      fullPath: '/api/public/webhook'
+      preLoaderRoute: typeof ApiPublicWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -356,6 +376,7 @@ const rootRouteChildren: RootRouteChildren = {
   TrackRoute: TrackRoute,
   ApiPublicInstagramWebhookRoute: ApiPublicInstagramWebhookRoute,
   ApiPublicTrackingRoute: ApiPublicTrackingRoute,
+  ApiPublicWebhookRoute: ApiPublicWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
