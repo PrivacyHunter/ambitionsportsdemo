@@ -1179,8 +1179,8 @@ function AnalyticsDashboard({ data }: { data: Dash }) {
       const deviceMatch = filter.device === "all" || t.device === filter.device;
       
       const date = t.created_at ? new Date(t.created_at).getTime() : 0;
-      const start = new Date(filter.startDate).getTime();
-      const end = new Date(filter.endDate).getTime() + (24 * 60 * 60 * 1000); // end of day
+      const start = new Date(filter.startDate || 0).getTime();
+      const end = new Date(filter.endDate || 0).getTime() + (24 * 60 * 60 * 1000); // end of day
       const dateMatch = date >= start && date <= end;
       
       return countryMatch && deviceMatch && dateMatch;
