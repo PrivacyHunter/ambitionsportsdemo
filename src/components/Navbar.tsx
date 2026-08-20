@@ -79,11 +79,12 @@ export function Navbar() {
         </div>
       )}
 
-      {/* Main Navbar */}
       <nav
         className={cn(
           "sticky top-0 z-50 w-full transition-all duration-300 px-4 lg:px-8 py-4",
-          isScrolled ? "bg-background/90 backdrop-blur-xl border-b border-neon-cyan/20 py-3" : "bg-transparent"
+          isScrolled 
+            ? "bg-white/95 dark:bg-background/95 backdrop-blur-xl border-b border-border/50 py-3 shadow-lg" 
+            : "bg-white/90 dark:bg-transparent backdrop-blur-sm lg:backdrop-blur-none"
         )}
       >
         <div className="max-w-7xl mx-auto flex justify-between items-center">
@@ -108,15 +109,15 @@ export function Navbar() {
               <Link
                 key={link.name}
                 to={link.href}
-                className="text-sm font-bold uppercase tracking-widest hover:text-neon-cyan transition-colors"
-                activeProps={{ className: "text-neon-cyan" }}
+                className="text-sm font-bold uppercase tracking-widest text-slate-700 dark:text-foreground hover:text-primary dark:hover:text-primary transition-colors"
+                activeProps={{ className: "text-primary" }}
               >
                 {link.name}
               </Link>
             ))}
             <Link
               to="/quote"
-              className="bg-neon-cyan hover:bg-neon-cyan/80 text-background px-6 py-2 rounded font-black text-sm uppercase transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(0,243,255,0.4)]"
+              className="bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded font-black text-sm uppercase transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(211,26,35,0.3)]"
             >
               Get a Quote
             </Link>
@@ -129,9 +130,8 @@ export function Navbar() {
           </div>
 
 
-          {/* Mobile Toggle */}
           <button
-            className="lg:hidden text-foreground"
+            className="lg:hidden text-slate-900 dark:text-foreground"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
