@@ -37,9 +37,10 @@ export function Footer() {
           <ul className="space-y-4 text-sm font-medium">
             <li><Link to="/sportswear" className="hover:text-neon-lime transition-colors">Sportswear</Link></li>
             <li><Link to="/activewear" className="hover:text-neon-lime transition-colors">Activewear</Link></li>
-            <li><Link to="/casual-wear" className="hover:text-neon-lime transition-colors">Casual Wear</Link></li>
+            <li><Link to="/customization" className="hover:text-neon-lime transition-colors">Customization</Link></li>
             <li><Link to="/about" className="hover:text-neon-lime transition-colors">About Us</Link></li>
             <li><Link to="/contact" className="hover:text-neon-lime transition-colors">Contact & Quote</Link></li>
+
           </ul>
         </div>
 
@@ -53,12 +54,13 @@ export function Footer() {
             </li>
             <li className="flex gap-3 text-muted-foreground">
               <Phone size={20} className="text-neon-lime shrink-0" />
-              <span>{branding.phone}</span>
+              <span>+92 (304) 989-3054</span>
             </li>
             <li className="flex gap-3 text-muted-foreground">
               <Mail size={20} className="text-neon-lime shrink-0" />
-              <span>{branding.email}</span>
+              <span>ambitionsports381@gmail.com</span>
             </li>
+
           </ul>
         </div>
 
