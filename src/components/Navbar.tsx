@@ -68,12 +68,18 @@ export function Navbar() {
       >
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 bg-neon-cyan rounded-lg flex items-center justify-center font-black text-background text-2xl group-hover:shadow-[0_0_20px_rgba(0,243,255,0.5)] transition-all">
-              A
-            </div>
-            <span className="text-xl font-black tracking-tighter uppercase italic group-hover:text-neon-cyan transition-colors">
-              Ambition <span className="text-neon-cyan">Sports</span>
-            </span>
+            {branding.logoUrl ? (
+              <img src={branding.logoUrl} alt={branding.logoText} className="h-10 w-auto object-contain" />
+            ) : (
+              <>
+                <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center font-black text-primary-foreground text-2xl group-hover:shadow-[0_0_20px_rgba(212,175,55,0.5)] transition-all">
+                  {branding.logoText?.[0] || 'A'}
+                </div>
+                <span className="text-xl font-black tracking-tighter uppercase italic group-hover:text-primary transition-colors">
+                  {branding.logoText.split(' ')[0]} <span className="text-primary">{branding.logoText.split(' ').slice(1).join(' ')}</span>
+                </span>
+              </>
+            )}
           </Link>
 
           {/* Desktop Nav */}

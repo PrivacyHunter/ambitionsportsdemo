@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { motion } from "framer-motion";
@@ -51,6 +52,23 @@ export const Route = createFileRoute("/about")({
 });
 
 function About() {
+  useEffect(() => {
+    const track = async () => {
+      try {
+        await fetch('/api/public/tracking', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            path: '/about',
+            referrer: document.referrer,
+            userAgent: navigator.userAgent
+          })
+        });
+      } catch (e) {}
+    };
+    track();
+  }, []);
+
   const submitInquiryFn = useServerFn(submitInquiry);
   const [fileName, setFileName] = useState<string | null>(null);
 

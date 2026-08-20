@@ -21,6 +21,7 @@ import { Route as QuoteRouteImport } from './routes/quote'
 import { Route as SportswearRouteImport } from './routes/sportswear'
 import { Route as TrackRouteImport } from './routes/track'
 import { Route as AuthenticatedPanelRouteImport } from './routes/_authenticated/panel'
+import { Route as ApiPublicTrackingRouteImport } from './routes/api/public/tracking'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -81,6 +82,11 @@ const AuthenticatedPanelRoute = AuthenticatedPanelRouteImport.update({
   path: '/panel',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicTrackingRoute = ApiPublicTrackingRouteImport.update({
+  id: '/api/public/tracking',
+  path: '/api/public/tracking',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -94,6 +100,7 @@ export interface FileRoutesByFullPath {
   '/sportswear': typeof SportswearRoute
   '/track': typeof TrackRoute
   '/panel': typeof AuthenticatedPanelRoute
+  '/api/public/tracking': typeof ApiPublicTrackingRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -107,6 +114,7 @@ export interface FileRoutesByTo {
   '/sportswear': typeof SportswearRoute
   '/track': typeof TrackRoute
   '/panel': typeof AuthenticatedPanelRoute
+  '/api/public/tracking': typeof ApiPublicTrackingRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -122,6 +130,7 @@ export interface FileRoutesById {
   '/sportswear': typeof SportswearRoute
   '/track': typeof TrackRoute
   '/_authenticated/panel': typeof AuthenticatedPanelRoute
+  '/api/public/tracking': typeof ApiPublicTrackingRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -137,6 +146,7 @@ export interface FileRouteTypes {
     | '/sportswear'
     | '/track'
     | '/panel'
+    | '/api/public/tracking'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -150,6 +160,7 @@ export interface FileRouteTypes {
     | '/sportswear'
     | '/track'
     | '/panel'
+    | '/api/public/tracking'
   id:
     | '__root__'
     | '/'
@@ -164,6 +175,7 @@ export interface FileRouteTypes {
     | '/sportswear'
     | '/track'
     | '/_authenticated/panel'
+    | '/api/public/tracking'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -178,6 +190,7 @@ export interface RootRouteChildren {
   QuoteRoute: typeof QuoteRoute
   SportswearRoute: typeof SportswearRoute
   TrackRoute: typeof TrackRoute
+  ApiPublicTrackingRoute: typeof ApiPublicTrackingRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -266,6 +279,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPanelRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/tracking': {
+      id: '/api/public/tracking'
+      path: '/api/public/tracking'
+      fullPath: '/api/public/tracking'
+      preLoaderRoute: typeof ApiPublicTrackingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -292,6 +312,7 @@ const rootRouteChildren: RootRouteChildren = {
   QuoteRoute: QuoteRoute,
   SportswearRoute: SportswearRoute,
   TrackRoute: TrackRoute,
+  ApiPublicTrackingRoute: ApiPublicTrackingRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

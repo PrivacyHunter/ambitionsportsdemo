@@ -1,9 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { CheckCircle2, ArrowLeft } from "lucide-react";
+import { CheckCircle2, ArrowLeft, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useServerFn } from "@tanstack/react-start";
+import { createOrder } from "@/lib/checkout.functions";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/checkout")({
   component: Checkout,
@@ -11,6 +14,50 @@ export const Route = createFileRoute("/checkout")({
 
 function Checkout() {
   const [placed, setPlaced] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    address: "",
+    city: "",
+    country: "",
+    paymentMethod: "Credit Card"
+  });
+
+  const orderFn = useServerFn(createOrder);
+
+  const handlePlaceOrder = async () => {
+    if (!form.email || !form.firstName || !form.address) {
+      toast.error("Please fill in required fields");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await orderFn({
+        data: {
+          email: form.email,
+          amount: 0, // In real app, calculate from cart
+          items: [],
+          shippingDetails: {
+            firstName: form.firstName,
+            lastName: form.lastName,
+            address: form.address,
+            city: form.city,
+            country: form.country,
+          },
+          paymentMethod: form.paymentMethod
+        }
+      });
+      setPlaced(true);
+      toast.success("Order placed successfully!");
+    } catch (err) {
+      toast.error("Failed to place order. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (placed) {
     return (
@@ -53,12 +100,12 @@ function Checkout() {
             <div className="bg-card p-10 rounded-[2.5rem] border border-white/5">
               <h2 className="text-2xl font-black uppercase italic mb-8 border-b border-white/10 pb-4">Shipping Information</h2>
               <div className="grid md:grid-cols-2 gap-6">
-                <input placeholder="First Name" className="bg-white/5 border border-white/10 p-5 rounded-2xl outline-none focus:border-neon-cyan transition-colors" />
-                <input placeholder="Last Name" className="bg-white/5 border border-white/10 p-5 rounded-2xl outline-none focus:border-neon-cyan transition-colors" />
-                <input placeholder="Email Address" className="md:col-span-2 bg-white/5 border border-white/10 p-5 rounded-2xl outline-none focus:border-neon-cyan transition-colors" />
-                <input placeholder="Shipping Address" className="md:col-span-2 bg-white/5 border border-white/10 p-5 rounded-2xl outline-none focus:border-neon-cyan transition-colors" />
-                <input placeholder="City" className="bg-white/5 border border-white/10 p-5 rounded-2xl outline-none focus:border-neon-cyan transition-colors" />
-                <input placeholder="Country" className="bg-white/5 border border-white/10 p-5 rounded-2xl outline-none focus:border-neon-cyan transition-colors" />
+                <input placeholder="First Name" value={form.firstName} onChange={e => setForm({...form, firstName: e.target.value})} className="bg-white/5 border border-white/10 p-5 rounded-2xl outline-none focus:border-neon-cyan transition-colors" />
+                <input placeholder="Last Name" value={form.lastName} onChange={e => setForm({...form, lastName: e.target.value})} className="bg-white/5 border border-white/10 p-5 rounded-2xl outline-none focus:border-neon-cyan transition-colors" />
+                <input placeholder="Email Address" value={form.email} onChange={e => setForm({...form, email: e.target.value})} className="md:col-span-2 bg-white/5 border border-white/10 p-5 rounded-2xl outline-none focus:border-neon-cyan transition-colors" />
+                <input placeholder="Shipping Address" value={form.address} onChange={e => setForm({...form, address: e.target.value})} className="md:col-span-2 bg-white/5 border border-white/10 p-5 rounded-2xl outline-none focus:border-neon-cyan transition-colors" />
+                <input placeholder="City" value={form.city} onChange={e => setForm({...form, city: e.target.value})} className="bg-white/5 border border-white/10 p-5 rounded-2xl outline-none focus:border-neon-cyan transition-colors" />
+                <input placeholder="Country" value={form.country} onChange={e => setForm({...form, country: e.target.value})} className="bg-white/5 border border-white/10 p-5 rounded-2xl outline-none focus:border-neon-cyan transition-colors" />
               </div>
             </div>
 
@@ -67,7 +114,7 @@ function Checkout() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {['Direct Bank Wire', 'Credit Card', 'PayPal'].map((method) => (
                   <label key={method} className="relative group cursor-pointer">
-                    <input type="radio" name="payment" className="peer hidden" defaultChecked={method === 'Credit Card'} />
+                    <input type="radio" name="payment" className="peer hidden" checked={form.paymentMethod === method} onChange={() => setForm({...form, paymentMethod: method})} />
                     <div className="p-6 bg-white/5 border border-white/10 rounded-2xl text-center peer-checked:border-neon-cyan peer-checked:bg-neon-cyan/5 transition-all group-hover:bg-white/10">
                       <span className="font-bold text-xs uppercase tracking-widest">{method}</span>
                     </div>
@@ -96,10 +143,11 @@ function Checkout() {
                 </div>
               </div>
               <button 
-                onClick={() => setPlaced(true)}
-                className="w-full bg-neon-cyan hover:bg-neon-lime text-background py-6 rounded-2xl font-black uppercase italic tracking-widest transition-all shadow-[0_20px_40px_rgba(0,243,255,0.2)]"
+                onClick={handlePlaceOrder}
+                disabled={loading}
+                className="w-full bg-neon-cyan hover:bg-neon-lime text-background py-6 rounded-2xl font-black uppercase italic tracking-widest transition-all shadow-[0_20px_40px_rgba(0,243,255,0.2)] flex items-center justify-center gap-2"
               >
-                Place Secure Order
+                {loading ? <Loader2 className="animate-spin" /> : "Place Secure Order"}
               </button>
               <p className="text-[10px] text-center text-muted-foreground uppercase font-bold tracking-widest mt-6">
                 🔒 256-bit SSL Encrypted Connection
