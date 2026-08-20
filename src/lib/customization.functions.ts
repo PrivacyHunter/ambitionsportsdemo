@@ -13,14 +13,6 @@ const MOCK_VIDEOS = [
       { start: 0, end: 3, text: "Welcome to our Sublimation Studio" },
       { start: 4, end: 8, text: "Where vibrant colors come to life" }
     ]
-  },
-  {
-    id: "2",
-    title: "Precision Heat Transfer",
-    description: "Utilizing industrial-grade vinyl and 3D silicone transfers, we deliver sharp, professional logos and player numbers.",
-    video_url: "https://player.vimeo.com/external/494164100.hd.mp4?s=1d5440a40d5884d5930e1c3a6b57904797686b2d&profile_id=175",
-    display_order: 2,
-    is_published: true
   }
 ];
 
@@ -64,7 +56,6 @@ export const upsertCustomizationVideo = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { supabase } = await import("@/integrations/supabase/client");
     
-    // Cleanup old storage file if video_url changed
     if (data.id) {
       const { data: existing } = await supabase.from('customization_videos').select('video_url').eq('id', data.id).single();
       const oldUrl = (existing as any)?.video_url;
@@ -90,7 +81,6 @@ export const deleteCustomizationVideo = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { supabase } = await import("@/integrations/supabase/client");
     
-    // Cleanup storage
     const { data: existing } = await supabase.from('customization_videos').select('video_url').eq('id', data.id).single();
     const oldUrl = (existing as any)?.video_url;
     if (oldUrl && oldUrl.includes('storage/v1/object/public/studio-assets')) {
@@ -116,7 +106,6 @@ export const bulkActionCustomizationVideos = createServerFn({ method: "POST" })
     const { supabase } = await import("@/integrations/supabase/client");
     
     if (data.action === 'delete') {
-      // Cleanup storage for all
       const { data: videos } = await supabase.from('customization_videos').select('video_url').in('id', data.ids);
       const paths = (videos || [])
         .map((v: any) => v.video_url)
@@ -149,18 +138,15 @@ export const trackVideoEngagement = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { supabase } = await import("@/integrations/supabase/client");
     
-    // Log individual action
-    await supabase.from('video_engagement').insert([data]);
+    // Using loose typing to bypass generation delay
+    await (supabase.from('video_engagement' as any) as any).insert([data]);
 
-    // Update aggregate counts
     const column = data.action === 'play' ? 'total_plays' : data.action === 'pause' ? 'total_pauses' : 'total_time_watched';
     const increment = data.value || 1;
 
-    // Use raw query for increment if RPC isn't recognized by TS types yet
     await supabase.from('customization_videos')
       .update({ [column]: supabase.rpc('increment' as any, { row_id: data.video_id, amount: increment } as any) } as any)
       .eq('id', data.video_id);
-
 
     return { success: true };
   });
