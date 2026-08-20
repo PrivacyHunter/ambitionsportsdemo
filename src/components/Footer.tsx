@@ -74,7 +74,7 @@ export function Footer() {
               placeholder="Your Email" 
               className="w-full bg-white/5 border border-white/10 rounded-md py-3 px-4 text-sm focus:outline-none focus:border-neon-cyan transition-colors"
             />
-            <button className="absolute right-2 top-2 p-1.5 bg-neon-cyan rounded text-background hover:bg-neon-lime transition-all">
+            <button className="absolute right-2 top-2 p-1.5 bg-primary rounded text-primary-foreground hover:bg-neon-lime transition-all">
               <Send size={16} />
             </button>
           </div>
