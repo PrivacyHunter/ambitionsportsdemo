@@ -104,6 +104,8 @@ export function themeVars(theme: ThemeConfig, mode: ThemeMode): Record<string, s
     "--accent": theme.cyanAccent,
     "--neon-cyan": theme.cyanAccent,
     "--background": isDark ? theme.darkBackground : theme.lightBackground,
+    "--nav-bg": isDark ? "transparent" : "#ffffff",
+    "--nav-foreground": isDark ? "#ffffff" : "#0f172a",
     "--foreground": isDark ? "#f8fafc" : "#0f172a",
     "--card": isDark ? "#0f1118" : "#f8fafc",
     "--border": isDark ? "rgb(255 255 255 / 10%)" : "rgb(15 23 42 / 10%)",

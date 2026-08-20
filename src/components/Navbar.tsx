@@ -83,8 +83,8 @@ export function Navbar() {
         className={cn(
           "sticky top-0 z-50 w-full transition-all duration-300 px-4 lg:px-8 py-4",
           isScrolled 
-            ? "bg-white/95 dark:bg-background/95 backdrop-blur-xl border-b border-border/50 py-3 shadow-lg" 
-            : "bg-white/90 dark:bg-transparent backdrop-blur-sm lg:backdrop-blur-none"
+            ? "bg-nav/95 backdrop-blur-xl border-b border-border/50 py-3 shadow-lg" 
+            : "bg-nav/90 lg:bg-transparent backdrop-blur-sm lg:backdrop-blur-none"
         )}
       >
         <div className="max-w-7xl mx-auto flex justify-between items-center">
@@ -109,7 +109,7 @@ export function Navbar() {
               <Link
                 key={link.name}
                 to={link.href}
-                className="text-sm font-bold uppercase tracking-widest text-slate-700 dark:text-foreground hover:text-primary dark:hover:text-primary transition-colors"
+                className="text-sm font-bold uppercase tracking-widest text-nav-foreground lg:text-foreground dark:lg:text-foreground hover:text-primary transition-colors"
                 activeProps={{ className: "text-primary" }}
               >
                 {link.name}
@@ -123,7 +123,7 @@ export function Navbar() {
             </Link>
             <button 
               onClick={toggleMode}
-              className="p-2 hover:bg-white/5 rounded-full transition-colors text-muted-foreground hover:text-primary"
+              className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors text-nav-foreground lg:text-muted-foreground hover:text-primary"
             >
               {mode === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
             </button>
@@ -131,7 +131,7 @@ export function Navbar() {
 
 
           <button
-            className="lg:hidden text-slate-900 dark:text-foreground"
+            className="lg:hidden text-nav-foreground"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
