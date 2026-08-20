@@ -291,18 +291,26 @@ function ProductsTab({ data, onDone }: { data: Dash; onDone: () => void }) {
                           <button type="button" onClick={() => {
                             const next = [...currentImages];
                             const temp = next[idx];
-                            next[idx] = next[idx-1];
-                            next[idx-1] = temp;
-                            setForm({ ...form, images: next.join(",") });
+                            const prev = next[idx-1];
+                            if (temp !== undefined && prev !== undefined) {
+                              next[idx] = prev;
+                              next[idx-1] = temp;
+                              setForm({ ...form, images: next.join(",") });
+                            }
+
                           }} className="p-1 bg-white/10 rounded hover:bg-white/20">←</button>
                         )}
                         {idx < currentImages.length - 1 && (
                           <button type="button" onClick={() => {
                             const next = [...currentImages];
                             const temp = next[idx];
-                            next[idx] = next[idx+1];
-                            next[idx+1] = temp;
-                            setForm({ ...form, images: next.join(",") });
+                            const nextImg = next[idx+1];
+                            if (temp !== undefined && nextImg !== undefined) {
+                              next[idx] = nextImg;
+                              next[idx+1] = temp;
+                              setForm({ ...form, images: next.join(",") });
+                            }
+
                           }} className="p-1 bg-white/10 rounded hover:bg-white/20">→</button>
                         )}
                       </div>
