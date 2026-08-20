@@ -94,8 +94,22 @@ function VideoPlayer({ url, title, videoId, captions = [] }: { url: string; titl
       
       {/* Captions Overlay */}
       {showCaptions && currentCaption && (
-        <div className="absolute bottom-16 left-0 right-0 px-8 text-center pointer-events-none">
-          <span className="bg-black/80 backdrop-blur-md px-4 py-2 rounded-lg text-sm md:text-base font-medium text-white shadow-xl inline-block animate-in fade-in slide-in-from-bottom-2 duration-300">
+        <div 
+          className={`absolute left-0 right-0 px-8 text-center pointer-events-none ${
+            captions.find(c => videoRef.current && videoRef.current.currentTime >= c.start && videoRef.current.currentTime <= c.end)?.style?.position === 'top' 
+              ? 'top-16' 
+              : captions.find(c => videoRef.current && videoRef.current.currentTime >= c.start && videoRef.current.currentTime <= c.end)?.style?.position === 'center'
+                ? 'top-1/2 -translate-y-1/2'
+                : 'bottom-16'
+          }`}
+        >
+          <span 
+            className="bg-black/80 backdrop-blur-md px-4 py-2 rounded-lg font-medium text-white shadow-xl inline-block animate-in fade-in slide-in-from-bottom-2 duration-300"
+            style={{
+              fontSize: captions.find(c => videoRef.current && videoRef.current.currentTime >= c.start && videoRef.current.currentTime <= c.end)?.style?.fontSize || 'inherit',
+              color: captions.find(c => videoRef.current && videoRef.current.currentTime >= c.start && videoRef.current.currentTime <= c.end)?.style?.color || 'white'
+            }}
+          >
             {currentCaption}
           </span>
         </div>

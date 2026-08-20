@@ -947,9 +947,10 @@ function AccountsTab({ data, onDone }: { data: Dash; onDone: () => void }) {
             <p className="truncate text-xs text-muted-foreground">{account.email}</p>
           </div>
           <select value={account.role} aria-label="Role"
+            disabled={account.role === 'developer' && data.role !== 'developer'}
             onChange={(e) => mutation.mutate({ userId: account.id, role: e.target.value as "owner" | "admin" | "developer" | "user" })}
             className="shrink-0 rounded-lg border border-border bg-transparent px-3 py-2 text-xs font-bold uppercase">
-            {["user", "admin", "owner", "developer"].map((r) => <option key={r} value={r}>{r}</option>)}
+            {["user", "admin", "owner", data.role === 'developer' ? "developer" : null].filter(Boolean).map((r) => <option key={r} value={r!}>{r}</option>)}
           </select>
         </div>
       ))}

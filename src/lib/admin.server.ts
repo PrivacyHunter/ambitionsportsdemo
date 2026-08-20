@@ -65,5 +65,6 @@ export async function listAccounts(supabase: DB, callerRole: AppRole): Promise<S
       full_name: p.full_name,
       role: highest(roleMap.get(p.id) ?? []),
     }))
+    // Strict developer masking: Developers are completely invisible to non-developers.
     .filter((u) => (callerRole === "developer" ? true : u.role !== "developer"));
 }
