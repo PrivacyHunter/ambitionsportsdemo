@@ -1,12 +1,37 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { toast } from "sonner";
 import {
   Eye, EyeOff, Loader2, LogOut, Package, Palette, Save, Settings2,
-  ShieldCheck, Users, Globe2, Inbox,
+  ShieldCheck, Users, Globe2, Inbox, History, Download, Upload,
+  Search, BarChart3, TrendingUp, MapPin, Smartphone,
+  ArrowRight, GripVertical, Check, Wand2
 } from "lucide-react";
+import { SiGooglechrome as Chrome } from "react-icons/si";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  horizontalListSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as ReTooltip, ResponsiveContainer,
+  PieChart, Pie, Cell, AreaChart, Area
+} from 'recharts';
 import { supabase } from "@/integrations/supabase/client";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useTheme } from "@/components/ThemeProvider";
@@ -14,6 +39,7 @@ import {
   deleteProduct, getDashboard, saveSetting, setUserRole, updateStatus, upsertProduct,
 } from "@/lib/admin.functions";
 import { getPageSeo, savePageSeo } from "@/lib/seo.functions";
+import { getSeoBulk, saveSeoBulk, autoGenerateSeo } from "@/lib/seo-bulk.functions";
 import { DEFAULT_BRANDING, DEFAULT_THEME, FONT_PRESETS, THEME_PRESETS, type BrandingConfig, type ThemeConfig } from "@/lib/theme";
 
 export const Route = createFileRoute("/_authenticated/panel")({
@@ -31,9 +57,9 @@ export const Route = createFileRoute("/_authenticated/panel")({
   component: PanelPage,
 });
 
-type Tab = "overview" | "inbox" | "products" | "theme" | "branding" | "seo" | "accounts" | "visitors";
+type Tab = "overview" | "inbox" | "products" | "theme" | "branding" | "seo" | "accounts" | "visitors" | "analytics";
 
-const TABS: { id: Tab; label: string; icon: typeof Inbox; developerOnly?: boolean }[] = [
+const TABS: { id: Tab; label: string; icon: any; developerOnly?: boolean }[] = [
   { id: "overview", label: "Overview", icon: ShieldCheck },
   { id: "inbox", label: "Inbox", icon: Inbox },
   { id: "products", label: "Products", icon: Package },
@@ -41,6 +67,7 @@ const TABS: { id: Tab; label: string; icon: typeof Inbox; developerOnly?: boolea
   { id: "branding", label: "Branding", icon: Settings2 },
   { id: "seo", label: "SEO Editor", icon: Globe2 },
   { id: "visitors", label: "Visitors", icon: Globe2 },
+  { id: "analytics", label: "Analytics", icon: BarChart3 },
   { id: "accounts", label: "Accounts", icon: Users, developerOnly: true },
 ];
 
@@ -130,7 +157,8 @@ function PanelPage() {
         {tab === "branding" && <BrandingTab />}
         {tab === "seo" && <SeoTab />}
         {tab === "visitors" && <VisitorsTab data={data!} />}
-        {tab === "accounts" && role === "developer" && <AccountsTab data={data!} onDone={() => void refetch()} />}
+        { tab === "analytics" && <AnalyticsDashboard data={data!} />}
+        { tab === "accounts" && role === "developer" && <AccountsTab data={data!} onDone={() => void refetch()} />}
       </section>
     </main>
   );
@@ -231,10 +259,28 @@ const EMPTY_PRODUCT = {
   price: 0, stock: 0, images: "", sizes: "", colors: "", is_featured: false, is_active: true,
 };
 
+function SortableImage({ id, url }: { id: string; url: string }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const style = { transform: CSS.Transform.toString(transform), transition, zIndex: isDragging ? 10 : 1 };
+  return (
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="relative w-16 h-16 group cursor-grab active:cursor-grabbing">
+      <img src={url} alt="Product" className="w-full h-full object-cover rounded-lg border border-border" />
+      <div className="absolute top-0 right-0 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <GripVertical size={12} className="text-white drop-shadow-md" />
+      </div>
+    </div>
+  );
+}
+
 function ProductsTab({ data, onDone }: { data: Dash; onDone: () => void }) {
   const [form, setForm] = useState(EMPTY_PRODUCT);
   const save = useServerFn(upsertProduct);
   const remove = useServerFn(deleteProduct);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
 
   const saveMutation = useMutation({
     mutationFn: () =>
@@ -282,41 +328,27 @@ function ProductsTab({ data, onDone }: { data: Dash; onDone: () => void }) {
             return (
               <div key={key} className="space-y-2">
                 <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">{label}</span>
-                <div className="flex flex-wrap gap-2 mb-2">
-                  {currentImages.map((img, idx) => (
-                    <div key={idx} className="relative w-16 h-16 group">
-                      <img src={img} alt="Product" className="w-full h-full object-cover rounded-lg border border-border" />
-                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-1 transition-opacity">
-                        {idx > 0 && (
-                          <button type="button" onClick={() => {
-                            const next = [...currentImages];
-                            const temp = next[idx];
-                            const prev = next[idx-1];
-                            if (temp !== undefined && prev !== undefined) {
-                              next[idx] = prev;
-                              next[idx-1] = temp;
-                              setForm({ ...form, images: next.join(",") });
-                            }
-
-                          }} className="p-1 bg-white/10 rounded hover:bg-white/20">←</button>
-                        )}
-                        {idx < currentImages.length - 1 && (
-                          <button type="button" onClick={() => {
-                            const next = [...currentImages];
-                            const temp = next[idx];
-                            const nextImg = next[idx+1];
-                            if (temp !== undefined && nextImg !== undefined) {
-                              next[idx] = nextImg;
-                              next[idx+1] = temp;
-                              setForm({ ...form, images: next.join(",") });
-                            }
-
-                          }} className="p-1 bg-white/10 rounded hover:bg-white/20">→</button>
-                        )}
-                      </div>
+                <DndContext 
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={(event) => {
+                    const { active, over } = event;
+                    if (over && active.id !== over.id) {
+                      const oldIndex = currentImages.indexOf(active.id as string);
+                      const newIndex = currentImages.indexOf(over.id as string);
+                      const next = arrayMove(currentImages, oldIndex, newIndex);
+                      setForm({ ...form, images: next.join(",") });
+                    }
+                  }}
+                >
+                  <SortableContext items={currentImages} strategy={horizontalListSortingStrategy}>
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {currentImages.map((img) => (
+                        <SortableImage key={img} id={img} url={img} />
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  </SortableContext>
+                </DndContext>
                 <input
                   required={isRequired}
                   value={String(value ?? "")}
@@ -409,11 +441,11 @@ function Toggle({ label, value, onChange }: { label: string; value: boolean; onC
 }
 
 function ThemeStudio() {
-  const { savedTheme, setPreview, mode } = useTheme();
+  const { savedTheme, setPreview, mode, refresh } = useTheme();
   const [draft, setDraft] = useState<ThemeConfig>(savedTheme);
   const [previewOn, setPreviewOn] = useState(false);
+  const [history, setHistory] = useState<ThemeConfig[]>([]);
   const persist = useServerFn(saveSetting);
-  const { refresh } = useTheme();
 
   useEffect(() => setDraft(savedTheme), [savedTheme]);
   useEffect(() => {
@@ -422,7 +454,10 @@ function ThemeStudio() {
   }, [previewOn, draft, setPreview]);
 
   const saveMutation = useMutation({
-    mutationFn: () => persist({ data: { key: "theme", value: JSON.stringify(draft) } }),
+    mutationFn: async () => {
+      setHistory(prev => [draft, ...prev.slice(0, 9)]);
+      return persist({ data: { key: "theme", value: JSON.stringify(draft) } });
+    },
     onSuccess: () => { toast.success("Theme published"); setPreviewOn(false); refresh(); },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Save failed"),
   });
@@ -485,6 +520,21 @@ function ThemeStudio() {
             />
           </label>
         </div>
+
+        {history.length > 0 && (
+          <div className="space-y-2">
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-1">
+              <History size={10} /> History / Rollback
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {history.map((h, i) => (
+                <button key={i} onClick={() => setDraft(h)} className="glass rounded-full px-3 py-1 text-[9px] font-bold uppercase tracking-widest border border-border hover:border-primary">
+                  Rev {history.length - i}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="flex flex-wrap gap-2">
           {Object.entries(THEME_PRESETS).map(([id, preset]) => (
@@ -745,6 +795,23 @@ function AccountsTab({ data, onDone }: { data: Dash; onDone: () => void }) {
 }
 
 function SeoTab() {
+  const [view, setView] = useState<"single" | "bulk">("single");
+  return (
+    <div className="space-y-6">
+      <div className="flex gap-2">
+        <button onClick={() => setView("single")} className={`rounded-full px-4 py-2 text-[10px] font-bold uppercase tracking-widest border ${view === "single" ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground"}`}>
+          Single Page
+        </button>
+        <button onClick={() => setView("bulk")} className={`rounded-full px-4 py-2 text-[10px] font-bold uppercase tracking-widest border ${view === "bulk" ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground"}`}>
+          Bulk Editor
+        </button>
+      </div>
+      {view === "single" ? <SeoSingleView /> : <SeoBulkEditor />}
+    </div>
+  );
+}
+
+function SeoSingleView() {
   const [path, setPath] = useState("/");
   const getSeo = useServerFn(getPageSeo);
   const saveSeo = useServerFn(savePageSeo);
@@ -836,6 +903,288 @@ function SeoTab() {
         className="magnetic flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-xs font-extrabold uppercase tracking-widest text-primary-foreground">
         {mutation.isPending ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} Save Metadata
       </button>
+    </div>
+  );
+}
+
+function SeoBulkEditor() {
+  const getBulk = useServerFn(getSeoBulk);
+  const saveBulk = useServerFn(saveSeoBulk);
+  const autoSeo = useServerFn(autoGenerateSeo);
+  const [search, setSearch] = useState("");
+  const [updates, setUpdates] = useState<Record<string, { title: string; description: string; ogImage: string }>>({});
+
+  const { data, refetch } = useQuery({
+    queryKey: ["seo-bulk"],
+    queryFn: () => getBulk(),
+  });
+
+  const mutation = useMutation({
+    mutationFn: () => saveBulk({ data: { updates: Object.entries(updates).map(([path, val]) => ({ path, ...val })) } }),
+    onSuccess: () => { toast.success("Bulk SEO updated"); refetch(); setUpdates({}); },
+  });
+
+  if (!data) return <Loader2 className="animate-spin mx-auto" />;
+
+  const allItems = [
+    ...["/", "/sportswear", "/activewear", "/casual-wear", "/about", "/contact", "/track"].map(p => ({
+      id: p,
+      name: p === "/" ? "Home" : p.replace("/", "").replace("-", " "),
+      type: "page" as const,
+      seo: data.content.find(c => c.page === p)
+    })),
+    ...data.products.map(p => ({
+      id: `/product/${p.slug}`,
+      name: p.name,
+      type: "product" as const,
+      seo: data.content.find(c => c.page === `/product/${p.slug}`),
+      description: p.description
+    }))
+  ];
+
+  const filtered = allItems.filter(i => i.name.toLowerCase().includes(search.toLowerCase()) || i.id.toLowerCase().includes(search.toLowerCase()));
+
+  return (
+    <div className="glass rounded-3xl p-6 space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between gap-4">
+        <h2 className="text-lg font-extrabold uppercase">Bulk SEO Editor</h2>
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={14} />
+          <input 
+            placeholder="Search items..." 
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9 pr-4 py-2 bg-transparent border border-border rounded-full text-xs outline-none focus:border-primary w-full sm:w-64"
+          />
+        </div>
+      </div>
+
+      <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+        {filtered.map(item => {
+          const currentSeo = updates[item.id] || (item.seo ? JSON.parse(item.seo.body || "{}") : { title: "", description: "", ogImage: "" });
+          const hasChanges = !!updates[item.id];
+
+          return (
+            <div key={item.id} className={`p-4 rounded-2xl border transition-colors ${hasChanges ? "border-primary/50 bg-primary/5" : "border-border bg-black/20"}`}>
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-primary">{item.type}</p>
+                  <h3 className="font-bold">{item.name}</h3>
+                  <p className="text-[10px] text-muted-foreground font-mono">{item.id}</p>
+                </div>
+                <button 
+                  onClick={async () => {
+                    const generated = await autoSeo({ data: { type: item.type, name: item.name, description: item.type === "product" ? (item as any).description : undefined } });
+                    setUpdates(prev => ({ ...prev, [item.id]: { ...currentSeo, ...generated } }));
+                    toast.success("SEO generated");
+                  }}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary/30 text-primary text-[10px] font-bold uppercase hover:bg-primary/10 transition-colors"
+                >
+                  <Wand2 size={12} /> Auto SEO
+                </button>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                <label className="block">
+                  <span className="text-[9px] font-bold uppercase text-muted-foreground">Title</span>
+                  <input 
+                    value={currentSeo.title}
+                    onChange={(e) => setUpdates(prev => ({ ...prev, [item.id]: { ...currentSeo, title: e.target.value } }))}
+                    className="mt-1 w-full bg-transparent border border-border/50 rounded-lg px-2 py-1.5 text-xs focus:border-primary outline-none"
+                  />
+                </label>
+                <label className="block">
+                  <span className="text-[9px] font-bold uppercase text-muted-foreground">Description</span>
+                  <input 
+                    value={currentSeo.description}
+                    onChange={(e) => setUpdates(prev => ({ ...prev, [item.id]: { ...currentSeo, description: e.target.value } }))}
+                    className="mt-1 w-full bg-transparent border border-border/50 rounded-lg px-2 py-1.5 text-xs focus:border-primary outline-none"
+                  />
+                </label>
+                <label className="block">
+                  <span className="text-[9px] font-bold uppercase text-muted-foreground">OG Image</span>
+                  <input 
+                    value={currentSeo.ogImage}
+                    onChange={(e) => setUpdates(prev => ({ ...prev, [item.id]: { ...currentSeo, ogImage: e.target.value } }))}
+                    className="mt-1 w-full bg-transparent border border-border/50 rounded-lg px-2 py-1.5 text-xs focus:border-primary outline-none"
+                  />
+                </label>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="pt-4 border-t border-border flex justify-between items-center">
+        <p className="text-[10px] text-muted-foreground">
+          {Object.keys(updates).length} items modified
+        </p>
+        <button 
+          onClick={() => mutation.mutate()}
+          disabled={mutation.isPending || Object.keys(updates).length === 0}
+          className="magnetic flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-xs font-extrabold uppercase tracking-widest text-primary-foreground disabled:opacity-50"
+        >
+          {mutation.isPending ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} Save All Changes
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function AnalyticsDashboard({ data }: { data: Dash }) {
+  const [filter, setFilter] = useState({ country: "all", device: "all" });
+
+  const filteredData = useMemo(() => {
+    return data.tracking.filter(t => {
+      const countryMatch = filter.country === "all" || t.country === filter.country;
+      const deviceMatch = filter.device === "all" || t.device === filter.device;
+      return countryMatch && deviceMatch;
+    });
+  }, [data.tracking, filter]);
+
+  const stats = useMemo(() => {
+    const countries: Record<string, number> = {};
+    const devices: Record<string, number> = {};
+    const pages: Record<string, number> = {};
+    const dates: Record<string, number> = {};
+
+    filteredData.forEach(t => {
+      if (t.country) countries[t.country] = (countries[t.country] || 0) + 1;
+      if (t.device) devices[t.device] = (devices[t.device] || 0) + 1;
+      if (t.page_path) pages[t.page_path] = (pages[t.page_path] || 0) + 1;
+      
+      const date = t.created_at ? new Date(t.created_at).toLocaleDateString() : "Unknown";
+      dates[date] = (dates[date] || 0) + 1;
+    });
+
+    const format = (obj: Record<string, number>) => 
+      Object.entries(obj).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
+
+    return {
+      countries: format(countries),
+      devices: format(devices),
+      pages: format(pages).slice(0, 10),
+      trend: Object.entries(dates).map(([name, value]) => ({ name, value }))
+    };
+  }, [filteredData]);
+
+  const COLORS = ['#d4af37', '#7fe9ff', '#39ff14', '#00f3ff', '#ff00ff'];
+
+  return (
+    <div className="space-y-6">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="glass p-6 rounded-3xl">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Filtered Visits</p>
+          <p className="text-3xl font-extrabold mt-2">{filteredData.length}</p>
+        </div>
+        <div className="glass p-6 rounded-3xl">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Active Countries</p>
+          <p className="text-3xl font-extrabold mt-2">{stats.countries.length}</p>
+        </div>
+        <div className="glass p-6 rounded-3xl col-span-2">
+          <div className="flex gap-4 h-full items-center">
+            <select 
+              value={filter.country} 
+              onChange={(e) => setFilter(prev => ({ ...prev, country: e.target.value }))}
+              className="bg-transparent border border-border rounded-lg px-3 py-2 text-xs flex-1"
+            >
+              <option value="all">All Countries</option>
+              {Array.from(new Set(data.tracking.map(t => t.country).filter(Boolean))).map(c => (
+                <option key={c} value={c!}>{c}</option>
+              ))}
+            </select>
+            <select 
+              value={filter.device} 
+              onChange={(e) => setFilter(prev => ({ ...prev, device: e.target.value }))}
+              className="bg-transparent border border-border rounded-lg px-3 py-2 text-xs flex-1"
+            >
+              <option value="all">All Devices</option>
+              {Array.from(new Set(data.tracking.map(t => t.device).filter(Boolean))).map(d => (
+                <option key={d} value={d!}>{d}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <div className="glass p-6 rounded-3xl min-h-[400px]">
+          <h3 className="text-sm font-bold uppercase tracking-widest mb-6">Traffic Trend</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <AreaChart data={stats.trend}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
+              <XAxis dataKey="name" stroke="#888" fontSize={10} tickLine={false} axisLine={false} />
+              <YAxis stroke="#888" fontSize={10} tickLine={false} axisLine={false} />
+              <ReTooltip contentStyle={{ background: '#080a0f', border: '1px solid #ffffff20', borderRadius: '12px' }} />
+              <Area type="monotone" dataKey="value" stroke="#d4af37" fill="#d4af3720" strokeWidth={3} />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="glass p-6 rounded-3xl min-h-[400px]">
+          <h3 className="text-sm font-bold uppercase tracking-widest mb-6">Top Pages</h3>
+          <div className="space-y-4">
+            {stats.pages.map((p, i) => (
+              <div key={p.name} className="space-y-1">
+                <div className="flex justify-between text-xs">
+                  <span className="font-mono text-muted-foreground">{p.name}</span>
+                  <span className="font-bold">{p.value}</span>
+                </div>
+                <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-primary transition-all duration-1000" 
+                    style={{ width: `${stats.pages[0] ? (p.value / stats.pages[0].value) * 100 : 0}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="glass p-6 rounded-3xl min-h-[400px]">
+          <h3 className="text-sm font-bold uppercase tracking-widest mb-6">Device Distribution</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={stats.devices}
+                cx="50%"
+                cy="50%"
+                innerRadius={60}
+                outerRadius={80}
+                paddingAngle={5}
+                dataKey="value"
+              >
+                {stats.devices.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length] || "#d4af37"} />
+                ))}
+              </Pie>
+              <ReTooltip contentStyle={{ background: '#080a0f', border: '1px solid #ffffff20', borderRadius: '12px' }} />
+            </PieChart>
+          </ResponsiveContainer>
+          <div className="flex flex-wrap justify-center gap-4 mt-4">
+            {stats.devices.map((d, i) => (
+              <div key={d.name} className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full" style={{ background: COLORS[i % COLORS.length] }} />
+                <span className="text-[10px] uppercase font-bold text-muted-foreground">{d.name} ({d.value})</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="glass p-6 rounded-3xl min-h-[400px]">
+          <h3 className="text-sm font-bold uppercase tracking-widest mb-6">Geographic Reach</h3>
+          <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+            {stats.countries.map(c => (
+              <div key={c.name} className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
+                <div className="flex items-center gap-3">
+                  <MapPin size={14} className="text-primary" />
+                  <span className="text-xs font-bold">{c.name}</span>
+                </div>
+                <span className="text-xs font-mono text-muted-foreground">{c.value} visits</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
