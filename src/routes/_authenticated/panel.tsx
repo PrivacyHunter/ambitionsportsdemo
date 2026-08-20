@@ -8,7 +8,7 @@ import {
   ShieldCheck, Users, Globe2, Inbox, History, Download, Upload,
   Search, BarChart3, TrendingUp, MapPin, Smartphone,
   ArrowRight, GripVertical, Check, Wand2, FileJson,
-  Layout, ShoppingBag, FileText, Activity
+  Layout, ShoppingBag, FileText, Activity, Mail
 } from "lucide-react";
 import { SiGooglechrome as Chrome } from "react-icons/si";
 import {
@@ -38,8 +38,9 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { useTheme } from "@/components/ThemeProvider";
 import {
   deleteProduct, getDashboard, saveSetting, setUserRole, updateStatus, upsertProduct,
-  inviteUser, backupSettings, restoreSettings,
+  inviteUser, backupSettings, restoreSettings, listSettings,
 } from "@/lib/admin.functions";
+import { saveThemeVersion, getThemeHistory, scheduleReport } from "@/lib/history.functions";
 import { getPageSeo, savePageSeo } from "@/lib/seo.functions";
 import { getSeoBulk, saveSeoBulk, autoGenerateSeo } from "@/lib/seo-bulk.functions";
 import { logAuditAction, getAuditLogs, getEmailLogs } from "@/lib/logs.functions";
@@ -65,17 +66,17 @@ export const Route = createFileRoute("/_authenticated/panel")({
 
 type Tab = "overview" | "inbox" | "products" | "theme" | "branding" | "seo" | "accounts" | "visitors" | "analytics" | "logs";
 
-const TABS: { id: Tab; label: string; icon: any; developerOnly?: boolean }[] = [
+const TABS: { id: Tab; label: string; icon: any; roles?: ("owner" | "admin" | "developer")[] }[] = [
   { id: "overview", label: "Overview", icon: ShieldCheck },
-  { id: "inbox", label: "Inbox", icon: Inbox },
-  { id: "products", label: "Products", icon: Package },
-  { id: "theme", label: "Theme Studio", icon: Palette },
-  { id: "branding", label: "Branding", icon: Settings2 },
-  { id: "seo", label: "SEO Editor", icon: Globe2 },
-  { id: "visitors", label: "Visitors", icon: Globe2 },
-  { id: "analytics", label: "Analytics", icon: BarChart3 },
-  { id: "accounts", label: "Accounts", icon: Users, developerOnly: true },
-  { id: "logs", label: "Logs", icon: Activity, developerOnly: true },
+  { id: "inbox", label: "Inbox", icon: Inbox, roles: ["owner", "admin", "developer"] },
+  { id: "products", label: "Products", icon: Package, roles: ["owner", "admin", "developer"] },
+  { id: "theme", label: "Theme Studio", icon: Palette, roles: ["owner", "admin", "developer"] },
+  { id: "branding", label: "Branding", icon: Settings2, roles: ["owner", "admin", "developer"] },
+  { id: "seo", label: "SEO Editor", icon: Globe2, roles: ["owner", "admin", "developer"] },
+  { id: "visitors", label: "Visitors", icon: Globe2, roles: ["owner", "admin", "developer"] },
+  { id: "analytics", label: "Analytics", icon: BarChart3, roles: ["owner", "admin", "developer"] },
+  { id: "accounts", label: "Accounts", icon: Users, roles: ["developer"] },
+  { id: "logs", label: "Logs", icon: Activity, roles: ["admin", "owner", "developer"] },
 ];
 
 function PanelPage() {
@@ -122,7 +123,7 @@ function PanelPage() {
   }
 
   const role = data!.role;
-  const visibleTabs = TABS.filter((t) => !t.developerOnly || role === "developer");
+  const visibleTabs = TABS.filter((t) => !t.roles || t.roles.includes(role as any));
 
   return (
     <main className="min-h-screen px-4 py-8 sm:px-6 lg:px-10">
@@ -538,9 +539,19 @@ function ThemeStudio() {
   const { savedTheme, setPreview, mode, refresh } = useTheme();
   const [draft, setDraft] = useState<ThemeConfig>(savedTheme);
   const [previewOn, setPreviewOn] = useState(false);
-  const [history, setHistory] = useState<ThemeConfig[]>([]);
   const [diffMode, setDiffMode] = useState(false);
   const [diffPreset, setDiffPreset] = useState<ThemeConfig | null>(null);
+  const [localHistory, setLocalHistory] = useState<ThemeConfig[]>([]);
+  
+  const historyQuery = useQuery({
+    queryKey: ["theme-history"],
+    queryFn: useServerFn(getThemeHistory)
+  });
+  
+  const saveHistoryMutation = useMutation({
+    mutationFn: useServerFn(saveThemeVersion),
+    onSuccess: () => historyQuery.refetch()
+  });
 
   const themeKeys: (keyof ThemeConfig)[] = [
     "goldAccent", "cyanAccent", "darkBackground", "lightBackground",
@@ -588,7 +599,8 @@ function ThemeStudio() {
   const saveMutation = useMutation({
     mutationFn: async () => {
       const log = useServerFn(logAuditAction);
-      await log({ data: { action: "theme_publish", details: { config: draft } } });
+      await log({ data: { action: "theme_publish", action_type: "theme", details: { config: draft } } });
+      await saveHistoryMutation.mutateAsync({ data: { name: `Version ${new Date().toLocaleString()}`, config: draft } });
       return persist({ data: { key: "theme", value: JSON.stringify(draft) } });
     },
     onSuccess: () => { toast.success("Theme published"); setPreviewOn(false); refresh(); },
@@ -654,15 +666,15 @@ function ThemeStudio() {
           </label>
         </div>
 
-        {history.length > 0 && (
+        {localHistory.length > 0 && (
           <div className="space-y-2">
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-1">
-              <History size={10} /> History / Rollback
+              <History size={10} /> Local Session History
             </p>
             <div className="flex flex-wrap gap-2">
-              {history.map((h, i) => (
+              {localHistory.map((h, i) => (
                 <button key={i} onClick={() => setDraft(h)} className="glass rounded-full px-3 py-1 text-[9px] font-bold uppercase tracking-widest border border-border hover:border-primary">
-                  Rev {history.length - i}
+                  Rev {localHistory.length - i}
                 </button>
               ))}
             </div>
@@ -1228,6 +1240,65 @@ function AnalyticsDashboard({ data }: { data: Dash }) {
 
   const COLORS = ['#d4af37', '#7fe9ff', '#39ff14', '#00f3ff', '#ff00ff'];
 
+  const ScheduleReportModal = () => {
+    const [reportForm, setReportForm] = useState({
+      name: "",
+      frequency: "weekly" as const,
+      recipient_email: "",
+      columns: ["When", "Location", "Device", "Page"],
+      date_range_type: "last_7d",
+      format: "pdf" as const
+    });
+    
+    const schedule = useServerFn(scheduleReport);
+    const mutation = useMutation({
+      mutationFn: (data: any) => schedule({ data }),
+      onSuccess: () => {
+        toast.success("Report scheduled successfully!");
+        setReportForm({ ...reportForm, name: "", recipient_email: "" });
+      },
+      onError: (e) => toast.error("Failed to schedule report")
+    });
+
+    return (
+      <div className="glass p-6 rounded-3xl border border-neon-cyan/20 space-y-4 mt-6">
+        <h3 className="text-sm font-bold uppercase tracking-widest flex items-center gap-2">
+          <Mail size={14} className="text-neon-cyan" /> Schedule Email Reports
+        </h3>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <input 
+            placeholder="Report Name" 
+            value={reportForm.name} 
+            onChange={e => setReportForm({...reportForm, name: e.target.value})}
+            className="bg-transparent border border-border rounded-xl px-4 py-2 text-xs w-full"
+          />
+          <input 
+            placeholder="Recipient Email" 
+            value={reportForm.recipient_email} 
+            onChange={e => setReportForm({...reportForm, recipient_email: e.target.value})}
+            className="bg-transparent border border-border rounded-xl px-4 py-2 text-xs w-full"
+          />
+          <select 
+            value={reportForm.frequency} 
+            onChange={e => setReportForm({...reportForm, frequency: e.target.value as any})}
+            className="bg-transparent border border-border rounded-xl px-4 py-2 text-xs"
+          >
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+          </select>
+          <button 
+            onClick={() => mutation.mutate(reportForm)}
+            disabled={mutation.isPending}
+            className="bg-neon-cyan text-background py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-neon-lime transition-all"
+          >
+            {mutation.isPending ? "Scheduling..." : "Schedule Now"}
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   const exportToCsv = () => {
     const rows = filteredData.map(t => {
       const allData: Record<string, string> = {
@@ -1293,6 +1364,8 @@ function AnalyticsDashboard({ data }: { data: Dash }) {
           <FileText size={14} /> Export Wizard
         </button>
       </div>
+
+      <ScheduleReportModal />
 
       {exportWizardOpen && (
         <div className="glass p-6 rounded-3xl border border-primary/20 space-y-4">
@@ -1452,24 +1525,37 @@ function AnalyticsDashboard({ data }: { data: Dash }) {
 }
 
 function LogsTab() {
+  const [filterType, setFilterType] = useState<string>("all");
   const auditLogs = useQuery({ queryKey: ["audit-logs"], queryFn: useServerFn(getAuditLogs) });
   const emailLogs = useQuery({ queryKey: ["email-logs"], queryFn: useServerFn(getEmailLogs) });
+
+  const filteredAudit = auditLogs.data?.filter(l => filterType === "all" || l.action_type === filterType);
 
   return (
     <div className="space-y-8">
       <div className="glass overflow-x-auto rounded-3xl p-6">
-        <h2 className="mb-4 text-lg font-extrabold uppercase">Audit Logs (Theme Changes)</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-extrabold uppercase text-primary">System Audit Log</h2>
+          <div className="flex gap-2">
+            {["all", "theme", "role", "export", "backup", "template", "security"].map(t => (
+              <button key={t} onClick={() => setFilterType(t)} className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all ${filterType === t ? 'border-primary bg-primary/10 text-primary' : 'border-border text-muted-foreground hover:text-foreground'}`}>
+                {t}
+              </button>
+            ))}
+          </div>
+        </div>
         <table className="w-full text-left text-xs">
           <thead className="text-[10px] uppercase text-muted-foreground">
-            <tr><th className="py-2">User</th><th>Action</th><th>Details</th><th>Date</th></tr>
+            <tr><th className="py-2">User</th><th>Action</th><th>Type</th><th>Details</th><th>Date</th></tr>
           </thead>
           <tbody>
-            {auditLogs.data?.map(l => (
-              <tr key={l.id} className="border-t border-border">
-                <td className="py-3">{(l.profiles as any)?.email}</td>
-                <td>{l.action}</td>
-                <td className="font-mono">{JSON.stringify(l.details)}</td>
-                <td>{new Date(l.created_at).toLocaleString()}</td>
+            {filteredAudit?.map(l => (
+              <tr key={l.id} className="border-t border-border/50 group hover:bg-white/5 transition-colors">
+                <td className="py-3 font-bold">{(l.profiles as any)?.email}</td>
+                <td><span className="bg-primary/5 text-primary px-2 py-0.5 rounded text-[10px] font-bold uppercase">{l.action}</span></td>
+                <td className="uppercase font-bold tracking-tighter opacity-70">{l.action_type}</td>
+                <td className="font-mono text-[10px] max-w-xs truncate">{JSON.stringify(l.details)}</td>
+                <td className="text-muted-foreground">{new Date(l.created_at).toLocaleString()}</td>
               </tr>
             ))}
           </tbody>
@@ -1526,6 +1612,7 @@ function BackupButton() {
 }
 
 function RestoreButton() {
+  const [dryRunData, setDryRunData] = useState<any>(null);
   const restore = useServerFn(restoreSettings);
   const mutation = useMutation({
     mutationFn: (data: any) => restore({ data }),
@@ -1543,9 +1630,7 @@ function RestoreButton() {
     reader.onload = (event) => {
       try {
         const data = JSON.parse(event.target?.result as string);
-        if (confirm("This will overwrite current settings and SEO templates. Continue?")) {
-          mutation.mutate(data);
-        }
+        setDryRunData(data);
       } catch {
         toast.error("Invalid backup file");
       }
@@ -1554,11 +1639,48 @@ function RestoreButton() {
   };
 
   return (
-    <label className="flex items-center gap-2 px-5 py-3 rounded-xl border border-border text-muted-foreground text-[10px] font-bold uppercase hover:border-primary hover:text-foreground cursor-pointer transition-colors">
-      {mutation.isPending ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />} 
-      Restore from Backup
-      <input type="file" accept=".json" onChange={handleFile} className="hidden" />
-    </label>
+    <>
+      <label className="flex items-center gap-2 px-5 py-3 rounded-xl border border-border text-muted-foreground text-[10px] font-bold uppercase hover:border-primary hover:text-foreground cursor-pointer transition-colors">
+        {mutation.isPending ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />} 
+        Restore from Backup
+        <input type="file" accept=".json" onChange={handleFile} className="hidden" />
+      </label>
+
+      {dryRunData && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="glass w-full max-w-2xl rounded-[2rem] p-8 border border-primary/20 max-h-[80vh] overflow-y-auto">
+            <h3 className="text-xl font-black uppercase tracking-widest text-primary mb-4">Restore Dry-Run Preview</h3>
+            <p className="text-xs text-muted-foreground mb-6 uppercase tracking-wider">The following sections will be overwritten:</p>
+            
+            <div className="space-y-4 mb-8">
+              {Object.keys(dryRunData).map(key => (
+                <div key={key} className="p-4 bg-white/5 rounded-2xl border border-white/10">
+                  <p className="text-[10px] font-bold uppercase text-primary mb-2">{key}</p>
+                  <pre className="text-[9px] font-mono text-muted-foreground overflow-x-auto whitespace-pre-wrap">
+                    {JSON.stringify(dryRunData[key], null, 2).slice(0, 300)}...
+                  </pre>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex gap-4">
+              <button 
+                onClick={() => mutation.mutate(dryRunData)}
+                className="flex-1 bg-primary text-primary-foreground py-3 rounded-xl text-[10px] font-bold uppercase tracking-[0.2em] hover:scale-[1.02] transition-all"
+              >
+                Confirm Restore
+              </button>
+              <button 
+                onClick={() => setDryRunData(null)}
+                className="flex-1 bg-white/5 text-foreground py-3 rounded-xl text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-white/10 transition-all"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 

@@ -7,6 +7,7 @@ export const logAuditAction = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => z.object({
     action: z.string(),
+    action_type: z.enum(["theme", "role", "export", "backup", "template", "security"]).optional(),
     details: z.any().optional(),
   }).parse(data))
   .handler(async ({ context, data }) => {
@@ -16,6 +17,7 @@ export const logAuditAction = createServerFn({ method: "POST" })
       .insert({
         user_id: context.userId,
         action: data.action,
+        action_type: data.action_type || "security",
         details: data.details || {},
       } as any);
     if (error) throw new Error(error.message);

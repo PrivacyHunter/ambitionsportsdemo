@@ -18,16 +18,24 @@ export const applyTemplate = createServerFn({ method: "POST" })
         logoText: "Ambition Enterprise",
         notificationText: "Leading Apparel Manufacturer & Exporter",
         footerDescription: "Global leaders in premium apparel manufacturing, providing end-to-end solutions for teams and corporate entities.",
+        showTopInfoBar: true,
+        showSocialIcons: true,
+        showWhatsappButton: false,
       };
       await s.from("site_settings").upsert({ key: "branding", value: JSON.stringify(branding) });
+      await s.from("site_settings").upsert({ key: "site_mode", value: "business" });
     } else {
       // Branding and initial products for a store
       const branding = {
         logoText: "Ambition Shop",
         notificationText: "Shop the Latest Pro Performance Gear — Free Shipping over $100",
         footerDescription: "Your one-stop shop for elite performance gear. Designed for athletes, worn by champions.",
+        showTopInfoBar: true,
+        showSocialIcons: true,
+        showWhatsappButton: true,
       };
       await s.from("site_settings").upsert({ key: "branding", value: JSON.stringify(branding) });
+      await s.from("site_settings").upsert({ key: "site_mode", value: "store" });
 
       // Add a few sample products if empty
       const { count } = await s.from("products").select("id", { count: "exact", head: true });
