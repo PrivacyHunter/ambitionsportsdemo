@@ -2149,15 +2149,6 @@ function CustomizationTab({ onDone }: { onDone: () => void }) {
                    </div>
                 </div>
 
-                             className={`flex-1 py-1 rounded border text-[8px] uppercase font-bold transition-all ${editing.caption_style?.position === pos ? 'border-primary bg-primary/10 text-primary' : 'border-white/10 text-muted-foreground'}`}
-                           >
-                             {pos}
-                           </button>
-                         ))}
-                       </div>
-                     </div>
-                   </div>
-                </div>
 
                 <div className="space-y-1">
                   <label className="text-[10px] font-bold uppercase text-muted-foreground flex items-center justify-between">
