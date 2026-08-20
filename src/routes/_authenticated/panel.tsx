@@ -45,7 +45,7 @@ import { getPageSeo, savePageSeo } from "@/lib/seo.functions";
 import { getSeoBulk, saveSeoBulk, autoGenerateSeo } from "@/lib/seo-bulk.functions";
 import { logAuditAction, getAuditLogs, getEmailLogs } from "@/lib/logs.functions";
 import { applyTemplate } from "@/lib/templates.functions";
-import { getCustomizationVideos, upsertCustomizationVideo, deleteCustomizationVideo } from "@/lib/customization.functions";
+import { getCustomizationVideos, upsertCustomizationVideo, deleteCustomizationVideo, getEngagementStats } from "@/lib/customization.functions";
 import { DEFAULT_BRANDING, DEFAULT_THEME, FONT_PRESETS, THEME_PRESETS, type BrandingConfig, type ThemeConfig } from "@/lib/theme";
 
 // PDF export will be handled by dynamic import in AnalyticsDashboard
