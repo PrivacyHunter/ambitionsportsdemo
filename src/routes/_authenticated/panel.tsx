@@ -64,7 +64,7 @@ export const Route = createFileRoute("/_authenticated/panel")({
   component: PanelPage,
 });
 
-type Tab = "overview" | "inbox" | "products" | "theme" | "branding" | "seo" | "accounts" | "visitors" | "analytics" | "logs";
+type Tab = "overview" | "inbox" | "products" | "theme" | "branding" | "seo" | "customization" | "visitors" | "analytics" | "accounts" | "logs";
 
 const TABS: { id: Tab; label: string; icon: any; roles?: ("owner" | "admin" | "developer")[] }[] = [
   { id: "overview", label: "Overview", icon: ShieldCheck },
@@ -73,6 +73,7 @@ const TABS: { id: Tab; label: string; icon: any; roles?: ("owner" | "admin" | "d
   { id: "theme", label: "Theme Studio", icon: Palette, roles: ["owner", "admin", "developer"] },
   { id: "branding", label: "Branding", icon: Settings2, roles: ["owner", "admin", "developer"] },
   { id: "seo", label: "SEO Editor", icon: Globe2, roles: ["owner", "admin", "developer"] },
+  { id: "customization", label: "Studio Manager", icon: Layers, roles: ["owner", "admin", "developer"] },
   { id: "visitors", label: "Visitors", icon: Globe2, roles: ["owner", "admin", "developer"] },
   { id: "analytics", label: "Analytics", icon: BarChart3, roles: ["owner", "admin", "developer"] },
   { id: "accounts", label: "Accounts", icon: Users, roles: ["developer"] },
