@@ -60,7 +60,7 @@ import {
   syncInstagramPosts 
 } from "@/lib/instagram.functions";
 import { DEFAULT_BRANDING, DEFAULT_THEME, FONT_PRESETS, THEME_PRESETS, type BrandingConfig, type ThemeConfig } from "@/lib/theme";
-import { getInstagramLogs } from "@/lib/instagram.functions";
+import { getInstagramLogs, retrySyncLog, reconnectInstagram } from "@/lib/instagram.functions";
 import { CaptionPreview } from "@/components/CaptionPreview";
 
 
