@@ -273,17 +273,58 @@ function ProductsTab({ data, onDone }: { data: Dash; onDone: () => void }) {
           ["name", "Name"], ["slug", "Slug (lowercase-dashes)"], ["description", "Description"],
           ["images", "Image URLs (comma separated)"], ["sizes", "Sizes (comma separated)"],
           ["colors", "Colors (comma separated)"],
-        ] as const).map(([key, label]) => (
-          <label key={key} className="block">
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">{label}</span>
-            <input
-              required={key === "name" || key === "slug"}
-              value={form[key]}
-              onChange={(e) => setForm({ ...form, [key]: e.target.value })}
-              className="mt-1 w-full rounded-lg border border-border bg-transparent px-3 py-2 text-sm outline-none focus:border-primary"
-            />
-          </label>
-        ))}
+        ] as const).map(([key, label]) => {
+          if (key === "images") {
+            const currentImages = form.images.split(",").map((s) => s.trim()).filter(Boolean);
+            return (
+              <div key={key} className="space-y-2">
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">{label}</span>
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {currentImages.map((img, idx) => (
+                    <div key={idx} className="relative w-16 h-16 group">
+                      <img src={img} alt="Product" className="w-full h-full object-cover rounded-lg border border-border" />
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-1 transition-opacity">
+                        {idx > 0 && (
+                          <button type="button" onClick={() => {
+                            const next = [...currentImages];
+                            [next[idx], next[idx-1]] = [next[idx-1], next[idx]];
+                            setForm({ ...form, images: next.join(",") });
+                          }} className="p-1 bg-white/10 rounded hover:bg-white/20">←</button>
+                        )}
+                        {idx < currentImages.length - 1 && (
+                          <button type="button" onClick={() => {
+                            const next = [...currentImages];
+                            [next[idx], next[idx+1]] = [next[idx+1], next[idx]];
+                            setForm({ ...form, images: next.join(",") });
+                          }} className="p-1 bg-white/10 rounded hover:bg-white/20">→</button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <input
+                  required={key === "name" || key === "slug"}
+                  value={form[key]}
+                  onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+                  className="w-full rounded-lg border border-border bg-transparent px-3 py-2 text-sm outline-none focus:border-primary"
+                  placeholder="URL 1, URL 2..."
+                />
+              </div>
+            );
+          }
+          return (
+            <label key={key} className="block">
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">{label}</span>
+              <input
+                required={key === "name" || key === "slug"}
+                value={form[key]}
+                onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+                className="mt-1 w-full rounded-lg border border-border bg-transparent px-3 py-2 text-sm outline-none focus:border-primary"
+              />
+            </label>
+          );
+        })}
+
         <div className="grid grid-cols-2 gap-3">
           <label className="block">
             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Price</span>
