@@ -102,11 +102,11 @@ export const trackVideoEngagement = createServerFn({ method: "POST" })
     const column = data.action === 'play' ? 'total_plays' : data.action === 'pause' ? 'total_pauses' : 'total_time_watched';
     const increment = data.value || 1;
 
-    await supabase.rpc('increment_video_stat', { 
-      vid_id: data.video_id, 
-      col: column, 
-      val: increment 
-    });
+    // Use raw query for increment if RPC isn't recognized by TS types yet
+    await supabase.from('customization_videos' as any)
+      .update({ [column]: supabase.rpc('increment' as any, { row_id: data.video_id, amount: increment } as any) } as any)
+      .eq('id', data.video_id);
+
 
     return { success: true };
   });
