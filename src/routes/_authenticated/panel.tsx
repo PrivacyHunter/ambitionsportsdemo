@@ -1727,6 +1727,7 @@ function CustomizationTab({ onDone }: { onDone: () => void }) {
   const upsertVideoFn = useServerFn(upsertCustomizationVideo);
   const deleteVideoFn = useServerFn(deleteCustomizationVideo);
   const getStatsFn = useServerFn(getEngagementStats);
+  const bulkActionFn = useServerFn(bulkActionCustomizationVideos);
   
   const { data: videos, refetch } = useQuery({
     queryKey: ['admin-customization-videos'],
@@ -1738,8 +1739,11 @@ function CustomizationTab({ onDone }: { onDone: () => void }) {
     queryFn: () => getStatsFn(),
   });
 
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [editing, setEditing] = useState<any>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isUploadingSubtitles, setIsUploadingSubtitles] = useState(false);
+
   
   const mutation = useMutation({
     mutationFn: (data: any) => upsertVideoFn({ data }),
