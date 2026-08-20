@@ -23,10 +23,10 @@ export function Footer() {
           </p>
           {branding.showSocialIcons && (
             <div className="flex gap-4">
-              <SocialIcon icon={<FaFacebook size={18} />} href="#" />
-              <SocialIcon icon={<FaInstagram size={18} />} href="#" />
-              <SocialIcon icon={<FaTwitter size={18} />} href="#" />
-              <SocialIcon icon={<FaLinkedin size={18} />} href="#" />
+              <SocialIcon icon={<FaFacebook size={18} />} href="https://wa.me/923049893054" />
+              <SocialIcon icon={<FaInstagram size={18} />} href="https://wa.me/923049893054" />
+              <SocialIcon icon={<FaTwitter size={18} />} href="https://wa.me/923049893054" />
+              <SocialIcon icon={<FaLinkedin size={18} />} href="https://wa.me/923049893054" />
             </div>
           )}
         </div>
