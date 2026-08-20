@@ -12,12 +12,12 @@ export const logAuditAction = createServerFn({ method: "POST" })
   .handler(async ({ context, data }) => {
     await assertStaff(context.supabase, context.userId);
     const { error } = await context.supabase
-      .from("audit_logs")
+      .from("audit_logs" as any)
       .insert({
         user_id: context.userId,
         action: data.action,
         details: data.details || {},
-      });
+      } as any);
     if (error) throw new Error(error.message);
     return { success: true };
   });
@@ -27,12 +27,12 @@ export const getAuditLogs = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     await assertStaff(context.supabase, context.userId);
     const { data, error } = await context.supabase
-      .from("audit_logs")
-      .select("*, profiles(email)")
+      .from("audit_logs" as any)
+      .select("*, profiles(email)" as any)
       .order("created_at", { ascending: false })
       .limit(100);
     if (error) throw new Error(error.message);
-    return data;
+    return data as any[];
   });
 
 export const getEmailLogs = createServerFn({ method: "GET" })
@@ -40,10 +40,10 @@ export const getEmailLogs = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     await assertStaff(context.supabase, context.userId);
     const { data, error } = await context.supabase
-      .from("email_logs")
-      .select("*")
+      .from("email_logs" as any)
+      .select("*" as any)
       .order("created_at", { ascending: false })
       .limit(100);
     if (error) throw new Error(error.message);
-    return data;
+    return data as any[];
   });
