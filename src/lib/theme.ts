@@ -16,9 +16,9 @@ export type ThemeConfig = {
 };
 
 export const DEFAULT_THEME: ThemeConfig = {
-  goldAccent: "#ef1822",
-  cyanAccent: "#ff4d57",
-  darkBackground: "#05060a",
+  goldAccent: "#d31a23",
+  cyanAccent: "#ef4444",
+  darkBackground: "#080a0f",
   lightBackground: "#ffffff",
   displayFont: '"Syne", "Space Grotesk", sans-serif',
   bodyFont: '"Plus Jakarta Sans", "Inter", sans-serif',
@@ -26,7 +26,7 @@ export const DEFAULT_THEME: ThemeConfig = {
   radius: "0.9rem",
   sectionSpace: "6rem",
   containerWidth: "80rem",
-  glassOpacity: 3,
+  glassOpacity: 5,
   defaultMode: "dark",
 };
 
@@ -95,22 +95,26 @@ export const DEFAULT_BRANDING: BrandingConfig = {
 
 /** CSS custom properties derived from a theme config. */
 export function themeVars(theme: ThemeConfig, mode: ThemeMode): Record<string, string> {
+  const isDark = mode === "dark";
   return {
     "--gold": theme.goldAccent,
-    "--neon-lime": theme.goldAccent,
+    "--neon-lime": theme.cyanAccent,
     "--primary": theme.goldAccent,
     "--ring": theme.goldAccent,
     "--accent": theme.cyanAccent,
     "--neon-cyan": theme.cyanAccent,
-    "--background": mode === "dark" ? theme.darkBackground : theme.lightBackground,
+    "--background": isDark ? theme.darkBackground : theme.lightBackground,
+    "--foreground": isDark ? "#f8fafc" : "#0f172a",
+    "--card": isDark ? "#0f1118" : "#f8fafc",
+    "--border": isDark ? "rgb(255 255 255 / 10%)" : "rgb(15 23 42 / 10%)",
     "--font-display-family": theme.displayFont,
     "--font-body-family": theme.bodyFont,
     "--display-tracking": theme.displayTracking,
     "--radius": theme.radius,
     "--section-space": theme.sectionSpace,
     "--container-width": theme.containerWidth,
-    "--surface": `rgb(${mode === "dark" ? "255 255 255" : "11 15 25"} / ${theme.glassOpacity}%)`,
-    "--surface-strong": `rgb(${mode === "dark" ? "255 255 255" : "11 15 25"} / ${theme.glassOpacity * 2}%)`,
+    "--surface": `rgb(${isDark ? "255 255 255" : "15 23 42"} / ${theme.glassOpacity}%)`,
+    "--surface-strong": `rgb(${isDark ? "255 255 255" : "15 23 42"} / ${theme.glassOpacity * 1.5}%)`,
   };
 }
 
