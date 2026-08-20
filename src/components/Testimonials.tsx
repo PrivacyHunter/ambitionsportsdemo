@@ -24,10 +24,10 @@ const testimonials = [
 
 export function Testimonials() {
   return (
-    <section className="py-24 bg-slate-900/30">
+    <section className="py-24 bg-surface/30">
       <div className="max-w-7xl mx-auto px-4">
         <h2 className="text-4xl font-black italic uppercase text-center mb-16">
-          What Our <span className="text-neon-cyan">Clients Say</span>
+          What Our <span className="text-primary">Clients Say</span>
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {testimonials.map((t, i) => (
@@ -36,16 +36,16 @@ export function Testimonials() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
-              className="bg-background/50 border border-white/5 p-8 rounded-xl"
+              className="bg-surface border border-border p-8 rounded-xl"
             >
               <div className="flex gap-1 mb-4">
                 {[...Array(t.rating)].map((_, i) => (
-                  <Star key={i} size={16} className="fill-neon-lime text-neon-lime" />
+                  <Star key={i} size={16} className="fill-primary text-primary" />
                 ))}
               </div>
               <p className="text-muted-foreground italic mb-6">"{t.content}"</p>
               <div>
-                <p className="font-bold text-neon-cyan">{t.name}</p>
+                <p className="font-bold text-primary">{t.name}</p>
                 <p className="text-xs uppercase tracking-widest text-white/40">{t.role}</p>
               </div>
             </motion.div>
