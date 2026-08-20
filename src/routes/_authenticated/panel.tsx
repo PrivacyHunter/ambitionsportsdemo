@@ -2525,9 +2525,25 @@ function InstagramTab() {
                   <span className="text-[10px] font-bold uppercase">Filter by Hashtag</span>
                   <input placeholder="#ambition" className="bg-transparent border-none text-[10px] text-right focus:ring-0 outline-none placeholder:text-white/20" />
                 </div>
+                <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
+                  <div className="space-y-0.5">
+                    <span className="text-[10px] font-bold uppercase block">Caption Language</span>
+                    <span className="text-[8px] text-muted-foreground uppercase font-medium">Instagram captions convert to subtitles</span>
+                  </div>
+                  <select
+                    value={settings?.caption_language ?? 'en'}
+                    onChange={e => updateMutation.mutate({ caption_language: e.target.value })}
+                    className="bg-black/30 border border-white/10 rounded-lg px-2 py-1 text-[10px] font-bold uppercase"
+                  >
+                    <option value="en">English</option>
+                    <option value="ur">Urdu</option>
+                    <option value="ar">Arabic</option>
+                    <option value="es">Spanish</option>
+                  </select>
+                </div>
                 <div className="pt-4 mt-4 border-t border-white/5">
                   <p className="text-[9px] text-muted-foreground leading-relaxed uppercase tracking-tighter">
-                    Posts will be cached for 24 hours to ensure elite page performance. You can force a sync anytime from the connection panel.
+                    Realtime webhooks publish new photos and reels the moment you post. Duplicates are blocked automatically, so overlapping syncs and retries never double-post.
                   </p>
                 </div>
               </div>
@@ -2535,6 +2551,55 @@ function InstagramTab() {
           </div>
         </div>
       </div>
+
+      {openLog && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4" onClick={() => setOpenLog(null)}>
+          <div className="glass rounded-[2rem] p-8 max-w-lg w-full border border-white/10 space-y-5" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-black uppercase italic">Sync Entry Details</h3>
+              <span className={`text-[9px] font-black uppercase px-2 py-1 rounded-full ${openLog.status === 'success' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
+                {openLog.status}
+              </span>
+            </div>
+            <div className="space-y-3 text-[11px]">
+              <Detail label="Timestamp" value={new Date(openLog.created_at).toLocaleString()} />
+              <Detail label="Media ID" value={openLog.media_id ?? '—'} />
+              <Detail label="Error Code" value={openLog.error_code || '—'} />
+              <Detail label="Message" value={openLog.message ?? '—'} />
+              <Detail label="Next Action" value={openLog.recommended_action ?? (openLog.status === 'success' ? 'None required' : 'Retry the sync')} />
+              <div className="space-y-1">
+                <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Payload</span>
+                <pre className="bg-black/40 border border-white/10 rounded-xl p-3 text-[9px] overflow-x-auto">
+                  {JSON.stringify(openLog.payload ?? {}, null, 2)}
+                </pre>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              {openLog.status !== 'success' && (
+                <button
+                  onClick={() => retryMutation.mutate(openLog.id)}
+                  disabled={retryMutation.isPending}
+                  className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground text-[10px] font-black uppercase tracking-[0.2em] disabled:opacity-40"
+                >
+                  {retryMutation.isPending ? 'Retrying...' : 'Retry Now'}
+                </button>
+              )}
+              <button onClick={() => setOpenLog(null)} className="flex-1 py-3 rounded-xl bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-[0.2em]">
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Detail({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-start justify-between gap-4">
+      <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground shrink-0">{label}</span>
+      <span className="text-right break-words">{value}</span>
     </div>
   );
 }
