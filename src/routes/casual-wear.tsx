@@ -110,7 +110,7 @@ function CasualWear() {
 
         {/* Product Grid */}
         <section className="py-32 px-4 lg:px-8 max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-12">
             {products.map((p, i) => (
               <motion.div 
                 key={i}

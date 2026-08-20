@@ -383,6 +383,50 @@ function ThemeStudio() {
             className={`flex shrink-0 items-center gap-2 rounded-full border px-3 py-2 text-[10px] font-bold uppercase tracking-widest ${
               previewOn ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground"
             }`}>
+            {previewOn ? <EyeOff size={14} /> : <Eye size={14} />} {previewOn ? "Preview ON" : "Live Preview"}
+          </button>
+        </div>
+
+        <div className="flex gap-4">
+          <button
+            onClick={() => {
+              const blob = new Blob([JSON.stringify(draft, null, 2)], { type: "application/json" });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = `ambition-theme-${new Date().toISOString().split("T")[0]}.json`;
+              a.click();
+            }}
+            className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-border py-3 text-[10px] font-bold uppercase tracking-widest hover:border-primary"
+          >
+            Export JSON
+          </button>
+          <label className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl border border-border py-3 text-[10px] font-bold uppercase tracking-widest hover:border-primary">
+            Import JSON
+            <input
+              type="file"
+              accept=".json"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (re) => {
+                  try {
+                    const imported = JSON.parse(re.target?.result as string);
+                    setDraft({ ...DEFAULT_THEME, ...imported });
+                    toast.success("Theme imported (click publish to save)");
+                  } catch {
+                    toast.error("Invalid theme file");
+                  }
+                };
+                reader.readAsText(file);
+              }}
+            />
+          </label>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
             {previewOn ? <Eye size={13} /> : <EyeOff size={13} />} Live preview
           </button>
         </div>

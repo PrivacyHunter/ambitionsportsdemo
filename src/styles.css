@@ -45,46 +45,46 @@
   --font-sans: var(--font-body-family);
 }
 
-/* ---------- Luxury Obsidian (default) ---------- */
+/* ---------- Unique Luxury Matte Obsidian ---------- */
 :root {
-  --radius: 0.9rem;
-  --section-space: 6rem;
+  --radius: 0.75rem;
+  --section-space: 8rem;
 
-  --font-display-family: "Syne", "Space Grotesk", sans-serif;
-  --font-body-family: "Plus Jakarta Sans", "Inter", sans-serif;
-  --display-tracking: -0.03em;
+  --font-display-family: "Syne", sans-serif;
+  --font-body-family: "Plus Jakarta Sans", sans-serif;
+  --display-tracking: -0.05em;
 
-  --background: #080a0f;
-  --foreground: #f4f7fb;
-  --card: #111622;
-  --card-foreground: #f4f7fb;
-  --popover: #111622;
-  --popover-foreground: #f4f7fb;
+  --background: #05070a;
+  --foreground: #f8fafc;
+  --card: #0a0d14;
+  --card-foreground: #f8fafc;
+  --popover: #0a0d14;
+  --popover-foreground: #f8fafc;
   --primary: #d4af37;
-  --primary-foreground: #0b0f19;
-  --secondary: #1a2130;
-  --secondary-foreground: #f4f7fb;
-  --muted: #161c29;
-  --muted-foreground: #97a3b6;
-  --accent: #7fe9ff;
-  --accent-foreground: #0b0f19;
+  --primary-foreground: #05070a;
+  --secondary: #0f172a;
+  --secondary-foreground: #f8fafc;
+  --muted: #0f172a;
+  --muted-foreground: #94a3b8;
+  --accent: #00f3ff;
+  --accent-foreground: #05070a;
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
-  --border: rgb(255 255 255 / 10%);
-  --input: rgb(255 255 255 / 14%);
+  --border: rgb(255 255 255 / 6%);
+  --input: rgb(255 255 255 / 10%);
   --ring: #d4af37;
 
-  --neon-cyan: #7fe9ff;
-  --neon-lime: #d4af37;
+  --neon-cyan: #00f3ff;
+  --neon-lime: #39ff14;
   --gold: #d4af37;
-  --silver: #e2e8f0;
+  --silver: #cbd5e1;
 
-  --surface: rgb(255 255 255 / 3%);
-  --surface-strong: rgb(255 255 255 / 7%);
-  --hairline: rgb(255 255 255 / 10%);
+  --surface: rgb(255 255 255 / 2%);
+  --surface-strong: rgb(255 255 255 / 5%);
+  --hairline: rgb(255 255 255 / 8%);
 
-  --elevation: 0 30px 80px -30px rgb(0 0 0 / 80%);
-  --glow: 0 0 40px rgb(212 175 55 / 22%);
+  --elevation: 0 40px 100px -40px rgb(0 0 0 / 95%);
+  --glow: 0 0 50px rgb(212 175 55 / 15%);
 }
 
 /* ---------- Minimalist Studio Light ---------- */
