@@ -906,3 +906,285 @@ function SeoSingleView() {
     </div>
   );
 }
+
+function SeoBulkEditor() {
+  const getBulk = useServerFn(getSeoBulk);
+  const saveBulk = useServerFn(saveSeoBulk);
+  const autoSeo = useServerFn(autoGenerateSeo);
+  const [search, setSearch] = useState("");
+  const [updates, setUpdates] = useState<Record<string, { title: string; description: string; ogImage: string }>>({});
+
+  const { data, refetch } = useQuery({
+    queryKey: ["seo-bulk"],
+    queryFn: () => getBulk(),
+  });
+
+  const mutation = useMutation({
+    mutationFn: () => saveBulk({ data: { updates: Object.entries(updates).map(([path, val]) => ({ path, ...val })) } }),
+    onSuccess: () => { toast.success("Bulk SEO updated"); refetch(); setUpdates({}); },
+  });
+
+  if (!data) return <Loader2 className="animate-spin mx-auto" />;
+
+  const allItems = [
+    ...["/", "/sportswear", "/activewear", "/casual-wear", "/about", "/contact", "/track"].map(p => ({
+      id: p,
+      name: p === "/" ? "Home" : p.replace("/", "").replace("-", " "),
+      type: "page" as const,
+      seo: data.content.find(c => c.page === p)
+    })),
+    ...data.products.map(p => ({
+      id: `/product/${p.slug}`,
+      name: p.name,
+      type: "product" as const,
+      seo: data.content.find(c => c.page === `/product/${p.slug}`),
+      description: p.description
+    }))
+  ];
+
+  const filtered = allItems.filter(i => i.name.toLowerCase().includes(search.toLowerCase()) || i.id.toLowerCase().includes(search.toLowerCase()));
+
+  return (
+    <div className="glass rounded-3xl p-6 space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between gap-4">
+        <h2 className="text-lg font-extrabold uppercase">Bulk SEO Editor</h2>
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={14} />
+          <input 
+            placeholder="Search items..." 
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9 pr-4 py-2 bg-transparent border border-border rounded-full text-xs outline-none focus:border-primary w-full sm:w-64"
+          />
+        </div>
+      </div>
+
+      <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+        {filtered.map(item => {
+          const currentSeo = updates[item.id] || (item.seo ? JSON.parse(item.seo.body || "{}") : { title: "", description: "", ogImage: "" });
+          const hasChanges = !!updates[item.id];
+
+          return (
+            <div key={item.id} className={`p-4 rounded-2xl border transition-colors ${hasChanges ? "border-primary/50 bg-primary/5" : "border-border bg-black/20"}`}>
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-primary">{item.type}</p>
+                  <h3 className="font-bold">{item.name}</h3>
+                  <p className="text-[10px] text-muted-foreground font-mono">{item.id}</p>
+                </div>
+                <button 
+                  onClick={async () => {
+                    const generated = await autoSeo({ data: { type: item.type, name: item.name, description: item.type === "product" ? (item as any).description : undefined } });
+                    setUpdates(prev => ({ ...prev, [item.id]: { ...currentSeo, ...generated } }));
+                    toast.success("SEO generated");
+                  }}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary/30 text-primary text-[10px] font-bold uppercase hover:bg-primary/10 transition-colors"
+                >
+                  <Wand2 size={12} /> Auto SEO
+                </button>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                <label className="block">
+                  <span className="text-[9px] font-bold uppercase text-muted-foreground">Title</span>
+                  <input 
+                    value={currentSeo.title}
+                    onChange={(e) => setUpdates(prev => ({ ...prev, [item.id]: { ...currentSeo, title: e.target.value } }))}
+                    className="mt-1 w-full bg-transparent border border-border/50 rounded-lg px-2 py-1.5 text-xs focus:border-primary outline-none"
+                  />
+                </label>
+                <label className="block">
+                  <span className="text-[9px] font-bold uppercase text-muted-foreground">Description</span>
+                  <input 
+                    value={currentSeo.description}
+                    onChange={(e) => setUpdates(prev => ({ ...prev, [item.id]: { ...currentSeo, description: e.target.value } }))}
+                    className="mt-1 w-full bg-transparent border border-border/50 rounded-lg px-2 py-1.5 text-xs focus:border-primary outline-none"
+                  />
+                </label>
+                <label className="block">
+                  <span className="text-[9px] font-bold uppercase text-muted-foreground">OG Image</span>
+                  <input 
+                    value={currentSeo.ogImage}
+                    onChange={(e) => setUpdates(prev => ({ ...prev, [item.id]: { ...currentSeo, ogImage: e.target.value } }))}
+                    className="mt-1 w-full bg-transparent border border-border/50 rounded-lg px-2 py-1.5 text-xs focus:border-primary outline-none"
+                  />
+                </label>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="pt-4 border-t border-border flex justify-between items-center">
+        <p className="text-[10px] text-muted-foreground">
+          {Object.keys(updates).length} items modified
+        </p>
+        <button 
+          onClick={() => mutation.mutate()}
+          disabled={mutation.isPending || Object.keys(updates).length === 0}
+          className="magnetic flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-xs font-extrabold uppercase tracking-widest text-primary-foreground disabled:opacity-50"
+        >
+          {mutation.isPending ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} Save All Changes
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function AnalyticsDashboard({ data }: { data: Dash }) {
+  const [filter, setFilter] = useState({ country: "all", device: "all" });
+
+  const filteredData = useMemo(() => {
+    return data.tracking.filter(t => {
+      const countryMatch = filter.country === "all" || t.country === filter.country;
+      const deviceMatch = filter.device === "all" || t.device === filter.device;
+      return countryMatch && deviceMatch;
+    });
+  }, [data.tracking, filter]);
+
+  const stats = useMemo(() => {
+    const countries: Record<string, number> = {};
+    const devices: Record<string, number> = {};
+    const pages: Record<string, number> = {};
+    const dates: Record<string, number> = {};
+
+    filteredData.forEach(t => {
+      if (t.country) countries[t.country] = (countries[t.country] || 0) + 1;
+      if (t.device) devices[t.device] = (devices[t.device] || 0) + 1;
+      if (t.page_path) pages[t.page_path] = (pages[t.page_path] || 0) + 1;
+      
+      const date = t.created_at ? new Date(t.created_at).toLocaleDateString() : "Unknown";
+      dates[date] = (dates[date] || 0) + 1;
+    });
+
+    const format = (obj: Record<string, number>) => 
+      Object.entries(obj).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
+
+    return {
+      countries: format(countries),
+      devices: format(devices),
+      pages: format(pages).slice(0, 10),
+      trend: Object.entries(dates).map(([name, value]) => ({ name, value }))
+    };
+  }, [filteredData]);
+
+  const COLORS = ['#d4af37', '#7fe9ff', '#39ff14', '#00f3ff', '#ff00ff'];
+
+  return (
+    <div className="space-y-6">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="glass p-6 rounded-3xl">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Filtered Visits</p>
+          <p className="text-3xl font-extrabold mt-2">{filteredData.length}</p>
+        </div>
+        <div className="glass p-6 rounded-3xl">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Active Countries</p>
+          <p className="text-3xl font-extrabold mt-2">{stats.countries.length}</p>
+        </div>
+        <div className="glass p-6 rounded-3xl col-span-2">
+          <div className="flex gap-4 h-full items-center">
+            <select 
+              value={filter.country} 
+              onChange={(e) => setFilter(prev => ({ ...prev, country: e.target.value }))}
+              className="bg-transparent border border-border rounded-lg px-3 py-2 text-xs flex-1"
+            >
+              <option value="all">All Countries</option>
+              {Array.from(new Set(data.tracking.map(t => t.country).filter(Boolean))).map(c => (
+                <option key={c} value={c!}>{c}</option>
+              ))}
+            </select>
+            <select 
+              value={filter.device} 
+              onChange={(e) => setFilter(prev => ({ ...prev, device: e.target.value }))}
+              className="bg-transparent border border-border rounded-lg px-3 py-2 text-xs flex-1"
+            >
+              <option value="all">All Devices</option>
+              {Array.from(new Set(data.tracking.map(t => t.device).filter(Boolean))).map(d => (
+                <option key={d} value={d!}>{d}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <div className="glass p-6 rounded-3xl min-h-[400px]">
+          <h3 className="text-sm font-bold uppercase tracking-widest mb-6">Traffic Trend</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <AreaChart data={stats.trend}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
+              <XAxis dataKey="name" stroke="#888" fontSize={10} tickLine={false} axisLine={false} />
+              <YAxis stroke="#888" fontSize={10} tickLine={false} axisLine={false} />
+              <ReTooltip contentStyle={{ background: '#080a0f', border: '1px solid #ffffff20', borderRadius: '12px' }} />
+              <Area type="monotone" dataKey="value" stroke="#d4af37" fill="#d4af3720" strokeWidth={3} />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="glass p-6 rounded-3xl min-h-[400px]">
+          <h3 className="text-sm font-bold uppercase tracking-widest mb-6">Top Pages</h3>
+          <div className="space-y-4">
+            {stats.pages.map((p, i) => (
+              <div key={p.name} className="space-y-1">
+                <div className="flex justify-between text-xs">
+                  <span className="font-mono text-muted-foreground">{p.name}</span>
+                  <span className="font-bold">{p.value}</span>
+                </div>
+                <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-primary transition-all duration-1000" 
+                    style={{ width: `${(p.value / stats.pages[0].value) * 100}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="glass p-6 rounded-3xl min-h-[400px]">
+          <h3 className="text-sm font-bold uppercase tracking-widest mb-6">Device Distribution</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={stats.devices}
+                cx="50%"
+                cy="50%"
+                innerRadius={60}
+                outerRadius={80}
+                paddingAngle={5}
+                dataKey="value"
+              >
+                {stats.devices.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <ReTooltip contentStyle={{ background: '#080a0f', border: '1px solid #ffffff20', borderRadius: '12px' }} />
+            </PieChart>
+          </ResponsiveContainer>
+          <div className="flex flex-wrap justify-center gap-4 mt-4">
+            {stats.devices.map((d, i) => (
+              <div key={d.name} className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full" style={{ background: COLORS[i % COLORS.length] }} />
+                <span className="text-[10px] uppercase font-bold text-muted-foreground">{d.name} ({d.value})</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="glass p-6 rounded-3xl min-h-[400px]">
+          <h3 className="text-sm font-bold uppercase tracking-widest mb-6">Geographic Reach</h3>
+          <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+            {stats.countries.map(c => (
+              <div key={c.name} className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
+                <div className="flex items-center gap-3">
+                  <MapPin size={14} className="text-primary" />
+                  <span className="text-xs font-bold">{c.name}</span>
+                </div>
+                <span className="text-xs font-mono text-muted-foreground">{c.value} visits</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
