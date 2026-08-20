@@ -9,7 +9,7 @@ import {
   Search, BarChart3, TrendingUp, MapPin, Smartphone,
   ArrowRight, GripVertical, Check, Wand2, FileJson,
   Layout, ShoppingBag, FileText, Activity, Mail, Layers, Play, Subtitles, X,
-  Trash2, CheckSquare, Square, DownloadCloud
+  Trash2, CheckSquare, Square, DownloadCloud, Instagram, RefreshCw, Link, ExternalLink
 } from "lucide-react";
 
 import { SiGooglechrome as Chrome } from "react-icons/si";
