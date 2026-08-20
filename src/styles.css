@@ -54,70 +54,70 @@
   --font-body-family: "Plus Jakarta Sans", sans-serif;
   --display-tracking: -0.05em;
 
-  --background: #05070a;
+  --background: #05060a;
   --foreground: #f8fafc;
-  --card: #0a0d14;
+  --card: #0b0c11;
   --card-foreground: #f8fafc;
-  --popover: #0a0d14;
+  --popover: #0b0c11;
   --popover-foreground: #f8fafc;
-  --primary: #d4af37;
-  --primary-foreground: #05070a;
-  --secondary: #0f172a;
+  --primary: #ef1822;
+  --primary-foreground: #ffffff;
+  --secondary: #14161c;
   --secondary-foreground: #f8fafc;
-  --muted: #0f172a;
-  --muted-foreground: #94a3b8;
-  --accent: #00f3ff;
-  --accent-foreground: #05070a;
+  --muted: #14161c;
+  --muted-foreground: #9aa1ad;
+  --accent: #ff4d57;
+  --accent-foreground: #05060a;
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
   --border: rgb(255 255 255 / 6%);
   --input: rgb(255 255 255 / 10%);
-  --ring: #d4af37;
+  --ring: #ef1822;
 
-  --neon-cyan: #00f3ff;
-  --neon-lime: #39ff14;
-  --gold: #d4af37;
-  --silver: #cbd5e1;
+  --neon-cyan: #ff4d57;
+  --neon-lime: #ef1822;
+  --gold: #ef1822;
+  --silver: #f1f5f9;
 
   --surface: rgb(255 255 255 / 2%);
   --surface-strong: rgb(255 255 255 / 5%);
   --hairline: rgb(255 255 255 / 8%);
 
   --elevation: 0 40px 100px -40px rgb(0 0 0 / 95%);
-  --glow: 0 0 50px rgb(212 175 55 / 15%);
+  --glow: 0 0 50px rgb(239 24 34 / 22%);
 }
 
 /* ---------- Minimalist Studio Light ---------- */
 .light {
   --background: #ffffff;
-  --foreground: #0b0f19;
-  --card: #f4f6f8;
-  --card-foreground: #0b0f19;
+  --foreground: #08090d;
+  --card: #f5f6f8;
+  --card-foreground: #08090d;
   --popover: #ffffff;
-  --popover-foreground: #0b0f19;
-  --primary: #b3922c;
+  --popover-foreground: #08090d;
+  --primary: #d31220;
   --primary-foreground: #ffffff;
-  --secondary: #eef1f4;
-  --secondary-foreground: #0b0f19;
-  --muted: #f4f6f8;
-  --muted-foreground: #57606f;
-  --accent: #0e7490;
+  --secondary: #eef0f3;
+  --secondary-foreground: #08090d;
+  --muted: #f5f6f8;
+  --muted-foreground: #575e6b;
+  --accent: #08090d;
   --accent-foreground: #ffffff;
-  --border: rgb(11 15 25 / 10%);
-  --input: rgb(11 15 25 / 14%);
-  --ring: #b3922c;
+  --border: rgb(8 9 13 / 10%);
+  --input: rgb(8 9 13 / 14%);
+  --ring: #d31220;
 
-  --neon-cyan: #0e7490;
-  --neon-lime: #b3922c;
-  --gold: #b3922c;
-  --silver: #64748b;
+  --neon-cyan: #d31220;
+  --neon-lime: #d31220;
+  --gold: #d31220;
+  --silver: #4b5563;
 
   --surface: rgb(11 15 25 / 3%);
   --surface-strong: rgb(11 15 25 / 6%);
   --hairline: rgb(11 15 25 / 8%);
 
   --elevation: 0 24px 60px -28px rgb(11 15 25 / 22%);
-  --glow: 0 0 34px rgb(179 146 44 / 18%);
+  --glow: 0 0 34px rgb(211 18 32 / 20%);
 }
 
 @layer base {

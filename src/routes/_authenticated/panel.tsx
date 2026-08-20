@@ -60,7 +60,7 @@ import {
   syncInstagramPosts 
 } from "@/lib/instagram.functions";
 import { DEFAULT_BRANDING, DEFAULT_THEME, FONT_PRESETS, THEME_PRESETS, type BrandingConfig, type ThemeConfig } from "@/lib/theme";
-import { getInstagramLogs } from "@/lib/instagram.functions";
+import { getInstagramLogs, retrySyncLog, reconnectInstagram } from "@/lib/instagram.functions";
 import { CaptionPreview } from "@/components/CaptionPreview";
 
 
@@ -2270,6 +2270,8 @@ function InstagramTab() {
   const updateSettings = useServerFn(updateInstagramSettings);
   const syncPosts = useServerFn(syncInstagramPosts);
   const getLogs = useServerFn(getInstagramLogs);
+  const retryLog = useServerFn(retrySyncLog);
+  const reconnect = useServerFn(reconnectInstagram);
   
   const { data: settings, refetch } = useQuery({
     queryKey: ['instagram-settings'],
@@ -2288,7 +2290,7 @@ function InstagramTab() {
   });
 
   const syncMutation = useMutation({
-    mutationFn: () => syncPosts(),
+    mutationFn: () => syncPosts({ data: {} }),
     onSuccess: () => { 
       toast.success("Posts synced successfully"); 
       refetch(); 
@@ -2296,7 +2298,31 @@ function InstagramTab() {
     }
   });
 
+  const retryMutation = useMutation({
+    mutationFn: (logId: string) => retryLog({ data: { logId } }),
+    onSuccess: () => {
+      toast.success("Retry succeeded — media republished");
+      refetch();
+      queryClient.invalidateQueries({ queryKey: ['instagram-logs'] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Retry failed"),
+  });
+
+  const reconnectMutation = useMutation({
+    mutationFn: (access_token: string) => reconnect({ data: { access_token } }),
+    onSuccess: (res: any) => {
+      toast.success(`Reconnected as @${res?.username ?? 'instagram'}`);
+      setToken("");
+      refetch();
+      queryClient.invalidateQueries({ queryKey: ['instagram-logs'] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Re-authorisation failed"),
+  });
+
   const [token, setToken] = useState("");
+  const [openLog, setOpenLog] = useState<any>(null);
+  const webhookUrl = typeof window !== 'undefined' ? `${window.location.origin}/api/public/instagram-webhook` : '';
+  const tokenExpired = settings?.token_expires_at ? new Date(settings.token_expires_at).getTime() < Date.now() : false;
 
   return (
     <div className="space-y-6">
@@ -2363,6 +2389,45 @@ function InstagramTab() {
                     <span>Last Synced</span>
                     <span>{settings.last_sync ? new Date(settings.last_sync).toLocaleString() : 'Never'}</span>
                   </div>
+
+                  <div className="pt-4 border-t border-white/5 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Token Status</span>
+                      <span className={`text-[9px] font-black uppercase ${tokenExpired ? 'text-red-500' : 'text-green-500'}`}>
+                        {tokenExpired ? 'Expired — re-auth required' : 'Valid'}
+                      </span>
+                    </div>
+                    <input
+                      type="password"
+                      placeholder="Paste fresh Graph API token to re-authorise..."
+                      className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm"
+                      value={token}
+                      onChange={e => setToken(e.target.value)}
+                    />
+                    <button
+                      onClick={() => reconnectMutation.mutate(token)}
+                      disabled={!token || reconnectMutation.isPending}
+                      className="w-full py-3 rounded-xl bg-primary text-primary-foreground text-[10px] font-black uppercase tracking-[0.2em] disabled:opacity-40"
+                    >
+                      {reconnectMutation.isPending ? 'Re-authorising...' : 'One-Click Reconnect'}
+                    </button>
+                  </div>
+
+                  <div className="pt-4 border-t border-white/5 space-y-2">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Realtime Webhook URL</span>
+                    <div className="flex gap-2">
+                      <input readOnly value={webhookUrl} className="flex-1 bg-black/20 border border-white/10 rounded-xl px-3 py-2 text-[10px]" />
+                      <button
+                        onClick={() => { void navigator.clipboard.writeText(webhookUrl); toast.success("Webhook URL copied"); }}
+                        className="px-3 rounded-xl bg-white/5 border border-white/10 text-[9px] font-black uppercase"
+                      >
+                        Copy
+                      </button>
+                    </div>
+                    <p className="text-[8px] text-muted-foreground uppercase tracking-tighter">
+                      Verify token: <span className="text-primary">{settings.webhook_verify_token ?? '—'}</span> · New posts publish instantly, duplicates are skipped automatically.
+                    </p>
+                  </div>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -2399,7 +2464,12 @@ function InstagramTab() {
               </h3>
               <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
                 {logs?.map((log: any) => (
-                  <div key={log.id} className="p-3 rounded-xl bg-black/20 border border-white/5 flex items-center justify-between group">
+                  <button
+                    type="button"
+                    key={log.id}
+                    onClick={() => setOpenLog(log)}
+                    className="w-full text-left p-3 rounded-xl bg-black/20 border border-white/5 flex items-center justify-between group hover:border-primary/30 transition-colors"
+                  >
                     <div>
                       <div className="flex items-center gap-2">
                         <span className={`w-1.5 h-1.5 rounded-full ${log.status === 'success' ? 'bg-green-500' : 'bg-red-500'}`} />
@@ -2407,10 +2477,12 @@ function InstagramTab() {
                       </div>
                       <p className="text-[8px] text-muted-foreground mt-0.5">{new Date(log.created_at).toLocaleString()}</p>
                     </div>
-                    {log.posts_synced > 0 && (
+                    {log.posts_synced > 0 ? (
                       <span className="text-[8px] font-black bg-primary/10 text-primary px-2 py-0.5 rounded-full">+{log.posts_synced} Posts</span>
+                    ) : (
+                      <span className="text-[8px] font-black text-muted-foreground uppercase">Details</span>
                     )}
-                  </div>
+                  </button>
                 ))}
                 {(!logs || logs.length === 0) && (
                   <p className="text-[10px] text-muted-foreground text-center py-8 italic uppercase tracking-widest">No logs available</p>
@@ -2453,9 +2525,25 @@ function InstagramTab() {
                   <span className="text-[10px] font-bold uppercase">Filter by Hashtag</span>
                   <input placeholder="#ambition" className="bg-transparent border-none text-[10px] text-right focus:ring-0 outline-none placeholder:text-white/20" />
                 </div>
+                <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
+                  <div className="space-y-0.5">
+                    <span className="text-[10px] font-bold uppercase block">Caption Language</span>
+                    <span className="text-[8px] text-muted-foreground uppercase font-medium">Instagram captions convert to subtitles</span>
+                  </div>
+                  <select
+                    value={settings?.caption_language ?? 'en'}
+                    onChange={e => updateMutation.mutate({ caption_language: e.target.value })}
+                    className="bg-black/30 border border-white/10 rounded-lg px-2 py-1 text-[10px] font-bold uppercase"
+                  >
+                    <option value="en">English</option>
+                    <option value="ur">Urdu</option>
+                    <option value="ar">Arabic</option>
+                    <option value="es">Spanish</option>
+                  </select>
+                </div>
                 <div className="pt-4 mt-4 border-t border-white/5">
                   <p className="text-[9px] text-muted-foreground leading-relaxed uppercase tracking-tighter">
-                    Posts will be cached for 24 hours to ensure elite page performance. You can force a sync anytime from the connection panel.
+                    Realtime webhooks publish new photos and reels the moment you post. Duplicates are blocked automatically, so overlapping syncs and retries never double-post.
                   </p>
                 </div>
               </div>
@@ -2463,6 +2551,55 @@ function InstagramTab() {
           </div>
         </div>
       </div>
+
+      {openLog && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4" onClick={() => setOpenLog(null)}>
+          <div className="glass rounded-[2rem] p-8 max-w-lg w-full border border-white/10 space-y-5" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-black uppercase italic">Sync Entry Details</h3>
+              <span className={`text-[9px] font-black uppercase px-2 py-1 rounded-full ${openLog.status === 'success' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
+                {openLog.status}
+              </span>
+            </div>
+            <div className="space-y-3 text-[11px]">
+              <Detail label="Timestamp" value={new Date(openLog.created_at).toLocaleString()} />
+              <Detail label="Media ID" value={openLog.media_id ?? '—'} />
+              <Detail label="Error Code" value={openLog.error_code || '—'} />
+              <Detail label="Message" value={openLog.message ?? '—'} />
+              <Detail label="Next Action" value={openLog.recommended_action ?? (openLog.status === 'success' ? 'None required' : 'Retry the sync')} />
+              <div className="space-y-1">
+                <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Payload</span>
+                <pre className="bg-black/40 border border-white/10 rounded-xl p-3 text-[9px] overflow-x-auto">
+                  {JSON.stringify(openLog.payload ?? {}, null, 2)}
+                </pre>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              {openLog.status !== 'success' && (
+                <button
+                  onClick={() => retryMutation.mutate(openLog.id)}
+                  disabled={retryMutation.isPending}
+                  className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground text-[10px] font-black uppercase tracking-[0.2em] disabled:opacity-40"
+                >
+                  {retryMutation.isPending ? 'Retrying...' : 'Retry Now'}
+                </button>
+              )}
+              <button onClick={() => setOpenLog(null)} className="flex-1 py-3 rounded-xl bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-[0.2em]">
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Detail({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-start justify-between gap-4">
+      <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground shrink-0">{label}</span>
+      <span className="text-right break-words">{value}</span>
     </div>
   );
 }

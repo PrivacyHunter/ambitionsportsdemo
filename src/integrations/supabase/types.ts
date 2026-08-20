@@ -176,10 +176,12 @@ export type Database = {
           created_at: string | null
           id: string
           is_visible: boolean | null
+          media_hash: string | null
           media_type: string | null
           media_url: string | null
           page_target: string | null
           permalink: string | null
+          source: string | null
           thumbnail_url: string | null
           timestamp: string | null
         }
@@ -189,10 +191,12 @@ export type Database = {
           created_at?: string | null
           id: string
           is_visible?: boolean | null
+          media_hash?: string | null
           media_type?: string | null
           media_url?: string | null
           page_target?: string | null
           permalink?: string | null
+          source?: string | null
           thumbnail_url?: string | null
           timestamp?: string | null
         }
@@ -202,10 +206,12 @@ export type Database = {
           created_at?: string | null
           id?: string
           is_visible?: boolean | null
+          media_hash?: string | null
           media_type?: string | null
           media_url?: string | null
           page_target?: string | null
           permalink?: string | null
+          source?: string | null
           thumbnail_url?: string | null
           timestamp?: string | null
         }
@@ -215,6 +221,7 @@ export type Database = {
         Row: {
           access_token: string | null
           auto_publish: boolean | null
+          caption_language: string | null
           created_at: string | null
           id: string
           instagram_user_id: string | null
@@ -222,12 +229,15 @@ export type Database = {
           last_sync: string | null
           last_sync_error: string | null
           last_sync_status: string | null
+          token_expires_at: string | null
           updated_at: string | null
           username: string | null
+          webhook_verify_token: string | null
         }
         Insert: {
           access_token?: string | null
           auto_publish?: boolean | null
+          caption_language?: string | null
           created_at?: string | null
           id?: string
           instagram_user_id?: string | null
@@ -235,12 +245,15 @@ export type Database = {
           last_sync?: string | null
           last_sync_error?: string | null
           last_sync_status?: string | null
+          token_expires_at?: string | null
           updated_at?: string | null
           username?: string | null
+          webhook_verify_token?: string | null
         }
         Update: {
           access_token?: string | null
           auto_publish?: boolean | null
+          caption_language?: string | null
           created_at?: string | null
           id?: string
           instagram_user_id?: string | null
@@ -248,33 +261,50 @@ export type Database = {
           last_sync?: string | null
           last_sync_error?: string | null
           last_sync_status?: string | null
+          token_expires_at?: string | null
           updated_at?: string | null
           username?: string | null
+          webhook_verify_token?: string | null
         }
         Relationships: []
       }
       instagram_sync_logs: {
         Row: {
           created_at: string | null
+          error_code: string | null
           id: string
+          media_id: string | null
           message: string | null
+          payload: Json | null
           posts_synced: number | null
+          recommended_action: string | null
+          resolved: boolean | null
           status: string
           user_id: string | null
         }
         Insert: {
           created_at?: string | null
+          error_code?: string | null
           id?: string
+          media_id?: string | null
           message?: string | null
+          payload?: Json | null
           posts_synced?: number | null
+          recommended_action?: string | null
+          resolved?: boolean | null
           status: string
           user_id?: string | null
         }
         Update: {
           created_at?: string | null
+          error_code?: string | null
           id?: string
+          media_id?: string | null
           message?: string | null
+          payload?: Json | null
           posts_synced?: number | null
+          recommended_action?: string | null
+          resolved?: boolean | null
           status?: string
           user_id?: string | null
         }

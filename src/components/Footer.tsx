@@ -11,9 +11,13 @@ export function Footer() {
         {/* Brand & Inquiry Info */}
         <div className="space-y-6">
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center font-black text-primary-foreground text-2xl">
-              {branding.logoText?.[0] || 'A'}
-            </div>
+            {branding.logoUrl ? (
+              <img src={branding.logoUrl} alt={branding.logoText} className="h-11 w-auto object-contain" />
+            ) : (
+              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center font-black text-primary-foreground text-2xl">
+                {branding.logoText?.[0] || 'A'}
+              </div>
+            )}
             <span className="text-xl font-black tracking-tighter uppercase italic">
               {branding.logoText.split(' ')[0]} <span className="text-primary">{branding.logoText.split(' ').slice(1).join(' ')}</span>
             </span>
