@@ -9,7 +9,31 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 
 
+import { getPageSeo } from "@/lib/seo.functions";
+
 export const Route = createFileRoute("/contact")({
+  loader: async ({ context }) => {
+    return context.queryClient.ensureQueryData({
+      queryKey: ["seo", "/contact"],
+      queryFn: () => getPageSeo({ data: { path: "/contact" } }),
+    });
+  },
+  head: ({ loaderData }) => {
+    const seo = loaderData as any;
+    const title = seo?.title || "Contact Us | Ambition Sports";
+    const description = seo?.description || "Get a quote for your custom sportswear project or visit our Sialkot factory.";
+    return {
+      title,
+      meta: [
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary_large_image" },
+        ...(seo?.ogImage ? [{ property: "og:image", content: seo.ogImage }] : []),
+      ],
+    };
+  },
   component: Contact,
 });
 

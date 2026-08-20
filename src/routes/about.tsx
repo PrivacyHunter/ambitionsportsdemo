@@ -22,7 +22,31 @@ const quoteSchema = z.object({
 
 type QuoteFormValues = z.infer<typeof quoteSchema>;
 
+import { getPageSeo } from "@/lib/seo.functions";
+
 export const Route = createFileRoute("/about")({
+  loader: async ({ context }) => {
+    return context.queryClient.ensureQueryData({
+      queryKey: ["seo", "/about"],
+      queryFn: () => getPageSeo({ data: { path: "/about" } }),
+    });
+  },
+  head: ({ loaderData }) => {
+    const seo = loaderData as any;
+    const title = seo?.title || "About Us | Ambition Sports";
+    const description = seo?.description || "Learn about Ambition Sports' legacy of premium custom sportswear manufacturing.";
+    return {
+      title,
+      meta: [
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary_large_image" },
+        ...(seo?.ogImage ? [{ property: "og:image", content: seo.ogImage }] : []),
+      ],
+    };
+  },
   component: About,
 });
 
