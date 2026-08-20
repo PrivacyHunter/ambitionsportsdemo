@@ -41,6 +41,60 @@ export type Database = {
         }
         Relationships: []
       }
+      customization_videos: {
+        Row: {
+          captions: Json | null
+          captions_raw: string | null
+          captions_url: string | null
+          created_at: string | null
+          description: string | null
+          display_order: number | null
+          id: string
+          is_published: boolean | null
+          thumbnail_url: string | null
+          title: string
+          total_pauses: number | null
+          total_plays: number | null
+          total_time_watched: number | null
+          updated_at: string | null
+          video_url: string
+        }
+        Insert: {
+          captions?: Json | null
+          captions_raw?: string | null
+          captions_url?: string | null
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          is_published?: boolean | null
+          thumbnail_url?: string | null
+          title: string
+          total_pauses?: number | null
+          total_plays?: number | null
+          total_time_watched?: number | null
+          updated_at?: string | null
+          video_url: string
+        }
+        Update: {
+          captions?: Json | null
+          captions_raw?: string | null
+          captions_url?: string | null
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          is_published?: boolean | null
+          thumbnail_url?: string | null
+          title?: string
+          total_pauses?: number | null
+          total_plays?: number | null
+          total_time_watched?: number | null
+          updated_at?: string | null
+          video_url?: string
+        }
+        Relationships: []
+      }
       email_logs: {
         Row: {
           created_at: string | null

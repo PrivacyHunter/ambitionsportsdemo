@@ -105,13 +105,13 @@ function Contact() {
                  <ContactCard 
                   icon={<Phone className="text-primary" size={24} />} 
                   title="Phone / WhatsApp" 
-                  value="+92 (300) 123-4567" 
+                  value="+92 (304) 989-3054" 
                   desc="Mon-Sat, 9am-6pm (GMT+5)"
                  />
                  <ContactCard 
                   icon={<Mail className="text-primary" size={24} />} 
                   title="Official Email" 
-                  value="sales@ambitionsports.com" 
+                  value="ambitionsports381@gmail.com" 
                   desc="For bulk order & dealership inquiries"
                  />
                  <ContactCard 
@@ -124,7 +124,7 @@ function Contact() {
                
                <motion.a 
                 whileHover={{ scale: 1.02 }}
-                href="https://wa.me/923001234567" 
+                href="https://wa.me/923049893054" 
                 target="_blank" 
                 className="flex items-center justify-center gap-4 bg-[#25D366] text-white font-black uppercase italic py-6 rounded-2xl hover:brightness-110 transition-all shadow-[0_20px_40px_rgba(37,211,102,0.2)] text-sm tracking-widest"
                >

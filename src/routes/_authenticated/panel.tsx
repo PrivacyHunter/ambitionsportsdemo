@@ -8,7 +8,8 @@ import {
   ShieldCheck, Users, Globe2, Inbox, History, Download, Upload,
   Search, BarChart3, TrendingUp, MapPin, Smartphone,
   ArrowRight, GripVertical, Check, Wand2, FileJson,
-  Layout, ShoppingBag, FileText, Activity, Mail, Layers, Play, Subtitles, X
+  Layout, ShoppingBag, FileText, Activity, Mail, Layers, Play, Subtitles, X,
+  Trash2, CheckSquare, Square, DownloadCloud
 } from "lucide-react";
 
 import { SiGooglechrome as Chrome } from "react-icons/si";
@@ -44,9 +45,15 @@ import {
 import { saveThemeVersion, getThemeHistory, scheduleReport } from "@/lib/history.functions";
 import { getPageSeo, savePageSeo } from "@/lib/seo.functions";
 import { getSeoBulk, saveSeoBulk, autoGenerateSeo } from "@/lib/seo-bulk.functions";
-import { logAuditAction, getAuditLogs, getEmailLogs } from "@/lib/logs.functions";
+import { logAuditAction, getAuditLogs, getEmailLogs, exportAuditLogsCsv } from "@/lib/logs.functions";
 import { applyTemplate } from "@/lib/templates.functions";
-import { getCustomizationVideos, upsertCustomizationVideo, deleteCustomizationVideo, getEngagementStats } from "@/lib/customization.functions";
+import { 
+  getCustomizationVideos, 
+  upsertCustomizationVideo, 
+  deleteCustomizationVideo, 
+  getEngagementStats,
+  bulkActionCustomizationVideos 
+} from "@/lib/customization.functions";
 import { DEFAULT_BRANDING, DEFAULT_THEME, FONT_PRESETS, THEME_PRESETS, type BrandingConfig, type ThemeConfig } from "@/lib/theme";
 
 // PDF export will be handled by dynamic import in AnalyticsDashboard
@@ -1538,16 +1545,41 @@ function LogsTab() {
   return (
     <div className="space-y-8">
       <div className="glass overflow-x-auto rounded-3xl p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-extrabold uppercase text-primary">System Audit Log</h2>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+          <div>
+            <h2 className="text-lg font-extrabold uppercase text-primary">System Audit Log</h2>
+            <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest mt-1">Export filtered logs for legal or security review</p>
+          </div>
           <div className="flex gap-2">
+            <button 
+              onClick={async () => {
+                try {
+                  const exportFn = await import("@/lib/logs.functions").then(m => m.exportAuditLogsCsv);
+                  const csv = await exportFn({ data: { action_type: filterType } });
+                  const blob = new Blob([csv], { type: 'text/csv' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `audit-logs-${filterType}-${new Date().toISOString().split('T')[0]}.csv`;
+                  a.click();
+                  toast.success("Logs exported to CSV");
+                } catch (err: any) {
+                  toast.error(err.message);
+                }
+              }}
+              className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 hover:scale-105 transition-all shadow-[0_0_15px_rgba(212,175,55,0.3)]"
+            >
+              <DownloadCloud size={14} /> Export CSV
+            </button>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-2 custom-scrollbar">
             {["all", "theme", "role", "export", "backup", "template", "security"].map(t => (
               <button key={t} onClick={() => setFilterType(t)} className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all ${filterType === t ? 'border-primary bg-primary/10 text-primary' : 'border-border text-muted-foreground hover:text-foreground'}`}>
                 {t}
               </button>
             ))}
           </div>
-        </div>
         <table className="w-full text-left text-xs">
           <thead className="text-[10px] uppercase text-muted-foreground">
             <tr><th className="py-2">User</th><th>Action</th><th>Type</th><th>Details</th><th>Date</th></tr>
@@ -1695,6 +1727,7 @@ function CustomizationTab({ onDone }: { onDone: () => void }) {
   const upsertVideoFn = useServerFn(upsertCustomizationVideo);
   const deleteVideoFn = useServerFn(deleteCustomizationVideo);
   const getStatsFn = useServerFn(getEngagementStats);
+  const bulkActionFn = useServerFn(bulkActionCustomizationVideos);
   
   const { data: videos, refetch } = useQuery({
     queryKey: ['admin-customization-videos'],
@@ -1706,8 +1739,11 @@ function CustomizationTab({ onDone }: { onDone: () => void }) {
     queryFn: () => getStatsFn(),
   });
 
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [editing, setEditing] = useState<any>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isUploadingSubtitles, setIsUploadingSubtitles] = useState(false);
+
   
   const mutation = useMutation({
     mutationFn: (data: any) => upsertVideoFn({ data }),
@@ -1729,7 +1765,19 @@ function CustomizationTab({ onDone }: { onDone: () => void }) {
     }
   });
 
+  const bulkMutation = useMutation({
+    mutationFn: (action: 'publish' | 'unpublish' | 'delete') => bulkActionFn({ data: { ids: selectedIds, action } }),
+    onSuccess: (_, action) => {
+      toast.success(`Bulk ${action} successful`);
+      setSelectedIds([]);
+      refetch();
+      onDone();
+    },
+    onError: (e: any) => toast.error(e.message)
+  });
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+
     const file = e.target.files?.[0];
     if (!file || !editing) return;
 
@@ -1758,6 +1806,48 @@ function CustomizationTab({ onDone }: { onDone: () => void }) {
     }
   };
 
+  const handleSubtitleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !editing) return;
+
+    setIsUploadingSubtitles(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `subtitles/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('studio-assets')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('studio-assets')
+        .getPublicUrl(filePath);
+
+      // Read content for raw storage
+      const content = await file.text();
+      
+      setEditing({ ...editing, captions_url: publicUrl, captions_raw: content });
+      toast.success("Subtitles uploaded successfully");
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
+      setIsUploadingSubtitles(false);
+    }
+  };
+
+  const toggleSelection = (id: string) => {
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  };
+
+  const toggleAll = () => {
+    if (selectedIds.length === videos?.length) setSelectedIds([]);
+    else setSelectedIds(videos?.map((v: any) => v.id) || []);
+  };
+
+
   return (
     <div className="space-y-6">
       <div className="glass rounded-3xl p-6 flex justify-between items-center">
@@ -1765,16 +1855,32 @@ function CustomizationTab({ onDone }: { onDone: () => void }) {
           <h2 className="text-lg font-extrabold uppercase">Studio Manager</h2>
           <p className="text-xs text-muted-foreground">Manage manufacturing process videos and descriptions.</p>
         </div>
-        <button 
-          onClick={() => setEditing({ title: '', description: '', video_url: '', display_order: (videos?.length || 0) + 1, is_published: true, captions: [] })}
-          className="bg-primary text-primary-foreground px-4 py-2 rounded-xl text-xs font-bold uppercase"
-        >
-          Add Video
-        </button>
+        <div className="flex items-center gap-3">
+          {selectedIds.length > 0 && (
+            <div className="flex gap-2 mr-4 border-r border-white/10 pr-4 animate-in slide-in-from-left duration-300">
+              <button onClick={() => bulkMutation.mutate('publish')} className="p-2 hover:bg-white/5 rounded-lg text-primary" title="Bulk Publish"><CheckSquare size={16} /></button>
+              <button onClick={() => bulkMutation.mutate('unpublish')} className="p-2 hover:bg-white/5 rounded-lg text-muted-foreground" title="Bulk Draft"><Square size={16} /></button>
+              <button onClick={() => confirm(`Delete ${selectedIds.length} videos?`) && bulkMutation.mutate('delete')} className="p-2 hover:bg-white/5 rounded-lg text-red-500" title="Bulk Delete"><Trash2 size={16} /></button>
+            </div>
+          )}
+          <button 
+            onClick={() => setEditing({ title: '', description: '', video_url: '', display_order: (videos?.length || 0) + 1, is_published: true, captions: [] })}
+            className="bg-primary text-primary-foreground px-4 py-2 rounded-xl text-xs font-bold uppercase"
+          >
+            Add Video
+          </button>
+        </div>
       </div>
 
       {/* Analytics Summary */}
       <div className="grid gap-4 md:grid-cols-4">
+        <div className="glass p-4 rounded-2xl flex flex-col justify-center">
+           <button onClick={toggleAll} className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-primary hover:text-white transition-colors">
+              {selectedIds.length === videos?.length ? <CheckSquare size={14} /> : <Square size={14} />} 
+              {selectedIds.length > 0 ? `Selected ${selectedIds.length}` : 'Select All'}
+           </button>
+        </div>
+
         {stats?.map((s: any) => (
           <div key={s.id} className="glass p-4 rounded-2xl">
             <p className="text-[8px] font-bold uppercase text-muted-foreground truncate">{s.title}</p>
@@ -1791,9 +1897,13 @@ function CustomizationTab({ onDone }: { onDone: () => void }) {
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {videos?.map((v: any) => (
-          <div key={v.id} className="glass rounded-3xl overflow-hidden flex flex-col">
-            <div className="aspect-video bg-black relative">
+          <div key={v.id} className={`glass rounded-3xl overflow-hidden flex flex-col border-2 transition-all ${selectedIds.includes(v.id) ? 'border-primary shadow-[0_0_20px_rgba(212,175,55,0.2)]' : 'border-transparent'}`}>
+            <div className="aspect-video bg-black relative group/vid">
               <video src={v.video_url} className="w-full h-full object-cover opacity-60" muted />
+              <div onClick={() => toggleSelection(v.id)} className={`absolute top-2 left-2 p-1.5 rounded-lg backdrop-blur-md border cursor-pointer transition-all z-10 ${selectedIds.includes(v.id) ? 'bg-primary border-primary text-primary-foreground' : 'bg-black/40 border-white/10 text-white/40 opacity-0 group-hover/vid:opacity-100 hover:text-white'}`}>
+                {selectedIds.includes(v.id) ? <CheckSquare size={14} /> : <Square size={14} />}
+              </div>
+
               <div className="absolute inset-0 flex items-center justify-center">
                  <Play size={32} className="text-white/50" />
               </div>
@@ -1908,10 +2018,30 @@ function CustomizationTab({ onDone }: { onDone: () => void }) {
               </div>
 
               <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <label className="text-[10px] font-bold uppercase text-muted-foreground flex items-center gap-2">
-                    <Subtitles size={12} /> Captions / Subtitles
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold uppercase text-muted-foreground flex items-center justify-between">
+                    <span>Subtitle File (SRT/VTT)</span>
+                    {editing.captions_url && <span className="text-primary italic">Connected</span>}
                   </label>
+                  <div className="flex gap-2">
+                    <input 
+                      placeholder="SRT/VTT URL"
+                      className="flex-grow bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm"
+                      value={editing.captions_url || ''}
+                      onChange={e => setEditing({...editing, captions_url: e.target.value})}
+                    />
+                    <label className="cursor-pointer bg-white/10 border border-white/10 px-4 py-3 rounded-xl flex items-center justify-center hover:bg-white/20 transition-colors">
+                      {isUploadingSubtitles ? <Loader2 size={16} className="animate-spin" /> : <Subtitles size={16} />}
+                      <input type="file" className="hidden" accept=".srt,.vtt" onChange={handleSubtitleUpload} />
+                    </label>
+                  </div>
+                </div>
+
+                <div className="flex justify-between items-center mt-6">
+                  <label className="text-[10px] font-bold uppercase text-muted-foreground flex items-center gap-2">
+                    <Play size={12} /> Manual Captions
+                  </label>
+
                   <button 
                     onClick={() => {
                       const caps = [...(editing.captions || [])];
@@ -1988,7 +2118,7 @@ function CustomizationTab({ onDone }: { onDone: () => void }) {
               </button>
               <button 
                 onClick={() => mutation.mutate(editing)}
-                disabled={mutation.isPending || isUploading}
+                disabled={mutation.isPending || isUploading || isUploadingSubtitles}
                 className="flex-grow bg-primary text-primary-foreground py-3 rounded-xl text-xs font-bold uppercase"
               >
                 {mutation.isPending ? 'Saving...' : 'Save Draft / Publish'}

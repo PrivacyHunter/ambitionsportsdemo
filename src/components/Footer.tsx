@@ -54,11 +54,11 @@ export function Footer() {
             </li>
             <li className="flex gap-3 text-muted-foreground">
               <Phone size={20} className="text-neon-lime shrink-0" />
-              <span>+92 (304) 989-3054</span>
+              <span>{branding.phone}</span>
             </li>
             <li className="flex gap-3 text-muted-foreground">
               <Mail size={20} className="text-neon-lime shrink-0" />
-              <span>ambitionsports381@gmail.com</span>
+              <span>{branding.email}</span>
             </li>
 
           </ul>
