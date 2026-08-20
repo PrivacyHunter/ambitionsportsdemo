@@ -203,12 +203,12 @@ function Sportswear() {
            </div>
            <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-12 relative z-10">
               <div className="text-center lg:text-left">
-                <h2 className="text-background font-black text-4xl md:text-5xl uppercase italic tracking-tighter mb-4">Download Our Latest Catalog</h2>
-                <p className="text-background/70 font-bold uppercase tracking-widest text-xs">Explore 500+ designs across all categories</p>
+                 <h2 className="text-primary-foreground font-black text-4xl md:text-5xl uppercase italic tracking-tighter mb-4">Download Our Latest Catalog</h2>
+                 <p className="text-primary-foreground/70 font-bold uppercase tracking-widest text-xs">Explore 500+ designs across all categories</p>
               </div>
-              <button className="bg-background text-neon-cyan hover:text-white px-12 py-6 rounded-2xl font-black uppercase tracking-widest text-sm transition-all shadow-xl">
-                Get PDF Catalog
-              </button>
+               <button className="bg-primary-foreground text-primary hover:bg-white px-12 py-6 rounded-2xl font-black uppercase tracking-widest text-sm transition-all shadow-xl">
+                 Get PDF Catalog
+               </button>
            </div>
         </section>
       </main>
