@@ -17,14 +17,14 @@ const banners: Banner[] = [
     subtitle: "Premium Custom Gear",
     title1: "Unleash Your",
     title2: "Ambition",
-    accent: "text-neon-cyan"
+    accent: "text-primary"
   },
   {
     image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070&auto=format&fit=crop",
     subtitle: "Elite Manufacturing",
     title1: "Precision",
     title2: "Performance",
-    accent: "text-neon-lime"
+    accent: "text-primary"
   },
   {
     image: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=2076&auto=format&fit=crop",
@@ -38,14 +38,14 @@ const banners: Banner[] = [
     subtitle: "Sublimation Specialists",
     title1: "Infinite",
     title2: "Design",
-    accent: "text-neon-cyan"
+    accent: "text-primary"
   },
   {
     image: "https://images.unsplash.com/photo-1505236858219-8359eb29e329?q=80&w=2062&auto=format&fit=crop",
     subtitle: "Activewear Revolution",
     title1: "Fit For",
     title2: "Greatness",
-    accent: "text-neon-lime"
+    accent: "text-primary"
   },
   {
     image: "https://images.unsplash.com/photo-1461896704690-474cb88d599a?q=80&w=2070&auto=format&fit=crop",
@@ -103,9 +103,9 @@ export function HeroSlider() {
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-neon-cyan font-black tracking-widest uppercase mb-4 flex items-center gap-3"
+              className="text-primary font-black tracking-widest uppercase mb-4 flex items-center gap-3"
             >
-              <span className="w-12 h-[2px] bg-neon-cyan" /> {activeBanner?.subtitle}
+              <span className="w-12 h-[2px] bg-primary" /> {activeBanner?.subtitle}
             </motion.p>
             <h1 className="text-6xl md:text-8xl lg:text-9xl font-black uppercase italic leading-[0.85] tracking-tighter mb-10">
               {activeBanner?.title1} <br />
@@ -114,13 +114,13 @@ export function HeroSlider() {
             <div className="flex flex-wrap gap-6">
               <Link
                 to="/sportswear"
-                className="bg-neon-cyan hover:bg-neon-lime text-background px-10 py-5 rounded-sm font-black uppercase transition-all hover:scale-105 hover:shadow-[0_0_40px_rgba(0,243,255,0.5)] flex items-center gap-3"
+                className="bg-primary hover:bg-white text-primary-foreground px-10 py-5 rounded-sm font-black uppercase transition-all hover:scale-105 hover:shadow-[0_0_40px_rgba(212,175,55,0.5)] flex items-center gap-3"
               >
                 Shop Now <ArrowRight size={22} />
               </Link>
               <Link
                 to="/contact"
-                className="border-2 border-white/20 text-white hover:border-neon-lime hover:text-neon-lime px-10 py-5 rounded-sm font-black uppercase transition-all backdrop-blur-sm"
+                className="border-2 border-white/20 text-white hover:border-primary hover:text-primary px-10 py-5 rounded-sm font-black uppercase transition-all backdrop-blur-sm"
               >
                 Custom Order
               </Link>
@@ -136,15 +136,15 @@ export function HeroSlider() {
             <button
               key={i}
               onClick={() => setCurrent(i)}
-              className={`h-1 transition-all duration-500 ${i === current ? "w-16 bg-neon-cyan" : "w-6 bg-white/20"}`}
+              className={`h-1 transition-all duration-500 ${i === current ? "w-16 bg-primary" : "w-6 bg-white/20"}`}
             />
           ))}
         </div>
         <div className="hidden lg:flex gap-4 ml-8">
-          <button onClick={prev} className="p-2 border border-white/10 rounded-full hover:bg-neon-cyan hover:text-background transition-all">
+          <button onClick={prev} className="p-2 border border-white/10 rounded-full hover:bg-primary hover:text-primary-foreground transition-all">
             <ChevronLeft size={20} />
           </button>
-          <button onClick={next} className="p-2 border border-white/10 rounded-full hover:bg-neon-cyan hover:text-background transition-all">
+          <button onClick={next} className="p-2 border border-white/10 rounded-full hover:bg-primary hover:text-primary-foreground transition-all">
             <ChevronRight size={20} />
           </button>
         </div>
