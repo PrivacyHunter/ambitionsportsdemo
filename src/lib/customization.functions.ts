@@ -29,7 +29,7 @@ export const getCustomizationVideos = createServerFn({ method: "GET" })
   .handler(async ({ data: input }) => {
     try {
       const { supabase } = await import("@/integrations/supabase/client");
-      let query = supabase.from('customization_videos' as any).select('*');
+      let query = supabase.from('customization_videos').select('*');
       
       if (!input?.all) {
         query = query.eq('is_published', true);
@@ -66,15 +66,16 @@ export const upsertCustomizationVideo = createServerFn({ method: "POST" })
     
     // Cleanup old storage file if video_url changed
     if (data.id) {
-      const { data: old } = await supabase.from('customization_videos' as any).select('video_url').eq('id', data.id).single();
-      if (old?.video_url && old.video_url !== data.video_url && old.video_url.includes('storage/v1/object/public/studio-assets')) {
-        const path = old.video_url.split('studio-assets/')[1];
+      const { data: existing } = await supabase.from('customization_videos').select('video_url').eq('id', data.id).single();
+      const oldUrl = (existing as any)?.video_url;
+      if (oldUrl && oldUrl !== data.video_url && oldUrl.includes('storage/v1/object/public/studio-assets')) {
+        const path = oldUrl.split('studio-assets/')[1];
         if (path) await supabase.storage.from('studio-assets').remove([path]);
       }
     }
 
     const { error } = await supabase
-      .from('customization_videos' as any)
+      .from('customization_videos')
       .upsert({
         ...data,
         updated_at: new Date().toISOString(),
@@ -90,14 +91,15 @@ export const deleteCustomizationVideo = createServerFn({ method: "POST" })
     const { supabase } = await import("@/integrations/supabase/client");
     
     // Cleanup storage
-    const { data: old } = await supabase.from('customization_videos' as any).select('video_url').eq('id', data.id).single();
-    if (old?.video_url && old.video_url.includes('storage/v1/object/public/studio-assets')) {
-      const path = old.video_url.split('studio-assets/')[1];
+    const { data: existing } = await supabase.from('customization_videos').select('video_url').eq('id', data.id).single();
+    const oldUrl = (existing as any)?.video_url;
+    if (oldUrl && oldUrl.includes('storage/v1/object/public/studio-assets')) {
+      const path = oldUrl.split('studio-assets/')[1];
       if (path) await supabase.storage.from('studio-assets').remove([path]);
     }
 
     const { error } = await supabase
-      .from('customization_videos' as any)
+      .from('customization_videos')
       .delete()
       .eq('id', data.id);
     
@@ -115,20 +117,20 @@ export const bulkActionCustomizationVideos = createServerFn({ method: "POST" })
     
     if (data.action === 'delete') {
       // Cleanup storage for all
-      const { data: videos } = await supabase.from('customization_videos' as any).select('video_url').in('id', data.ids);
+      const { data: videos } = await supabase.from('customization_videos').select('video_url').in('id', data.ids);
       const paths = (videos || [])
-        .map(v => v.video_url)
+        .map((v: any) => v.video_url)
         .filter(url => url?.includes('storage/v1/object/public/studio-assets'))
         .map(url => url.split('studio-assets/')[1])
         .filter(Boolean);
       
       if (paths.length > 0) await supabase.storage.from('studio-assets').remove(paths);
       
-      const { error } = await supabase.from('customization_videos' as any).delete().in('id', data.ids);
+      const { error } = await supabase.from('customization_videos').delete().in('id', data.ids);
       if (error) throw new Error(error.message);
     } else {
       const { error } = await supabase
-        .from('customization_videos' as any)
+        .from('customization_videos')
         .update({ is_published: data.action === 'publish' } as any)
         .in('id', data.ids);
       if (error) throw new Error(error.message);
@@ -148,14 +150,14 @@ export const trackVideoEngagement = createServerFn({ method: "POST" })
     const { supabase } = await import("@/integrations/supabase/client");
     
     // Log individual action
-    await supabase.from('video_engagement' as any).insert([data]);
+    await supabase.from('video_engagement').insert([data]);
 
     // Update aggregate counts
     const column = data.action === 'play' ? 'total_plays' : data.action === 'pause' ? 'total_pauses' : 'total_time_watched';
     const increment = data.value || 1;
 
     // Use raw query for increment if RPC isn't recognized by TS types yet
-    await supabase.from('customization_videos' as any)
+    await supabase.from('customization_videos')
       .update({ [column]: supabase.rpc('increment' as any, { row_id: data.video_id, amount: increment } as any) } as any)
       .eq('id', data.video_id);
 
@@ -167,7 +169,7 @@ export const getEngagementStats = createServerFn({ method: "GET" })
   .handler(async () => {
     const { supabase } = await import("@/integrations/supabase/client");
     const { data } = await supabase
-      .from('customization_videos' as any)
+      .from('customization_videos')
       .select('id, title, total_plays, total_time_watched, total_pauses');
     return data || [];
   });
