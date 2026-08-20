@@ -1,11 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { supabase } from "@/integrations/supabase/client";
 
 export const getCustomizationVideos = createServerFn({ method: "GET" })
   .handler(async () => {
+    const { supabase } = await import("@/integrations/supabase/client");
     const { data, error } = await supabase
-      .from('customization_videos')
+      .from('customization_videos' as any)
       .select('*')
       .order('display_order', { ascending: true });
     
@@ -24,12 +24,13 @@ export const upsertCustomizationVideo = createServerFn({ method: "POST" })
     is_published: z.boolean().optional(),
   }).parse(data))
   .handler(async ({ data }) => {
+    const { supabase } = await import("@/integrations/supabase/client");
     const { error } = await supabase
-      .from('customization_videos')
+      .from('customization_videos' as any)
       .upsert({
         ...data,
         updated_at: new Date().toISOString(),
-      });
+      } as any);
     
     if (error) throw new Error(error.message);
     return { success: true };
@@ -38,8 +39,9 @@ export const upsertCustomizationVideo = createServerFn({ method: "POST" })
 export const deleteCustomizationVideo = createServerFn({ method: "POST" })
   .inputValidator((data) => z.object({ id: z.string() }).parse(data))
   .handler(async ({ data }) => {
+    const { supabase } = await import("@/integrations/supabase/client");
     const { error } = await supabase
-      .from('customization_videos')
+      .from('customization_videos' as any)
       .delete()
       .eq('id', data.id);
     
