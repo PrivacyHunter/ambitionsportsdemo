@@ -151,3 +151,98 @@ export const updateStatus = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true as const };
   });
+
+export const inviteUser = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) =>
+    z
+      .object({
+        email: z.string().email(),
+        role: z.enum(["owner", "admin", "developer", "user"]),
+      })
+      .parse(data),
+  )
+  .handler(async ({ context, data }) => {
+    await assertDeveloper(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { sendInvitationEmail } = await import("./email.server");
+
+    // Check if user exists in auth
+    const { data: { users }, error: fetchError } = await supabaseAdmin.auth.admin.listUsers();
+    if (fetchError) throw fetchError;
+    
+    let targetUser = users.find(u => u.email === data.email);
+    let userId = targetUser?.id;
+
+    if (!userId) {
+      // Create user if they don't exist
+      const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
+        email: data.email,
+        email_confirm: true,
+      });
+      if (createError) throw createError;
+      userId = newUser.user.id;
+    }
+
+    // Set role
+    await context.supabase.from("user_roles").delete().eq("user_id", userId);
+    if (data.role !== "user") {
+      const { error } = await context.supabase.from("user_roles").insert({ user_id: userId, role: data.role });
+      if (error) throw new Error(error.message);
+    }
+
+    // Send email
+    await sendInvitationEmail({
+      email: data.email,
+      role: data.role,
+    });
+
+    return { ok: true as const };
+  });
+
+export const backupSettings = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertStaff(context.supabase, context.userId);
+    const { data: settings } = await context.supabase.from("site_settings").select("*");
+    const { data: seo } = await context.supabase.from("page_content").select("*").eq("section_key", "seo");
+    
+    return {
+      settings: settings || [],
+      seo: seo || [],
+      timestamp: new Date().toISOString(),
+      version: "1.0",
+    };
+  });
+
+export const restoreSettings = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => z.object({
+    settings: z.array(z.any()),
+    seo: z.array(z.any()),
+  }).parse(data))
+  .handler(async ({ context, data }) => {
+    await assertDeveloper(context.supabase, context.userId);
+    const s = context.supabase;
+
+    for (const item of data.settings) {
+      await s.from("site_settings").upsert({ key: item.key, value: item.value }, { onConflict: "key" });
+    }
+
+    for (const item of data.seo) {
+      const { page, section_key, title, body, sort_order } = item;
+      await s.from("page_content").upsert({ 
+        page, section_key, title, body, sort_order,
+        updated_at: new Date().toISOString()
+      }, { onConflict: "page, section_key" });
+    }
+
+    // Insert audit log directly to avoid circular dependency
+    await s.from("audit_logs" as any).insert({
+      user_id: context.userId,
+      action: "backup_restored",
+      details: { timestamp: new Date().toISOString() }
+    } as any);
+
+    return { ok: true as const };
+  });
