@@ -1751,8 +1751,9 @@ function CustomizationTab({ onDone }: { onDone: () => void }) {
   const [editing, setEditing] = useState<any>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isUploadingSubtitles, setIsUploadingSubtitles] = useState(false);
+  const [search, setSearch] = useState("");
+  const [filterType, setFilterType] = useState("all");
 
-  
   const mutation = useMutation({
     mutationFn: (data: any) => upsertVideoFn({ data }),
     onSuccess: () => {
