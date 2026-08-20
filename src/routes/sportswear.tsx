@@ -126,14 +126,14 @@ function Sportswear() {
             animate={{ opacity: 1, scale: 1 }}
             className="text-center relative z-10 px-4"
           >
-             <h3 className="text-neon-lime font-black tracking-[0.4em] uppercase mb-4 text-sm">Professional Grade</h3>
+             <h3 className="text-primary font-black tracking-[0.4em] uppercase mb-4 text-sm">Professional Grade</h3>
              <h1 className="text-6xl md:text-9xl font-black uppercase italic tracking-tighter leading-none mb-6">
-               Performance <br /><span className="text-neon-cyan">Sportswear</span>
+               Performance <br /><span className="text-primary">Sportswear</span>
              </h1>
              <div className="flex items-center justify-center gap-4">
-               <div className="h-[2px] w-12 bg-neon-cyan" />
+               <div className="h-[2px] w-12 bg-primary" />
                <p className="text-white font-bold uppercase tracking-widest text-xs">Custom Sublimation Specialists</p>
-               <div className="h-[2px] w-12 bg-neon-cyan" />
+               <div className="h-[2px] w-12 bg-primary" />
              </div>
           </motion.div>
         </section>
@@ -149,7 +149,7 @@ function Sportswear() {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
                 whileHover={{ y: -10 }}
-                className="bg-card border border-white/10 rounded-3xl overflow-hidden group flex flex-col h-full"
+                className="bg-card border border-border rounded-3xl overflow-hidden group flex flex-col h-full"
               >
                 <div className="h-80 relative overflow-hidden bg-white/5">
                   <div 
@@ -157,7 +157,7 @@ function Sportswear() {
                     style={{ backgroundImage: `url(${p.image})` }} 
                   />
                   <div className="absolute top-6 right-6">
-                    <span className="bg-neon-cyan text-background px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                    <span className="bg-primary text-primary-foreground px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
                       <Zap size={10} fill="currentColor" /> {p.category}
                     </span>
                   </div>
@@ -165,7 +165,7 @@ function Sportswear() {
                 </div>
 
                 <div className="p-10 flex flex-col flex-grow">
-                  <h3 className="text-2xl font-black uppercase tracking-tighter italic mb-3 group-hover:text-neon-cyan transition-colors leading-tight">{p.name}</h3>
+                  <h3 className="text-2xl font-black uppercase tracking-tighter italic mb-3 group-hover:text-primary transition-colors leading-tight">{p.name}</h3>
                   <p className="text-muted-foreground text-sm leading-relaxed mb-8 flex-grow">{p.desc}</p>
                   
                   <div className="flex items-center justify-between mb-8">
@@ -185,7 +185,7 @@ function Sportswear() {
                     </button>
                     <button 
                       onClick={() => handleInquiry(p.name)}
-                      className="bg-neon-cyan hover:bg-neon-lime text-background py-4 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 transition-all shadow-[0_10px_20px_rgba(0,243,255,0.1)]"
+                      className="bg-primary hover:bg-white text-primary-foreground py-4 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 transition-all shadow-[0_10px_20px_rgba(212,175,55,0.1)]"
                     >
                       Inquire Now <ArrowRight size={14} />
                     </button>
@@ -197,7 +197,7 @@ function Sportswear() {
         </section>
 
         {/* Global Catalog CTA */}
-        <section className="py-24 px-4 bg-neon-cyan relative overflow-hidden">
+        <section className="py-24 px-4 bg-primary relative overflow-hidden">
            <div className="absolute inset-0 bg-background/5 opacity-10 pointer-events-none">
              <div className="w-full h-full bg-[url('https://www.transparenttextures.com/patterns/graphy-dark.png')]" />
            </div>
