@@ -8,7 +8,7 @@ import {
   ShieldCheck, Users, Globe2, Inbox, History, Download, Upload,
   Search, BarChart3, TrendingUp, MapPin, Smartphone,
   ArrowRight, GripVertical, Check, Wand2, FileJson,
-  Layout, ShoppingBag, FileText, Activity, Mail, Layers
+  Layout, ShoppingBag, FileText, Activity, Mail, Layers, Play
 } from "lucide-react";
 import { SiGooglechrome as Chrome } from "react-icons/si";
 import {
