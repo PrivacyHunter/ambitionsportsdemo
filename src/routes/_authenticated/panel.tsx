@@ -8,7 +8,8 @@ import {
   ShieldCheck, Users, Globe2, Inbox, History, Download, Upload,
   Search, BarChart3, TrendingUp, MapPin, Smartphone,
   ArrowRight, GripVertical, Check, Wand2, FileJson,
-  Layout, ShoppingBag, FileText, Activity, Mail, Layers, Play, Subtitles, X
+  Layout, ShoppingBag, FileText, Activity, Mail, Layers, Play, Subtitles, X,
+  Trash2, CheckSquare, Square, DownloadCloud
 } from "lucide-react";
 
 import { SiGooglechrome as Chrome } from "react-icons/si";
@@ -44,9 +45,15 @@ import {
 import { saveThemeVersion, getThemeHistory, scheduleReport } from "@/lib/history.functions";
 import { getPageSeo, savePageSeo } from "@/lib/seo.functions";
 import { getSeoBulk, saveSeoBulk, autoGenerateSeo } from "@/lib/seo-bulk.functions";
-import { logAuditAction, getAuditLogs, getEmailLogs } from "@/lib/logs.functions";
+import { logAuditAction, getAuditLogs, getEmailLogs, exportAuditLogs } from "@/lib/logs.functions";
 import { applyTemplate } from "@/lib/templates.functions";
-import { getCustomizationVideos, upsertCustomizationVideo, deleteCustomizationVideo, getEngagementStats } from "@/lib/customization.functions";
+import { 
+  getCustomizationVideos, 
+  upsertCustomizationVideo, 
+  deleteCustomizationVideo, 
+  getEngagementStats,
+  bulkActionCustomizationVideos 
+} from "@/lib/customization.functions";
 import { DEFAULT_BRANDING, DEFAULT_THEME, FONT_PRESETS, THEME_PRESETS, type BrandingConfig, type ThemeConfig } from "@/lib/theme";
 
 // PDF export will be handled by dynamic import in AnalyticsDashboard
