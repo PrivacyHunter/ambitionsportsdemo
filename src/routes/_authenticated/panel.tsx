@@ -2139,3 +2139,146 @@ function CustomizationTab({ onDone }: { onDone: () => void }) {
   );
 }
 
+function InstagramTab() {
+  const getSettings = useServerFn(getInstagramSettings);
+  const updateSettings = useServerFn(updateInstagramSettings);
+  const syncPosts = useServerFn(syncInstagramPosts);
+  
+  const { data: settings, refetch } = useQuery({
+    queryKey: ['instagram-settings'],
+    queryFn: () => getSettings(),
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: (data: any) => updateSettings({ data }),
+    onSuccess: () => { toast.success("Instagram settings updated"); refetch(); }
+  });
+
+  const syncMutation = useMutation({
+    mutationFn: () => syncPosts(),
+    onSuccess: () => { toast.success("Posts synced successfully"); refetch(); }
+  });
+
+  const [token, setToken] = useState("");
+
+  return (
+    <div className="space-y-6">
+      <div className="glass rounded-[2rem] p-8 border border-white/5">
+        <div className="flex items-center gap-4 mb-6">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] flex items-center justify-center text-white shadow-xl">
+            <Instagram size={32} />
+          </div>
+          <div>
+            <h2 className="text-xl font-black uppercase italic">Instagram Studio</h2>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mt-1">Connect your brand's social feed</p>
+          </div>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-8">
+          <div className="space-y-6">
+            <div className="p-6 rounded-3xl bg-white/5 border border-white/10">
+              <h3 className="text-xs font-bold uppercase tracking-widest mb-4 flex items-center gap-2">
+                <Link size={14} className="text-primary" /> Connection Status
+              </h3>
+              
+              {settings?.is_connected ? (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-4 rounded-2xl bg-primary/10 border border-primary/20">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+                        <Check size={20} />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold">Connected as @{settings.username}</p>
+                        <p className="text-[10px] text-muted-foreground uppercase font-bold">Linked to Ambition Sports</p>
+                      </div>
+                    </div>
+                    <button 
+                      onClick={() => updateMutation.mutate({ is_connected: false })}
+                      className="text-[10px] font-bold uppercase text-red-500 hover:underline"
+                    >
+                      Disconnect
+                    </button>
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={() => syncMutation.mutate()}
+                      disabled={syncMutation.isPending}
+                      className="flex-1 py-3 rounded-xl bg-white/5 border border-white/10 text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-white/10 transition-all"
+                    >
+                      {syncMutation.isPending ? <RefreshCw size={14} className="animate-spin" /> : <RefreshCw size={14} />}
+                      Sync Feed Now
+                    </button>
+                  </div>
+                  <p className="text-[9px] text-muted-foreground text-center uppercase tracking-tighter">
+                    Last synced: {settings.last_sync ? new Date(settings.last_sync).toLocaleString() : 'Never'}
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Link your Instagram Business account to automatically display your latest posts and reels on your website.
+                  </p>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase text-muted-foreground">Access Token</label>
+                    <input 
+                      type="password"
+                      placeholder="Enter Graph API Token..."
+                      className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm"
+                      value={token}
+                      onChange={e => setToken(e.target.value)}
+                    />
+                  </div>
+                  <button 
+                    onClick={() => updateMutation.mutate({ access_token: token, is_connected: true, username: 'ambitionsports' })}
+                    disabled={updateMutation.isPending || !token}
+                    className="w-full py-4 rounded-xl bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(212,175,55,0.3)] hover:scale-[1.02] transition-all"
+                  >
+                    {updateMutation.isPending ? 'Connecting...' : 'Connect Instagram'}
+                  </button>
+                  <a href="https://developers.facebook.com/" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 text-[9px] font-bold uppercase text-muted-foreground hover:text-white transition-colors">
+                    <ExternalLink size={10} /> How to get a token?
+                  </a>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <div className="p-6 rounded-3xl bg-white/5 border border-white/10 h-full">
+              <h3 className="text-xs font-bold uppercase tracking-widest mb-4 flex items-center gap-2">
+                <Settings2 size={14} className="text-primary" /> Auto-Feed Rules
+              </h3>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
+                  <span className="text-[10px] font-bold uppercase">Show on Home Page</span>
+                  <button className="w-10 h-5 rounded-full bg-primary/20 border border-primary/40 relative">
+                    <div className="absolute right-1 top-1 w-3 h-3 rounded-full bg-primary" />
+                  </button>
+                </div>
+                <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
+                  <span className="text-[10px] font-bold uppercase">Show on Shop Pages</span>
+                  <button className="w-10 h-5 rounded-full bg-white/10 border border-white/20 relative">
+                    <div className="absolute left-1 top-1 w-3 h-3 rounded-full bg-white/40" />
+                  </button>
+                </div>
+                <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
+                  <span className="text-[10px] font-bold uppercase">Filter by Hashtag</span>
+                  <input placeholder="#ambition" className="bg-transparent border-none text-[10px] text-right focus:ring-0 outline-none" />
+                </div>
+                <div className="pt-4 mt-4 border-t border-white/5">
+                  <p className="text-[9px] text-muted-foreground leading-relaxed uppercase tracking-tighter">
+                    Posts will be cached for 24 hours to ensure elite page performance. You can force a sync anytime from the connection panel.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
