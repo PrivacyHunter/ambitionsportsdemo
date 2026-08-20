@@ -54,6 +54,11 @@ import {
   getEngagementStats,
   bulkActionCustomizationVideos 
 } from "@/lib/customization.functions";
+import { 
+  getInstagramSettings, 
+  updateInstagramSettings, 
+  syncInstagramPosts 
+} from "@/lib/instagram.functions";
 import { DEFAULT_BRANDING, DEFAULT_THEME, FONT_PRESETS, THEME_PRESETS, type BrandingConfig, type ThemeConfig } from "@/lib/theme";
 
 // PDF export will be handled by dynamic import in AnalyticsDashboard
