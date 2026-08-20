@@ -2464,7 +2464,12 @@ function InstagramTab() {
               </h3>
               <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
                 {logs?.map((log: any) => (
-                  <div key={log.id} className="p-3 rounded-xl bg-black/20 border border-white/5 flex items-center justify-between group">
+                  <button
+                    type="button"
+                    key={log.id}
+                    onClick={() => setOpenLog(log)}
+                    className="w-full text-left p-3 rounded-xl bg-black/20 border border-white/5 flex items-center justify-between group hover:border-primary/30 transition-colors"
+                  >
                     <div>
                       <div className="flex items-center gap-2">
                         <span className={`w-1.5 h-1.5 rounded-full ${log.status === 'success' ? 'bg-green-500' : 'bg-red-500'}`} />
@@ -2472,10 +2477,12 @@ function InstagramTab() {
                       </div>
                       <p className="text-[8px] text-muted-foreground mt-0.5">{new Date(log.created_at).toLocaleString()}</p>
                     </div>
-                    {log.posts_synced > 0 && (
+                    {log.posts_synced > 0 ? (
                       <span className="text-[8px] font-black bg-primary/10 text-primary px-2 py-0.5 rounded-full">+{log.posts_synced} Posts</span>
+                    ) : (
+                      <span className="text-[8px] font-black text-muted-foreground uppercase">Details</span>
                     )}
-                  </div>
+                  </button>
                 ))}
                 {(!logs || logs.length === 0) && (
                   <p className="text-[10px] text-muted-foreground text-center py-8 italic uppercase tracking-widest">No logs available</p>
