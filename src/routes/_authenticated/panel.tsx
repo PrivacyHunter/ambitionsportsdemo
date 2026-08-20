@@ -1686,3 +1686,150 @@ function RestoreButton() {
   );
 }
 
+
+function CustomizationTab({ onDone }: { onDone: () => void }) {
+  const getVideosFn = useServerFn(require('@/lib/customization.functions').getCustomizationVideos);
+  const upsertVideoFn = useServerFn(require('@/lib/customization.functions').upsertCustomizationVideo);
+  const deleteVideoFn = useServerFn(require('@/lib/customization.functions').deleteCustomizationVideo);
+  
+  const { data: videos, refetch } = useQuery({
+    queryKey: ['admin-customization-videos'],
+    queryFn: () => getVideosFn(),
+  });
+
+  const [editing, setEditing] = useState<any>(null);
+  
+  const mutation = useMutation({
+    mutationFn: (data: any) => upsertVideoFn({ data }),
+    onSuccess: () => {
+      toast.success("Video saved");
+      setEditing(null);
+      refetch();
+      onDone();
+    },
+    onError: (e: any) => toast.error(e.message)
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => deleteVideoFn({ data: { id } }),
+    onSuccess: () => {
+      toast.success("Video deleted");
+      refetch();
+      onDone();
+    }
+  });
+
+  return (
+    <div className="space-y-6">
+      <div className="glass rounded-3xl p-6 flex justify-between items-center">
+        <div>
+          <h2 className="text-lg font-extrabold uppercase">Studio Manager</h2>
+          <p className="text-xs text-muted-foreground">Manage manufacturing process videos and descriptions.</p>
+        </div>
+        <button 
+          onClick={() => setEditing({ title: '', description: '', video_url: '', display_order: (videos?.length || 0) + 1, is_published: true })}
+          className="bg-primary text-primary-foreground px-4 py-2 rounded-xl text-xs font-bold uppercase"
+        >
+          Add Video
+        </button>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {videos?.map((v: any) => (
+          <div key={v.id} className="glass rounded-3xl overflow-hidden flex flex-col">
+            <div className="aspect-video bg-black relative">
+              <video src={v.video_url} className="w-full h-full object-cover opacity-60" muted />
+              <div className="absolute inset-0 flex items-center justify-center">
+                 <Play size={32} className="text-white/50" />
+              </div>
+            </div>
+            <div className="p-4 flex-grow">
+              <div className="flex justify-between items-start mb-2">
+                <h3 className="font-bold uppercase text-sm truncate">{v.title}</h3>
+                <span className={`text-[8px] font-bold px-2 py-0.5 rounded-full border ${v.is_published ? 'border-primary/30 text-primary' : 'border-white/10 text-muted-foreground'}`}>
+                  {v.is_published ? 'Published' : 'Draft'}
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground line-clamp-2 mb-4">{v.description}</p>
+              <div className="flex gap-2">
+                <button 
+                  onClick={() => setEditing(v)}
+                  className="flex-grow glass border border-white/10 py-2 rounded-lg text-[10px] font-bold uppercase hover:bg-white/5"
+                >
+                  Edit
+                </button>
+                <button 
+                  onClick={() => confirm("Delete this video?") && deleteMutation.mutate(v.id)}
+                  className="px-3 border border-red-500/30 text-red-500 py-2 rounded-lg text-[10px] font-bold uppercase hover:bg-red-500/10"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {editing && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="glass w-full max-w-lg rounded-[2.5rem] p-8 space-y-4 animate-in zoom-in-95 duration-200">
+            <h2 className="text-xl font-black uppercase italic">Video Details</h2>
+            <div className="space-y-3">
+              <input 
+                placeholder="Title"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm"
+                value={editing.title}
+                onChange={e => setEditing({...editing, title: e.target.value})}
+              />
+              <textarea 
+                placeholder="Description"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm min-h-[100px]"
+                value={editing.description}
+                onChange={e => setEditing({...editing, description: e.target.value})}
+              />
+              <input 
+                placeholder="Video URL (Direct MP4 link)"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm"
+                value={editing.video_url}
+                onChange={e => setEditing({...editing, video_url: e.target.value})}
+              />
+              <div className="flex gap-4">
+                <input 
+                  type="number"
+                  placeholder="Order"
+                  className="flex-grow bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm"
+                  value={editing.display_order}
+                  onChange={e => setEditing({...editing, display_order: parseInt(e.target.value)})}
+                />
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input 
+                    type="checkbox"
+                    checked={editing.is_published}
+                    onChange={e => setEditing({...editing, is_published: e.target.checked})}
+                    className="w-4 h-4 accent-primary"
+                  />
+                  <span className="text-xs font-bold uppercase tracking-widest">Published</span>
+                </label>
+              </div>
+            </div>
+            <div className="flex gap-3 pt-4">
+              <button 
+                onClick={() => setEditing(null)}
+                className="flex-grow glass border border-white/10 py-3 rounded-xl text-xs font-bold uppercase"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={() => mutation.mutate(editing)}
+                disabled={mutation.isPending}
+                className="flex-grow bg-primary text-primary-foreground py-3 rounded-xl text-xs font-bold uppercase"
+              >
+                {mutation.isPending ? 'Saving...' : 'Save Video'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
