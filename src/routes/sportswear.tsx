@@ -81,7 +81,6 @@ const products = [
   },
 ];
 
-import { QuickViewModal } from "@/components/QuickViewModal";
 
 function Sportswear() {
   const submitInquiryFn = useServerFn(submitInquiry);
