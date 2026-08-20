@@ -6,9 +6,10 @@ import { toast } from "sonner";
 import {
   Eye, EyeOff, Loader2, LogOut, Package, Palette, Save, Settings2,
   ShieldCheck, Users, Globe2, Inbox, History, Download, Upload,
-  Search, BarChart3, TrendingUp, MapPin, Smartphone, Chrome,
+  Search, BarChart3, TrendingUp, MapPin, Smartphone,
   ArrowRight, GripVertical, Check, Wand2
 } from "lucide-react";
+import { SiGooglechrome as Chrome } from "react-icons/si";
 import {
   DndContext,
   closestCenter,
@@ -56,7 +57,7 @@ export const Route = createFileRoute("/_authenticated/panel")({
   component: PanelPage,
 });
 
-type Tab = "overview" | "inbox" | "products" | "theme" | "branding" | "seo" | "accounts" | "visitors";
+type Tab = "overview" | "inbox" | "products" | "theme" | "branding" | "seo" | "accounts" | "visitors" | "analytics";
 
 const TABS: { id: Tab; label: string; icon: typeof Inbox; developerOnly?: boolean }[] = [
   { id: "overview", label: "Overview", icon: ShieldCheck },
@@ -66,6 +67,7 @@ const TABS: { id: Tab; label: string; icon: typeof Inbox; developerOnly?: boolea
   { id: "branding", label: "Branding", icon: Settings2 },
   { id: "seo", label: "SEO Editor", icon: Globe2 },
   { id: "visitors", label: "Visitors", icon: Globe2 },
+  { id: "analytics", label: "Analytics", icon: BarChart3 },
   { id: "accounts", label: "Accounts", icon: Users, developerOnly: true },
 ];
 
@@ -154,8 +156,9 @@ function PanelPage() {
         {tab === "theme" && <ThemeStudio />}
         {tab === "branding" && <BrandingTab />}
         {tab === "seo" && <SeoTab />}
-        {tab === "visitors" && <VisitorsTab data={data!} />}
-        {tab === "accounts" && role === "developer" && <AccountsTab data={data!} onDone={() => void refetch()} />}
+        { tab: "visitors" === tab && <VisitorsTab data={data!} />}
+        { tab === "analytics" && <AnalyticsDashboard data={data!} />}
+        { tab === "accounts" && role === "developer" && <AccountsTab data={data!} onDone={() => void refetch()} />}
       </section>
     </main>
   );
@@ -307,41 +310,27 @@ function ProductsTab({ data, onDone }: { data: Dash; onDone: () => void }) {
             return (
               <div key={key} className="space-y-2">
                 <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">{label}</span>
-                <div className="flex flex-wrap gap-2 mb-2">
-                  {currentImages.map((img, idx) => (
-                    <div key={idx} className="relative w-16 h-16 group">
-                      <img src={img} alt="Product" className="w-full h-full object-cover rounded-lg border border-border" />
-                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-1 transition-opacity">
-                        {idx > 0 && (
-                          <button type="button" onClick={() => {
-                            const next = [...currentImages];
-                            const temp = next[idx];
-                            const prev = next[idx-1];
-                            if (temp !== undefined && prev !== undefined) {
-                              next[idx] = prev;
-                              next[idx-1] = temp;
-                              setForm({ ...form, images: next.join(",") });
-                            }
-
-                          }} className="p-1 bg-white/10 rounded hover:bg-white/20">←</button>
-                        )}
-                        {idx < currentImages.length - 1 && (
-                          <button type="button" onClick={() => {
-                            const next = [...currentImages];
-                            const temp = next[idx];
-                            const nextImg = next[idx+1];
-                            if (temp !== undefined && nextImg !== undefined) {
-                              next[idx] = nextImg;
-                              next[idx+1] = temp;
-                              setForm({ ...form, images: next.join(",") });
-                            }
-
-                          }} className="p-1 bg-white/10 rounded hover:bg-white/20">→</button>
-                        )}
-                      </div>
+                <DndContext 
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={(event) => {
+                    const { active, over } = event;
+                    if (over && active.id !== over.id) {
+                      const oldIndex = currentImages.indexOf(active.id as string);
+                      const newIndex = currentImages.indexOf(over.id as string);
+                      const next = arrayMove(currentImages, oldIndex, newIndex);
+                      setForm({ ...form, images: next.join(",") });
+                    }
+                  }}
+                >
+                  <SortableContext items={currentImages} strategy={horizontalListSortingStrategy}>
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {currentImages.map((img) => (
+                        <SortableImage key={img} id={img} url={img} />
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  </SortableContext>
+                </DndContext>
                 <input
                   required={isRequired}
                   value={String(value ?? "")}
@@ -434,11 +423,11 @@ function Toggle({ label, value, onChange }: { label: string; value: boolean; onC
 }
 
 function ThemeStudio() {
-  const { savedTheme, setPreview, mode } = useTheme();
+  const { savedTheme, setPreview, mode, refresh } = useTheme();
   const [draft, setDraft] = useState<ThemeConfig>(savedTheme);
   const [previewOn, setPreviewOn] = useState(false);
+  const [history, setHistory] = useState<ThemeConfig[]>([]);
   const persist = useServerFn(saveSetting);
-  const { refresh } = useTheme();
 
   useEffect(() => setDraft(savedTheme), [savedTheme]);
   useEffect(() => {
@@ -447,7 +436,10 @@ function ThemeStudio() {
   }, [previewOn, draft, setPreview]);
 
   const saveMutation = useMutation({
-    mutationFn: () => persist({ data: { key: "theme", value: JSON.stringify(draft) } }),
+    mutationFn: async () => {
+      setHistory(prev => [draft, ...prev.slice(0, 9)]);
+      return persist({ data: { key: "theme", value: JSON.stringify(draft) } });
+    },
     onSuccess: () => { toast.success("Theme published"); setPreviewOn(false); refresh(); },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Save failed"),
   });
@@ -510,6 +502,21 @@ function ThemeStudio() {
             />
           </label>
         </div>
+
+        {history.length > 0 && (
+          <div className="space-y-2">
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-1">
+              <History size={10} /> History / Rollback
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {history.map((h, i) => (
+                <button key={i} onClick={() => setDraft(h)} className="glass rounded-full px-3 py-1 text-[9px] font-bold uppercase tracking-widest border border-border hover:border-primary">
+                  Rev {history.length - i}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="flex flex-wrap gap-2">
           {Object.entries(THEME_PRESETS).map(([id, preset]) => (
@@ -770,6 +777,23 @@ function AccountsTab({ data, onDone }: { data: Dash; onDone: () => void }) {
 }
 
 function SeoTab() {
+  const [view, setView] = useState<"single" | "bulk">("single");
+  return (
+    <div className="space-y-6">
+      <div className="flex gap-2">
+        <button onClick={() => setView("single")} className={`rounded-full px-4 py-2 text-[10px] font-bold uppercase tracking-widest border ${view === "single" ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground"}`}>
+          Single Page
+        </button>
+        <button onClick={() => setView("bulk")} className={`rounded-full px-4 py-2 text-[10px] font-bold uppercase tracking-widest border ${view === "bulk" ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground"}`}>
+          Bulk Editor
+        </button>
+      </div>
+      {view === "single" ? <SeoSingleView /> : <SeoBulkEditor />}
+    </div>
+  );
+}
+
+function SeoSingleView() {
   const [path, setPath] = useState("/");
   const getSeo = useServerFn(getPageSeo);
   const saveSeo = useServerFn(savePageSeo);
