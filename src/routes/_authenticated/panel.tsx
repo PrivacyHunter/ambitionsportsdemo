@@ -8,8 +8,9 @@ import {
   ShieldCheck, Users, Globe2, Inbox, History, Download, Upload,
   Search, BarChart3, TrendingUp, MapPin, Smartphone,
   ArrowRight, GripVertical, Check, Wand2, FileJson,
-  Layout, ShoppingBag, FileText, Activity, Mail, Layers, Play
+  Layout, ShoppingBag, FileText, Activity, Mail, Layers, Play, Subtitles, X
 } from "lucide-react";
+
 import { SiGooglechrome as Chrome } from "react-icons/si";
 import {
   DndContext,
@@ -45,7 +46,7 @@ import { getPageSeo, savePageSeo } from "@/lib/seo.functions";
 import { getSeoBulk, saveSeoBulk, autoGenerateSeo } from "@/lib/seo-bulk.functions";
 import { logAuditAction, getAuditLogs, getEmailLogs } from "@/lib/logs.functions";
 import { applyTemplate } from "@/lib/templates.functions";
-import { getCustomizationVideos, upsertCustomizationVideo, deleteCustomizationVideo } from "@/lib/customization.functions";
+import { getCustomizationVideos, upsertCustomizationVideo, deleteCustomizationVideo, getEngagementStats } from "@/lib/customization.functions";
 import { DEFAULT_BRANDING, DEFAULT_THEME, FONT_PRESETS, THEME_PRESETS, type BrandingConfig, type ThemeConfig } from "@/lib/theme";
 
 // PDF export will be handled by dynamic import in AnalyticsDashboard
@@ -1693,14 +1694,20 @@ function CustomizationTab({ onDone }: { onDone: () => void }) {
   const getVideosFn = useServerFn(getCustomizationVideos);
   const upsertVideoFn = useServerFn(upsertCustomizationVideo);
   const deleteVideoFn = useServerFn(deleteCustomizationVideo);
-  
+  const getStatsFn = useServerFn(getEngagementStats);
   
   const { data: videos, refetch } = useQuery({
     queryKey: ['admin-customization-videos'],
-    queryFn: () => getVideosFn(),
+    queryFn: () => getVideosFn({ data: { all: true } }),
+  });
+
+  const { data: stats } = useQuery({
+    queryKey: ['admin-customization-stats'],
+    queryFn: () => getStatsFn(),
   });
 
   const [editing, setEditing] = useState<any>(null);
+  const [isUploading, setIsUploading] = useState(false);
   
   const mutation = useMutation({
     mutationFn: (data: any) => upsertVideoFn({ data }),
@@ -1722,6 +1729,35 @@ function CustomizationTab({ onDone }: { onDone: () => void }) {
     }
   });
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !editing) return;
+
+    setIsUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `videos/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('studio-assets')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('studio-assets')
+        .getPublicUrl(filePath);
+
+      setEditing({ ...editing, video_url: publicUrl });
+      toast.success("Video uploaded successfully");
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="glass rounded-3xl p-6 flex justify-between items-center">
@@ -1730,11 +1766,27 @@ function CustomizationTab({ onDone }: { onDone: () => void }) {
           <p className="text-xs text-muted-foreground">Manage manufacturing process videos and descriptions.</p>
         </div>
         <button 
-          onClick={() => setEditing({ title: '', description: '', video_url: '', display_order: (videos?.length || 0) + 1, is_published: true })}
+          onClick={() => setEditing({ title: '', description: '', video_url: '', display_order: (videos?.length || 0) + 1, is_published: true, captions: [] })}
           className="bg-primary text-primary-foreground px-4 py-2 rounded-xl text-xs font-bold uppercase"
         >
           Add Video
         </button>
+      </div>
+
+      {/* Analytics Summary */}
+      <div className="grid gap-4 md:grid-cols-4">
+        {stats?.map((s: any) => (
+          <div key={s.id} className="glass p-4 rounded-2xl">
+            <p className="text-[8px] font-bold uppercase text-muted-foreground truncate">{s.title}</p>
+            <div className="mt-2 flex items-baseline gap-2">
+              <span className="text-xl font-black">{s.total_plays || 0}</span>
+              <span className="text-[8px] text-muted-foreground uppercase font-bold">Plays</span>
+            </div>
+            <p className="text-[8px] mt-1 text-muted-foreground uppercase font-bold">
+              {Math.round((s.total_time_watched || 0) / 60)}m watched
+            </p>
+          </div>
+        ))}
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -1744,6 +1796,16 @@ function CustomizationTab({ onDone }: { onDone: () => void }) {
               <video src={v.video_url} className="w-full h-full object-cover opacity-60" muted />
               <div className="absolute inset-0 flex items-center justify-center">
                  <Play size={32} className="text-white/50" />
+              </div>
+              <div className="absolute top-2 right-2 flex gap-2">
+                <a 
+                  href={v.video_url} 
+                  download 
+                  className="p-2 bg-black/60 rounded-full text-white hover:bg-black/80 transition-colors"
+                  title="Download"
+                >
+                  <Download size={14} />
+                </a>
               </div>
             </div>
             <div className="p-4 flex-grow">
@@ -1775,47 +1837,149 @@ function CustomizationTab({ onDone }: { onDone: () => void }) {
 
       {editing && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="glass w-full max-w-lg rounded-[2.5rem] p-8 space-y-4 animate-in zoom-in-95 duration-200">
-            <h2 className="text-xl font-black uppercase italic">Video Details</h2>
-            <div className="space-y-3">
-              <input 
-                placeholder="Title"
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm"
-                value={editing.title}
-                onChange={e => setEditing({...editing, title: e.target.value})}
-              />
-              <textarea 
-                placeholder="Description"
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm min-h-[100px]"
-                value={editing.description}
-                onChange={e => setEditing({...editing, description: e.target.value})}
-              />
-              <input 
-                placeholder="Video URL (Direct MP4 link)"
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm"
-                value={editing.video_url}
-                onChange={e => setEditing({...editing, video_url: e.target.value})}
-              />
-              <div className="flex gap-4">
-                <input 
-                  type="number"
-                  placeholder="Order"
-                  className="flex-grow bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm"
-                  value={editing.display_order}
-                  onChange={e => setEditing({...editing, display_order: parseInt(e.target.value)})}
-                />
-                <label className="flex items-center gap-2 cursor-pointer">
+          <div className="glass w-full max-w-2xl rounded-[2.5rem] p-8 space-y-4 animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-black uppercase italic">Video Details</h2>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-primary">
+                {editing.id ? 'Review Mode' : 'New Draft'}
+              </span>
+            </div>
+            
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold uppercase text-muted-foreground">Title</label>
                   <input 
-                    type="checkbox"
-                    checked={editing.is_published}
-                    onChange={e => setEditing({...editing, is_published: e.target.checked})}
-                    className="w-4 h-4 accent-primary"
+                    placeholder="Title"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm"
+                    value={editing.title}
+                    onChange={e => setEditing({...editing, title: e.target.value})}
                   />
-                  <span className="text-xs font-bold uppercase tracking-widest">Published</span>
-                </label>
+                </div>
+                
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold uppercase text-muted-foreground">Description</label>
+                  <textarea 
+                    placeholder="Description"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm min-h-[100px]"
+                    value={editing.description}
+                    onChange={e => setEditing({...editing, description: e.target.value})}
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold uppercase text-muted-foreground">Video Asset</label>
+                  <div className="flex gap-2">
+                    <input 
+                      placeholder="Video URL"
+                      className="flex-grow bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm"
+                      value={editing.video_url}
+                      onChange={e => setEditing({...editing, video_url: e.target.value})}
+                    />
+                    <label className="cursor-pointer bg-white/10 border border-white/10 px-4 py-3 rounded-xl flex items-center justify-center hover:bg-white/20 transition-colors">
+                      {isUploading ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
+                      <input type="file" className="hidden" accept="video/mp4" onChange={handleFileUpload} />
+                    </label>
+                  </div>
+                </div>
+
+                <div className="flex gap-4">
+                  <div className="space-y-1 flex-grow">
+                    <label className="text-[10px] font-bold uppercase text-muted-foreground">Display Order</label>
+                    <input 
+                      type="number"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm"
+                      value={editing.display_order}
+                      onChange={e => setEditing({...editing, display_order: parseInt(e.target.value)})}
+                    />
+                  </div>
+                  <div className="flex items-end pb-3">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input 
+                        type="checkbox"
+                        checked={editing.is_published}
+                        onChange={e => setEditing({...editing, is_published: e.target.checked})}
+                        className="w-4 h-4 accent-primary"
+                      />
+                      <span className="text-[10px] font-bold uppercase tracking-widest">Published</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <label className="text-[10px] font-bold uppercase text-muted-foreground flex items-center gap-2">
+                    <Subtitles size={12} /> Captions / Subtitles
+                  </label>
+                  <button 
+                    onClick={() => {
+                      const caps = [...(editing.captions || [])];
+                      caps.push({ start: 0, end: 5, text: '' });
+                      setEditing({ ...editing, captions: caps });
+                    }}
+                    className="text-[8px] font-bold uppercase text-primary border border-primary/20 px-2 py-1 rounded"
+                  >
+                    Add Row
+                  </button>
+                </div>
+                
+                <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2">
+                  {(editing.captions || []).map((c: any, idx: number) => (
+                    <div key={idx} className="flex gap-2 items-start">
+                      <input 
+                        type="number" 
+                        step="0.1" 
+                        placeholder="0.0" 
+                        className="w-16 bg-white/5 border border-white/10 rounded px-2 py-1 text-[10px]"
+                        value={c.start}
+                        onChange={e => {
+                          const caps = [...editing.captions];
+                          caps[idx].start = parseFloat(e.target.value);
+                          setEditing({ ...editing, captions: caps });
+                        }}
+                      />
+                      <input 
+                        type="number" 
+                        step="0.1" 
+                        placeholder="5.0" 
+                        className="w-16 bg-white/5 border border-white/10 rounded px-2 py-1 text-[10px]"
+                        value={c.end}
+                        onChange={e => {
+                          const caps = [...editing.captions];
+                          caps[idx].end = parseFloat(e.target.value);
+                          setEditing({ ...editing, captions: caps });
+                        }}
+                      />
+                      <input 
+                        placeholder="Text..." 
+                        className="flex-grow bg-white/5 border border-white/10 rounded px-2 py-1 text-[10px]"
+                        value={c.text}
+                        onChange={e => {
+                          const caps = [...editing.captions];
+                          caps[idx].text = e.target.value;
+                          setEditing({ ...editing, captions: caps });
+                        }}
+                      />
+                      <button 
+                        onClick={() => {
+                          const caps = editing.captions.filter((_: any, i: number) => i !== idx);
+                          setEditing({ ...editing, captions: caps });
+                        }}
+                        className="text-red-500"
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
+                  ))}
+                  {(!editing.captions || editing.captions.length === 0) && (
+                    <p className="text-[10px] text-muted-foreground text-center py-4 italic">No captions added yet.</p>
+                  )}
+                </div>
               </div>
             </div>
-            <div className="flex gap-3 pt-4">
+
+            <div className="flex gap-3 pt-6">
               <button 
                 onClick={() => setEditing(null)}
                 className="flex-grow glass border border-white/10 py-3 rounded-xl text-xs font-bold uppercase"
@@ -1824,10 +1988,10 @@ function CustomizationTab({ onDone }: { onDone: () => void }) {
               </button>
               <button 
                 onClick={() => mutation.mutate(editing)}
-                disabled={mutation.isPending}
+                disabled={mutation.isPending || isUploading}
                 className="flex-grow bg-primary text-primary-foreground py-3 rounded-xl text-xs font-bold uppercase"
               >
-                {mutation.isPending ? 'Saving...' : 'Save Video'}
+                {mutation.isPending ? 'Saving...' : 'Save Draft / Publish'}
               </button>
             </div>
           </div>
@@ -1836,3 +2000,4 @@ function CustomizationTab({ onDone }: { onDone: () => void }) {
     </div>
   );
 }
+
