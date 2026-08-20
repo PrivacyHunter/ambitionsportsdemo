@@ -183,6 +183,7 @@ function PanelPage() {
         {tab === "customization" && <CustomizationTab onDone={() => void refetch()} />}
         {tab === "visitors" && <VisitorsTab data={data!} />}
         { tab === "analytics" && <AnalyticsDashboard data={data!} />}
+        { tab === "instagram" && <InstagramTab />}
         { tab === "accounts" && role === "developer" && <AccountsTab data={data!} onDone={() => void refetch()} />}
         { tab === "logs" && role === "developer" && <LogsTab />}
       </section>
