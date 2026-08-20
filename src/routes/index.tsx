@@ -179,7 +179,7 @@ function FacilityItem({ icon, title, desc }: { icon: React.ReactNode, title: str
 function WorkflowStep({ num, title, desc }: { num: string, title: string, desc: string }) {
   return (
     <div className="group relative">
-      <div className="w-16 h-16 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center mx-auto mb-8 group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-500 relative z-10">
+      <div className="w-16 h-16 bg-surface border border-border rounded-2xl flex items-center justify-center mx-auto mb-8 group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-500 relative z-10">
         <span className="text-xl font-black">{num}</span>
       </div>
       <h4 className="font-black uppercase tracking-widest text-lg mb-3 group-hover:text-primary transition-colors">{title}</h4>
