@@ -1239,6 +1239,65 @@ function AnalyticsDashboard({ data }: { data: Dash }) {
 
   const COLORS = ['#d4af37', '#7fe9ff', '#39ff14', '#00f3ff', '#ff00ff'];
 
+  const ScheduleReportModal = () => {
+    const [reportForm, setReportForm] = useState({
+      name: "",
+      frequency: "weekly" as const,
+      recipient_email: "",
+      columns: ["When", "Location", "Device", "Page"],
+      date_range_type: "last_7d",
+      format: "pdf" as const
+    });
+    
+    const schedule = useServerFn(scheduleReport);
+    const mutation = useMutation({
+      mutationFn: (data: any) => schedule({ data }),
+      onSuccess: () => {
+        toast.success("Report scheduled successfully!");
+        setReportForm({ ...reportForm, name: "", recipient_email: "" });
+      },
+      onError: (e) => toast.error("Failed to schedule report")
+    });
+
+    return (
+      <div className="glass p-6 rounded-3xl border border-neon-cyan/20 space-y-4 mt-6">
+        <h3 className="text-sm font-bold uppercase tracking-widest flex items-center gap-2">
+          <Mail size={14} className="text-neon-cyan" /> Schedule Email Reports
+        </h3>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <input 
+            placeholder="Report Name" 
+            value={reportForm.name} 
+            onChange={e => setReportForm({...reportForm, name: e.target.value})}
+            className="bg-transparent border border-border rounded-xl px-4 py-2 text-xs w-full"
+          />
+          <input 
+            placeholder="Recipient Email" 
+            value={reportForm.recipient_email} 
+            onChange={e => setReportForm({...reportForm, recipient_email: e.target.value})}
+            className="bg-transparent border border-border rounded-xl px-4 py-2 text-xs w-full"
+          />
+          <select 
+            value={reportForm.frequency} 
+            onChange={e => setReportForm({...reportForm, frequency: e.target.value as any})}
+            className="bg-transparent border border-border rounded-xl px-4 py-2 text-xs"
+          >
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+          </select>
+          <button 
+            onClick={() => mutation.mutate(reportForm)}
+            disabled={mutation.isPending}
+            className="bg-neon-cyan text-background py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-neon-lime transition-all"
+          >
+            {mutation.isPending ? "Scheduling..." : "Schedule Now"}
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   const exportToCsv = () => {
     const rows = filteredData.map(t => {
       const allData: Record<string, string> = {
@@ -1304,6 +1363,8 @@ function AnalyticsDashboard({ data }: { data: Dash }) {
           <FileText size={14} /> Export Wizard
         </button>
       </div>
+
+      <ScheduleReportModal />
 
       {exportWizardOpen && (
         <div className="glass p-6 rounded-3xl border border-primary/20 space-y-4">
