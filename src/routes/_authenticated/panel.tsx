@@ -412,7 +412,17 @@ function ProductsTab({ data, onDone }: { data: Dash; onDone: () => void }) {
                   <SortableContext items={currentImages} strategy={horizontalListSortingStrategy}>
                     <div className="flex flex-wrap gap-2 mb-2">
                       {currentImages.map((img) => (
-                        <SortableImage key={img} id={img} url={img} />
+                        <SortableImage 
+                          key={img} 
+                          id={img} 
+                          url={img} 
+                          isCover={form.images.split(',')[0] === img} 
+                          onSetCover={() => {
+                            const imgs = form.images.split(',').map(s => s.trim()).filter(Boolean);
+                            const next = [img, ...imgs.filter(i => i !== img)];
+                            setForm({ ...form, images: next.join(',') });
+                          }}
+                        />
                       ))}
                     </div>
                   </SortableContext>
@@ -1032,6 +1042,9 @@ function SeoBulkEditor() {
         {filtered.map(item => {
           const currentSeo = updates[item.id] || (item.seo ? JSON.parse(item.seo.body || "{}") : { title: "", description: "", ogImage: "" });
           const hasChanges = !!updates[item.id];
+          const isTitleTooLong = currentSeo.title.length > 60;
+          const isDescTooLong = currentSeo.description.length > 160;
+          const isDescTooShort = currentSeo.description.length > 0 && currentSeo.description.length < 120;
 
           return (
             <div key={item.id} className={`p-4 rounded-2xl border transition-colors ${hasChanges ? "border-primary/50 bg-primary/5" : "border-border bg-black/20"}`}>
@@ -1058,16 +1071,19 @@ function SeoBulkEditor() {
                   <input 
                     value={currentSeo.title}
                     onChange={(e) => setUpdates(prev => ({ ...prev, [item.id]: { ...currentSeo, title: e.target.value } }))}
-                    className="mt-1 w-full bg-transparent border border-border/50 rounded-lg px-2 py-1.5 text-xs focus:border-primary outline-none"
+                    className={`mt-1 w-full bg-transparent border rounded-lg px-2 py-1.5 text-xs outline-none focus:border-primary ${isTitleTooLong ? 'border-red-500/50' : 'border-border/50'}`}
                   />
+                  {isTitleTooLong && <p className="text-[8px] text-red-500 mt-0.5">Title is too long ({currentSeo.title.length}/60)</p>}
                 </label>
                 <label className="block">
                   <span className="text-[9px] font-bold uppercase text-muted-foreground">Description</span>
                   <input 
                     value={currentSeo.description}
                     onChange={(e) => setUpdates(prev => ({ ...prev, [item.id]: { ...currentSeo, description: e.target.value } }))}
-                    className="mt-1 w-full bg-transparent border border-border/50 rounded-lg px-2 py-1.5 text-xs focus:border-primary outline-none"
+                    className={`mt-1 w-full bg-transparent border rounded-lg px-2 py-1.5 text-xs outline-none focus:border-primary ${isDescTooLong || isDescTooShort ? 'border-amber-500/50' : 'border-border/50'}`}
                   />
+                  {isDescTooLong && <p className="text-[8px] text-red-500 mt-0.5">Description is too long ({currentSeo.description.length}/160)</p>}
+                  {isDescTooShort && <p className="text-[8px] text-amber-500 mt-0.5">Description is a bit short ({currentSeo.description.length}/120+ recommended)</p>}
                 </label>
                 <label className="block">
                   <span className="text-[9px] font-bold uppercase text-muted-foreground">OG Image</span>
@@ -1138,8 +1154,39 @@ function AnalyticsDashboard({ data }: { data: Dash }) {
 
   const COLORS = ['#d4af37', '#7fe9ff', '#39ff14', '#00f3ff', '#ff00ff'];
 
+  const exportToCsv = () => {
+    const headers = ["When", "Location", "Device", "Browser", "Page"];
+    const rows = filteredData.map(t => [
+      t.created_at ? new Date(t.created_at).toLocaleString() : "",
+      [t.city, t.region, t.country].filter(Boolean).join(", "),
+      `${t.device ?? ""}${t.os ? ` · ${t.os}` : ""}`,
+      t.browser ?? "",
+      t.page_path ?? ""
+    ]);
+    
+    const csvContent = [headers, ...rows].map(e => e.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `ambition-analytics-${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-extrabold uppercase">Visitor Analytics</h2>
+        <button 
+          onClick={exportToCsv}
+          className="flex items-center gap-2 px-4 py-2 rounded-xl border border-primary/30 text-primary text-[10px] font-bold uppercase hover:bg-primary/10 transition-colors"
+        >
+          <FileText size={14} /> Export CSV
+        </button>
+      </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="glass p-6 rounded-3xl">
           <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Filtered Visits</p>
@@ -1256,6 +1303,8 @@ function AnalyticsDashboard({ data }: { data: Dash }) {
       </div>
     </div>
   );
+}
+
 function LogsTab() {
   const auditLogs = useQuery({ queryKey: ["audit-logs"], queryFn: useServerFn(getAuditLogs) });
   const emailLogs = useQuery({ queryKey: ["email-logs"], queryFn: useServerFn(getEmailLogs) });
