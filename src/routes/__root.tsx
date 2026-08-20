@@ -9,6 +9,8 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { Toaster } from "sonner";
+import { ConsentBanner } from "@/components/ConsentBanner";
+
 
 import appCss from "../styles.css?url";
 import { ThemeProvider } from "@/components/ThemeProvider";
@@ -120,6 +122,8 @@ function RootComponent() {
           </ThemeProvider>
         </QueryClientProvider>
         <Toaster position="top-right" theme="dark" closeButton />
+        <ConsentBanner />
+
         <Scripts />
       </body>
     </html>

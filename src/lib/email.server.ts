@@ -48,3 +48,41 @@ export async function sendInquiryEmail(data: {
     return { success: false, error };
   }
 }
+
+export async function sendOrderConfirmationEmail(data: {
+  email: string;
+  orderId: string;
+  amount: number;
+  items: any[];
+}) {
+  const apiKey = process.env['RESEND_API_KEY'];
+  if (!apiKey) {
+    console.log("MOCK ORDER EMAIL (No API Key):", data);
+    return { success: true, mock: true };
+  }
+
+  const resend = new Resend(apiKey);
+  const { email, orderId, amount, items } = data;
+  
+  const html = `
+    <h2>Order Confirmed!</h2>
+    <p>Thank you for your order from Ambition Sports.</p>
+    <p><strong>Order ID:</strong> ${orderId}</p>
+    <p><strong>Total Amount:</strong> $${amount.toFixed(2)}</p>
+    <p>Our team is currently preparing your custom gear. You will receive another update once your order has shipped.</p>
+  `;
+
+  try {
+    const response = await resend.emails.send({
+      from: 'Ambition Sports <onboarding@resend.dev>',
+      to: email,
+      subject: `Order Confirmation #${orderId.slice(0, 8)}`,
+      html: html,
+    });
+    
+    return { success: true, data: response };
+  } catch (error) {
+    console.error('Error sending order email:', error);
+    return { success: false, error };
+  }
+}

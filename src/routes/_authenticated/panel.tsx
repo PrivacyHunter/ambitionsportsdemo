@@ -14,7 +14,7 @@ import {
   deleteProduct, getDashboard, saveSetting, setUserRole, updateStatus, upsertProduct,
 } from "@/lib/admin.functions";
 import { getPageSeo, savePageSeo } from "@/lib/seo.functions";
-import { DEFAULT_BRANDING, DEFAULT_THEME, FONT_PRESETS, type BrandingConfig, type ThemeConfig } from "@/lib/theme";
+import { DEFAULT_BRANDING, DEFAULT_THEME, FONT_PRESETS, THEME_PRESETS, type BrandingConfig, type ThemeConfig } from "@/lib/theme";
 
 export const Route = createFileRoute("/_authenticated/panel")({
   head: () => ({
@@ -273,17 +273,74 @@ function ProductsTab({ data, onDone }: { data: Dash; onDone: () => void }) {
           ["name", "Name"], ["slug", "Slug (lowercase-dashes)"], ["description", "Description"],
           ["images", "Image URLs (comma separated)"], ["sizes", "Sizes (comma separated)"],
           ["colors", "Colors (comma separated)"],
-        ] as const).map(([key, label]) => (
-          <label key={key} className="block">
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">{label}</span>
-            <input
-              required={key === "name" || key === "slug"}
-              value={form[key]}
-              onChange={(e) => setForm({ ...form, [key]: e.target.value })}
-              className="mt-1 w-full rounded-lg border border-border bg-transparent px-3 py-2 text-sm outline-none focus:border-primary"
-            />
-          </label>
-        ))}
+        ] as const).map(([key, label]) => {
+          const value = form[key as keyof typeof form];
+          const isRequired = key === "name" || key === "slug";
+          
+          if (key === "images") {
+            const currentImages = form.images.split(",").map((s) => s.trim()).filter(Boolean);
+            return (
+              <div key={key} className="space-y-2">
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">{label}</span>
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {currentImages.map((img, idx) => (
+                    <div key={idx} className="relative w-16 h-16 group">
+                      <img src={img} alt="Product" className="w-full h-full object-cover rounded-lg border border-border" />
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-1 transition-opacity">
+                        {idx > 0 && (
+                          <button type="button" onClick={() => {
+                            const next = [...currentImages];
+                            const temp = next[idx];
+                            const prev = next[idx-1];
+                            if (temp !== undefined && prev !== undefined) {
+                              next[idx] = prev;
+                              next[idx-1] = temp;
+                              setForm({ ...form, images: next.join(",") });
+                            }
+
+                          }} className="p-1 bg-white/10 rounded hover:bg-white/20">←</button>
+                        )}
+                        {idx < currentImages.length - 1 && (
+                          <button type="button" onClick={() => {
+                            const next = [...currentImages];
+                            const temp = next[idx];
+                            const nextImg = next[idx+1];
+                            if (temp !== undefined && nextImg !== undefined) {
+                              next[idx] = nextImg;
+                              next[idx+1] = temp;
+                              setForm({ ...form, images: next.join(",") });
+                            }
+
+                          }} className="p-1 bg-white/10 rounded hover:bg-white/20">→</button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <input
+                  required={isRequired}
+                  value={String(value ?? "")}
+                  onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+                  className="w-full rounded-lg border border-border bg-transparent px-3 py-2 text-sm outline-none focus:border-primary"
+                  placeholder="URL 1, URL 2..."
+                />
+              </div>
+            );
+          }
+          return (
+            <label key={key} className="block">
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">{label}</span>
+              <input
+                required={isRequired}
+                value={String(value ?? "")}
+                onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+                className="mt-1 w-full rounded-lg border border-border bg-transparent px-3 py-2 text-sm outline-none focus:border-primary"
+              />
+            </label>
+          );
+        })}
+
+
         <div className="grid grid-cols-2 gap-3">
           <label className="block">
             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Price</span>
@@ -428,6 +485,18 @@ function ThemeStudio() {
             />
           </label>
         </div>
+
+        <div className="flex flex-wrap gap-2">
+          {Object.entries(THEME_PRESETS).map(([id, preset]) => (
+            <button key={id}
+              onClick={() => setDraft(preset)}
+              className="rounded-full border border-border px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest hover:border-primary"
+            >
+              Preset: {id}
+            </button>
+          ))}
+        </div>
+
 
 
         <div className="grid gap-4 sm:grid-cols-2">
@@ -740,6 +809,28 @@ function SeoTab() {
             className="mt-2 w-full rounded-lg border border-border bg-transparent px-3 py-2 text-sm outline-none focus:border-primary" />
         </label>
       </div>
+
+      <div className="mt-8 border-t border-border pt-8">
+        <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-4">Preview (Search Result)</h3>
+        <div className="glass p-6 rounded-2xl bg-white max-w-xl text-left">
+          <p className="text-[#1a0dab] text-xl font-medium truncate mb-1">{draft.title || "Page Title"}</p>
+          <p className="text-[#006621] text-sm mb-1">https://ambitionsports.com{path}</p>
+          <p className="text-[#545454] text-sm line-clamp-2">{draft.description || "Page description goes here..."}</p>
+        </div>
+      </div>
+
+      <div className="mt-8 border-t border-border pt-8">
+        <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-4">Preview (Social Card)</h3>
+        <div className="glass overflow-hidden rounded-2xl border border-border max-w-sm text-left bg-[#1c1e21]">
+          {draft.ogImage && <img src={draft.ogImage} alt="OG Preview" className="w-full h-48 object-cover" />}
+          <div className="p-4">
+            <p className="text-[10px] uppercase text-muted-foreground mb-1">ambitionsports.com</p>
+            <p className="font-bold text-white truncate">{draft.title}</p>
+            <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{draft.description}</p>
+          </div>
+        </div>
+      </div>
+
 
       <button onClick={() => mutation.mutate()} disabled={mutation.isPending}
         className="magnetic flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-xs font-extrabold uppercase tracking-widest text-primary-foreground">

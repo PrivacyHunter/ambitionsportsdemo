@@ -40,6 +40,9 @@ export const Route = createFileRoute("/")({
 function Index() {
   useEffect(() => {
     const track = async () => {
+      const consent = localStorage.getItem("ambition_tracking_consent");
+      if (!consent) return;
+
       try {
         const res = await fetch('https://ipapi.co/json/');
         const location = await res.json();
@@ -68,6 +71,7 @@ function Index() {
     };
     track();
   }, []);
+
 
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
