@@ -259,10 +259,28 @@ const EMPTY_PRODUCT = {
   price: 0, stock: 0, images: "", sizes: "", colors: "", is_featured: false, is_active: true,
 };
 
+function SortableImage({ id, url }: { id: string; url: string }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const style = { transform: CSS.Transform.toString(transform), transition, zIndex: isDragging ? 10 : 1 };
+  return (
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="relative w-16 h-16 group cursor-grab active:cursor-grabbing">
+      <img src={url} alt="Product" className="w-full h-full object-cover rounded-lg border border-border" />
+      <div className="absolute top-0 right-0 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <GripVertical size={12} className="text-white drop-shadow-md" />
+      </div>
+    </div>
+  );
+}
+
 function ProductsTab({ data, onDone }: { data: Dash; onDone: () => void }) {
   const [form, setForm] = useState(EMPTY_PRODUCT);
   const save = useServerFn(upsertProduct);
   const remove = useServerFn(deleteProduct);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
 
   const saveMutation = useMutation({
     mutationFn: () =>
