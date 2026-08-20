@@ -156,7 +156,7 @@ function PanelPage() {
         {tab === "theme" && <ThemeStudio />}
         {tab === "branding" && <BrandingTab />}
         {tab === "seo" && <SeoTab />}
-        { tab: "visitors" === tab && <VisitorsTab data={data!} />}
+        {tab === "visitors" && <VisitorsTab data={data!} />}
         { tab === "analytics" && <AnalyticsDashboard data={data!} />}
         { tab === "accounts" && role === "developer" && <AccountsTab data={data!} onDone={() => void refetch()} />}
       </section>
