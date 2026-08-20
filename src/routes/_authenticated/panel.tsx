@@ -8,7 +8,7 @@ import {
   ShieldCheck, Users, Globe2, Inbox, History, Download, Upload,
   Search, BarChart3, TrendingUp, MapPin, Smartphone,
   ArrowRight, GripVertical, Check, Wand2, FileJson,
-  Layout, ShoppingBag, FileText, Activity, Mail
+  Layout, ShoppingBag, FileText, Activity, Mail, Layers
 } from "lucide-react";
 import { SiGooglechrome as Chrome } from "react-icons/si";
 import {
@@ -165,6 +165,7 @@ function PanelPage() {
         {tab === "theme" && <ThemeStudio />}
         {tab === "branding" && <BrandingTab />}
         {tab === "seo" && <SeoTab />}
+        {tab === "customization" && <CustomizationTab onDone={() => void refetch()} />}
         {tab === "visitors" && <VisitorsTab data={data!} />}
         { tab === "analytics" && <AnalyticsDashboard data={data!} />}
         { tab === "accounts" && role === "developer" && <AccountsTab data={data!} onDone={() => void refetch()} />}
