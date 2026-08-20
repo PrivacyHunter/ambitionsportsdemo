@@ -16,9 +16,9 @@ export type ThemeConfig = {
 };
 
 export const DEFAULT_THEME: ThemeConfig = {
-  goldAccent: "#d4af37",
-  cyanAccent: "#7fe9ff",
-  darkBackground: "#080a0f",
+  goldAccent: "#ef1822",
+  cyanAccent: "#ff4d57",
+  darkBackground: "#05060a",
   lightBackground: "#ffffff",
   displayFont: '"Syne", "Space Grotesk", sans-serif',
   bodyFont: '"Plus Jakarta Sans", "Inter", sans-serif',
@@ -39,15 +39,15 @@ export const FONT_PRESETS = [
 export const THEME_PRESETS: Record<string, ThemeConfig> = {
   luxury: {
     ...DEFAULT_THEME,
-    goldAccent: "#d4af37",
-    darkBackground: "#080a0f",
-    cyanAccent: "#7fe9ff",
+    goldAccent: "#ef1822",
+    darkBackground: "#05060a",
+    cyanAccent: "#ff4d57",
   },
   neon: {
     ...DEFAULT_THEME,
-    goldAccent: "#39ff14",
-    cyanAccent: "#00f3ff",
-    darkBackground: "#020617",
+    goldAccent: "#ff2d3c",
+    cyanAccent: "#ffffff",
+    darkBackground: "#000000",
   },
   studio: {
     ...DEFAULT_THEME,
@@ -78,7 +78,7 @@ export type BrandingConfig = {
 
 export const DEFAULT_BRANDING: BrandingConfig = {
   logoText: "Ambition Sports",
-  logoUrl: "",
+  logoUrl: "/logo.png",
   faviconUrl: "",
   showNotificationBar: true,
   notificationText: "Premium Custom Sportswear — Worldwide Shipping Available",
