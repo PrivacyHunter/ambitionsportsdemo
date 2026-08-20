@@ -429,6 +429,18 @@ function ThemeStudio() {
           </label>
         </div>
 
+        <div className="flex flex-wrap gap-2">
+          {Object.entries(THEME_PRESETS).map(([id, preset]) => (
+            <button key={id}
+              onClick={() => setDraft(preset)}
+              className="rounded-full border border-border px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest hover:border-primary"
+            >
+              Preset: {id}
+            </button>
+          ))}
+        </div>
+
+
 
         <div className="grid gap-4 sm:grid-cols-2">
           {colorFields.map(([key, label]) => (
@@ -740,6 +752,28 @@ function SeoTab() {
             className="mt-2 w-full rounded-lg border border-border bg-transparent px-3 py-2 text-sm outline-none focus:border-primary" />
         </label>
       </div>
+
+      <div className="mt-8 border-t border-border pt-8">
+        <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-4">Preview (Search Result)</h3>
+        <div className="glass p-6 rounded-2xl bg-white max-w-xl text-left">
+          <p className="text-[#1a0dab] text-xl font-medium truncate mb-1">{draft.title || "Page Title"}</p>
+          <p className="text-[#006621] text-sm mb-1">https://ambitionsports.com{path}</p>
+          <p className="text-[#545454] text-sm line-clamp-2">{draft.description || "Page description goes here..."}</p>
+        </div>
+      </div>
+
+      <div className="mt-8 border-t border-border pt-8">
+        <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-4">Preview (Social Card)</h3>
+        <div className="glass overflow-hidden rounded-2xl border border-border max-w-sm text-left bg-[#1c1e21]">
+          {draft.ogImage && <img src={draft.ogImage} alt="OG Preview" className="w-full h-48 object-cover" />}
+          <div className="p-4">
+            <p className="text-[10px] uppercase text-muted-foreground mb-1">ambitionsports.com</p>
+            <p className="font-bold text-white truncate">{draft.title}</p>
+            <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{draft.description}</p>
+          </div>
+        </div>
+      </div>
+
 
       <button onClick={() => mutation.mutate()} disabled={mutation.isPending}
         className="magnetic flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-xs font-extrabold uppercase tracking-widest text-primary-foreground">

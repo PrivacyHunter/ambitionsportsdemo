@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
+import { sendOrderConfirmationEmail } from "./email.server";
+
 
 export const createOrder = createServerFn({ method: "POST" })
   .inputValidator((data) => z.object({
@@ -34,6 +36,15 @@ export const createOrder = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
 
     // In a real app, you'd also save order_items here
+    
+    // Send confirmation email
+    await sendOrderConfirmationEmail({
+      email: data.email,
+      orderId: order.id,
+      amount: data.amount,
+      items: data.items,
+    });
+
     
     return { orderId: order.id, success: true };
   });
