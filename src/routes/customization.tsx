@@ -48,7 +48,7 @@ function VideoPlayer({ video }: { video: any }) {
 
     const handleTimeUpdate = () => {
       const time = v.currentTime;
-      const active = activeCaptions.find(c => time >= c.start && time <= c.end);
+      const active = activeCaptions.find((c: any) => time >= c.start && time <= c.end);
       setCurrentCaption(active ? active.text : "");
 
       // Track watch time every 5 seconds
