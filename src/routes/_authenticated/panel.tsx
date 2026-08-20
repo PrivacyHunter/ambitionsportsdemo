@@ -1412,7 +1412,7 @@ function AnalyticsDashboard({ data }: { data: Dash }) {
           <div className="flex flex-wrap justify-center gap-4 mt-4">
             {stats.devices.map((d, i) => (
               <div key={d.name} className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full" style={{ background: COLORS[i % COLORS.length] }} />
+                <div className="w-2 h-2 rounded-full" style={{ background: COLORS[i % COLORS.length] as string }} />
                 <span className="text-[10px] uppercase font-bold text-muted-foreground">{d.name} ({d.value})</span>
               </div>
             ))}
