@@ -30,6 +30,13 @@ function VideoPlayer({ url, title, videoId, captions = [] }: { url: string; titl
   const [isPlaying, setIsPlaying] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
   const [showCaptions, setShowCaptions] = useState(true);
+  const [language, setLanguage] = useState("en");
+
+  const captions = useMemo(() => {
+    if (!video.captions) return [];
+    return video.captions.filter((c: any) => !c.language || c.language === language);
+  }, [video.captions, language]);
+
   const [currentCaption, setCurrentCaption] = useState("");
   const lastTrackedTime = useRef(0);
 
@@ -96,24 +103,46 @@ function VideoPlayer({ url, title, videoId, captions = [] }: { url: string; titl
       {showCaptions && currentCaption && (
         <div 
           className={`absolute left-0 right-0 px-8 text-center pointer-events-none ${
-            captions.find(c => videoRef.current && videoRef.current.currentTime >= c.start && videoRef.current.currentTime <= c.end)?.style?.position === 'top' 
+            video.caption_style?.position === 'top' 
               ? 'top-16' 
-              : captions.find(c => videoRef.current && videoRef.current.currentTime >= c.start && videoRef.current.currentTime <= c.end)?.style?.position === 'center'
+              : video.caption_style?.position === 'center'
                 ? 'top-1/2 -translate-y-1/2'
                 : 'bottom-16'
           }`}
         >
           <span 
-            className="bg-black/80 backdrop-blur-md px-4 py-2 rounded-lg font-medium text-white shadow-xl inline-block animate-in fade-in slide-in-from-bottom-2 duration-300"
+            className={`bg-black/80 backdrop-blur-md px-4 py-2 rounded-lg font-medium text-white shadow-xl inline-block animate-in fade-in slide-in-from-bottom-2 duration-300 ${video.caption_style?.fontSize || 'text-sm'}`}
             style={{
-              fontSize: captions.find(c => videoRef.current && videoRef.current.currentTime >= c.start && videoRef.current.currentTime <= c.end)?.style?.fontSize || 'inherit',
-              color: captions.find(c => videoRef.current && videoRef.current.currentTime >= c.start && videoRef.current.currentTime <= c.end)?.style?.color || 'white'
+              color: video.caption_style?.color || 'white'
             }}
           >
             {currentCaption}
           </span>
         </div>
       )}
+
+      {/* Video Controls Overlay */}
+      <div className="absolute bottom-4 right-4 flex gap-2">
+        <button 
+          onClick={() => setShowCaptions(!showCaptions)}
+          className={`p-2 rounded-full backdrop-blur-md border transition-all ${showCaptions ? 'bg-primary border-primary text-primary-foreground' : 'bg-black/40 border-white/10 text-white/70'}`}
+          title="Toggle Captions"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+        {video.captions?.some((c: any) => c.language && c.language !== 'en') && (
+           <select 
+             className="bg-black/40 border border-white/10 text-white/70 text-[10px] rounded px-2 py-1 outline-none backdrop-blur-md"
+             value={language}
+             onChange={e => setLanguage(e.target.value)}
+           >
+             <option value="en">EN</option>
+             <option value="es">ES</option>
+             <option value="fr">FR</option>
+           </select>
+        )}
+      </div>
+
       
       {/* Overlay Controls */}
       <div className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity duration-300 ${isHovered || !isPlaying ? 'opacity-100' : 'opacity-0'}`}>
