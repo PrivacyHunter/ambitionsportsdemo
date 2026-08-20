@@ -38,8 +38,9 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { useTheme } from "@/components/ThemeProvider";
 import {
   deleteProduct, getDashboard, saveSetting, setUserRole, updateStatus, upsertProduct,
-  inviteUser, backupSettings, restoreSettings,
+  inviteUser, backupSettings, restoreSettings, listSettings,
 } from "@/lib/admin.functions";
+import { saveThemeVersion, getThemeHistory, scheduleReport } from "@/lib/history.functions";
 import { getPageSeo, savePageSeo } from "@/lib/seo.functions";
 import { getSeoBulk, saveSeoBulk, autoGenerateSeo } from "@/lib/seo-bulk.functions";
 import { logAuditAction, getAuditLogs, getEmailLogs } from "@/lib/logs.functions";
@@ -538,9 +539,18 @@ function ThemeStudio() {
   const { savedTheme, setPreview, mode, refresh } = useTheme();
   const [draft, setDraft] = useState<ThemeConfig>(savedTheme);
   const [previewOn, setPreviewOn] = useState(false);
-  const [history, setHistory] = useState<ThemeConfig[]>([]);
   const [diffMode, setDiffMode] = useState(false);
   const [diffPreset, setDiffPreset] = useState<ThemeConfig | null>(null);
+  
+  const historyQuery = useQuery({
+    queryKey: ["theme-history"],
+    queryFn: useServerFn(getThemeHistory)
+  });
+  
+  const saveHistoryMutation = useMutation({
+    mutationFn: useServerFn(saveThemeVersion),
+    onSuccess: () => historyQuery.refetch()
+  });
 
   const themeKeys: (keyof ThemeConfig)[] = [
     "goldAccent", "cyanAccent", "darkBackground", "lightBackground",
@@ -588,7 +598,8 @@ function ThemeStudio() {
   const saveMutation = useMutation({
     mutationFn: async () => {
       const log = useServerFn(logAuditAction);
-      await log({ data: { action: "theme_publish", details: { config: draft } } });
+      await log({ data: { action: "theme_publish", action_type: "theme", details: { config: draft } } });
+      await saveHistoryMutation.mutateAsync({ data: { name: `Version ${new Date().toLocaleString()}`, config: draft } });
       return persist({ data: { key: "theme", value: JSON.stringify(draft) } });
     },
     onSuccess: () => { toast.success("Theme published"); setPreviewOn(false); refresh(); },
@@ -1452,24 +1463,37 @@ function AnalyticsDashboard({ data }: { data: Dash }) {
 }
 
 function LogsTab() {
+  const [filterType, setFilterType] = useState<string>("all");
   const auditLogs = useQuery({ queryKey: ["audit-logs"], queryFn: useServerFn(getAuditLogs) });
   const emailLogs = useQuery({ queryKey: ["email-logs"], queryFn: useServerFn(getEmailLogs) });
+
+  const filteredAudit = auditLogs.data?.filter(l => filterType === "all" || l.action_type === filterType);
 
   return (
     <div className="space-y-8">
       <div className="glass overflow-x-auto rounded-3xl p-6">
-        <h2 className="mb-4 text-lg font-extrabold uppercase">Audit Logs (Theme Changes)</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-extrabold uppercase text-primary">System Audit Log</h2>
+          <div className="flex gap-2">
+            {["all", "theme", "role", "export", "backup", "template", "security"].map(t => (
+              <button key={t} onClick={() => setFilterType(t)} className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all ${filterType === t ? 'border-primary bg-primary/10 text-primary' : 'border-border text-muted-foreground hover:text-foreground'}`}>
+                {t}
+              </button>
+            ))}
+          </div>
+        </div>
         <table className="w-full text-left text-xs">
           <thead className="text-[10px] uppercase text-muted-foreground">
-            <tr><th className="py-2">User</th><th>Action</th><th>Details</th><th>Date</th></tr>
+            <tr><th className="py-2">User</th><th>Action</th><th>Type</th><th>Details</th><th>Date</th></tr>
           </thead>
           <tbody>
-            {auditLogs.data?.map(l => (
-              <tr key={l.id} className="border-t border-border">
-                <td className="py-3">{(l.profiles as any)?.email}</td>
-                <td>{l.action}</td>
-                <td className="font-mono">{JSON.stringify(l.details)}</td>
-                <td>{new Date(l.created_at).toLocaleString()}</td>
+            {filteredAudit?.map(l => (
+              <tr key={l.id} className="border-t border-border/50 group hover:bg-white/5 transition-colors">
+                <td className="py-3 font-bold">{(l.profiles as any)?.email}</td>
+                <td><span className="bg-primary/5 text-primary px-2 py-0.5 rounded text-[10px] font-bold uppercase">{l.action}</span></td>
+                <td className="uppercase font-bold tracking-tighter opacity-70">{l.action_type}</td>
+                <td className="font-mono text-[10px] max-w-xs truncate">{JSON.stringify(l.details)}</td>
+                <td className="text-muted-foreground">{new Date(l.created_at).toLocaleString()}</td>
               </tr>
             ))}
           </tbody>
