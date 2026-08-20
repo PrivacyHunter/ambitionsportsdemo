@@ -43,7 +43,6 @@ export const updateInstagramSettings = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-/** One-click re-auth: swap in a fresh long-lived token and clear the error state. */
 export const reconnectInstagram = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => z.object({ access_token: z.string().min(10) }).parse(data))
@@ -78,55 +77,6 @@ export const reconnectInstagram = createServerFn({ method: "POST" })
     return { ok: true, username: profile.username as string | null };
   });
 
-export const getInstagramPosts = createServerFn({ method: "GET" })
-  .handler(async () => {
-    const { createClient } = await import("@supabase/supabase-js");
-    const key = process.env["SUPABASE_PUBLISHABLE_KEY"] ?? process.env["SUPABASE_ANON_KEY"]!;
-    const client = createClient(process.env["SUPABASE_URL"]!, key, {
-      auth: { persistSession: false, autoRefreshToken: false },
-      global: {
-        fetch: (input: any, init: any) => {
-          const h = new Headers(init?.headers);
-          if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`) h.delete("Authorization");
-          h.set("apikey", key);
-          return fetch(input, { ...init, headers: h });
-        },
-      },
-    });
-    const { data } = await client
-      .from("instagram_posts")
-      .select("*")
-      .eq("is_visible", true)
-      .order("timestamp", { ascending: false });
-    return data || [];
-  });
-
-export const mapCaptionToSubtitles = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((data) => z.object({
-    postId: z.string(),
-    videoId: z.string(),
-    language: z.string().default("en"),
-  }).parse(data))
-  .handler(async ({ context, data }) => {
-    await assertStaff(context.supabase, context.userId);
-    const { captionToVtt } = await import("./instagram-media.server");
-    const { data: post } = await context.supabase
-      .from("instagram_posts")
-      .select("caption")
-      .eq("id", data.postId)
-      .maybeSingle();
-    if (!post?.caption) throw new Error("This post has no caption text to convert");
-
-    const vtt = captionToVtt(post.caption, data.language);
-    const { error } = await (context.supabase as any)
-      .from("customization_videos")
-      .update({ captions_raw: vtt, updated_at: new Date().toISOString() })
-      .eq("id", data.videoId);
-    if (error) throw new Error(error.message);
-    return { ok: true, vtt };
-  });
-
 export const syncInstagramPosts = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: { mediaId?: string } | undefined) => data ?? {})
@@ -154,7 +104,7 @@ export const syncInstagramPosts = createServerFn({ method: "POST" })
         message: `Published ${count} media item(s) (duplicates skipped)`,
         posts_synced: count,
         media_id: data?.mediaId ?? null,
-        payload: { items: items.map((i) => i.id) },
+        payload: { items: items.map((i: any) => i.id) },
         resolved: true,
         user_id: context.userId,
       });
@@ -219,6 +169,36 @@ export const retrySyncLog = createServerFn({ method: "POST" })
       });
       throw new Error(message);
     }
+  });
+
+export const getInstagramMetrics = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertStaff(context.supabase, context.userId);
+    const { data: logs } = await (context.supabase as any)
+      .from("instagram_sync_logs")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(100);
+    const successful = (logs || []).filter((l: any) => l.status === 'success');
+    const failures = (logs || []).filter((l: any) => l.status === 'error');
+    return {
+      total_syncs: logs?.length || 0,
+      success_rate: logs?.length ? (successful.length / logs.length) * 100 : 0,
+      recent_failures: failures.slice(0, 10),
+    };
+  });
+
+export const backfillInstagramMedia = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertStaff(context.supabase, context.userId);
+    const { fetchMedia, upsertMedia } = await import("./instagram-media.server");
+    const { data: settings } = await context.supabase.from("instagram_settings").select("*").maybeSingle();
+    if (!settings?.access_token) throw new Error("No token");
+    const items = await fetchMedia(settings.access_token);
+    const count = await upsertMedia(context.supabase as any, items, "backfill");
+    return { count };
   });
 
 export const getInstagramLogs = createServerFn({ method: "GET" })
