@@ -1688,7 +1688,6 @@ function RestoreButton() {
 }
 
 
-import { getCustomizationVideos, upsertCustomizationVideo, deleteCustomizationVideo } from "@/lib/customization.functions";
 
 function CustomizationTab({ onDone }: { onDone: () => void }) {
   const getVideosFn = useServerFn(getCustomizationVideos);
