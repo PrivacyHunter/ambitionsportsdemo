@@ -26,7 +26,13 @@ export const updateInstagramSettings = createServerFn({ method: "POST" })
     await assertDeveloper(context.supabase, context.userId);
     const { error } = await context.supabase
       .from("instagram_settings")
-      .upsert({ ...data, updated_at: new Date().toISOString() });
+      .upsert({
+        access_token: data.access_token ?? null,
+        instagram_user_id: data.instagram_user_id ?? null,
+        username: data.username ?? null,
+        is_connected: data.is_connected ?? null,
+        updated_at: new Date().toISOString()
+      });
     if (error) throw new Error(error.message);
     return { ok: true };
   });
