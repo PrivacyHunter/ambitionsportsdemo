@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Loader2, LockKeyhole } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 export const Route = createFileRoute("/auth")({
@@ -57,14 +56,6 @@ function AuthPage() {
       toast.error(error instanceof Error ? error.message : "Authentication failed");
     } finally {
       setBusy(false);
-    }
-  }
-
-  async function google() {
-    try {
-      await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Google sign-in unavailable");
     }
   }
 
@@ -124,14 +115,6 @@ function AuthPage() {
             {mode === "signin" ? "Sign In" : "Sign Up"}
           </button>
         </form>
-
-        <button
-          type="button"
-          onClick={google}
-          className="mt-4 w-full rounded-xl border border-border px-6 py-3 text-sm font-bold uppercase tracking-widest hover:border-primary"
-        >
-          Continue with Google
-        </button>
 
         <button
           type="button"
