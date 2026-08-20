@@ -38,12 +38,15 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { useTheme } from "@/components/ThemeProvider";
 import {
   deleteProduct, getDashboard, saveSetting, setUserRole, updateStatus, upsertProduct,
+  inviteUser, backupSettings, restoreSettings,
 } from "@/lib/admin.functions";
 import { getPageSeo, savePageSeo } from "@/lib/seo.functions";
 import { getSeoBulk, saveSeoBulk, autoGenerateSeo } from "@/lib/seo-bulk.functions";
 import { logAuditAction, getAuditLogs, getEmailLogs } from "@/lib/logs.functions";
 import { applyTemplate } from "@/lib/templates.functions";
 import { DEFAULT_BRANDING, DEFAULT_THEME, FONT_PRESETS, THEME_PRESETS, type BrandingConfig, type ThemeConfig } from "@/lib/theme";
+
+// PDF export will be handled by dynamic import in AnalyticsDashboard
 
 export const Route = createFileRoute("/_authenticated/panel")({
   head: () => ({
