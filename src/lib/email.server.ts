@@ -42,9 +42,39 @@ export async function sendInquiryEmail(data: {
     });
 
     
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabaseAdmin = createClient(
+      process.env['SUPABASE_URL']!,
+      process.env['SUPABASE_SERVICE_ROLE_KEY']!,
+      { auth: { persistSession: false, autoRefreshToken: false } }
+    );
+
+    await supabaseAdmin.from('email_logs').insert({
+      recipient: email,
+      subject: `Order Confirmation #${orderId.slice(0, 8)}`,
+      order_id: orderId,
+      status: 'sent',
+    });
+
     return { success: true, data: response };
   } catch (error) {
-    console.error('Error sending email:', error);
+    console.error('Error sending order email:', error);
+    
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabaseAdmin = createClient(
+      process.env['SUPABASE_URL']!,
+      process.env['SUPABASE_SERVICE_ROLE_KEY']!,
+      { auth: { persistSession: false, autoRefreshToken: false } }
+    );
+
+    await supabaseAdmin.from('email_logs').insert({
+      recipient: data.email,
+      subject: `Order Confirmation #${data.orderId.slice(0, 8)}`,
+      order_id: data.orderId,
+      status: 'failed',
+      error: error instanceof Error ? error.message : String(error),
+    });
+
     return { success: false, error };
   }
 }

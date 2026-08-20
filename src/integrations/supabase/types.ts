@@ -14,6 +14,68 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_logs: {
+        Row: {
+          action: string
+          created_at: string | null
+          details: Json | null
+          id: string
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      email_logs: {
+        Row: {
+          created_at: string | null
+          error: string | null
+          id: string
+          order_id: string | null
+          recipient: string
+          status: string
+          subject: string
+        }
+        Insert: {
+          created_at?: string | null
+          error?: string | null
+          id?: string
+          order_id?: string | null
+          recipient: string
+          status: string
+          subject: string
+        }
+        Update: {
+          created_at?: string | null
+          error?: string | null
+          id?: string
+          order_id?: string | null
+          recipient?: string
+          status?: string
+          subject?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_logs_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       inquiries: {
         Row: {
           created_at: string | null
@@ -111,6 +173,7 @@ export type Database = {
         Row: {
           category: string
           colors: Json
+          cover_image: string | null
           created_at: string
           currency: string
           description: string | null
@@ -129,6 +192,7 @@ export type Database = {
         Insert: {
           category: string
           colors?: Json
+          cover_image?: string | null
           created_at?: string
           currency?: string
           description?: string | null
@@ -147,6 +211,7 @@ export type Database = {
         Update: {
           category?: string
           colors?: Json
+          cover_image?: string | null
           created_at?: string
           currency?: string
           description?: string | null

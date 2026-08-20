@@ -22,7 +22,7 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [mode] = useState<"signin">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -77,7 +77,7 @@ function AuthPage() {
           </h1>
         </div>
         <p className="mt-3 text-sm text-muted-foreground">
-          Roles are granted in the database — the control panel opens only for owner, admin and developer accounts.
+          Enter your credentials to access the internal management tools.
         </p>
 
         <form onSubmit={onSubmit} className="mt-8 space-y-4">
@@ -115,14 +115,6 @@ function AuthPage() {
             {mode === "signin" ? "Sign In" : "Sign Up"}
           </button>
         </form>
-
-        <button
-          type="button"
-          onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-          className="mt-6 w-full text-center text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground hover:text-primary"
-        >
-          {mode === "signin" ? "Need an account? Sign up" : "Already registered? Sign in"}
-        </button>
       </div>
     </main>
   );
