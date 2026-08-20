@@ -4,14 +4,11 @@ import { Footer } from "@/components/Footer";
 import { motion } from "framer-motion";
 import { ArrowRight, ShoppingCart, Info, CheckCircle2, Zap } from "lucide-react";
 import { toast } from "sonner";
-import { submitInquiry } from "@/lib/inquiries.functions";
-import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { submitInquiry } from "@/lib/inquiries.functions";
 import { useServerFn } from "@tanstack/react-start";
-
-
+import { submitInquiry } from "@/lib/inquiries.functions";
 import { getPageSeo } from "@/lib/seo.functions";
+import { QuickViewModal } from "@/components/QuickViewModal";
 
 export const Route = createFileRoute("/sportswear")({
   loader: async ({ context }) => {
