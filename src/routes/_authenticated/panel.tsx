@@ -2264,7 +2264,9 @@ function CustomizationTab({ onDone }: { onDone: () => void }) {
 }
 
 function InstagramTab() {
+  const queryClient = useQueryClient();
   const getSettings = useServerFn(getInstagramSettings);
+
   const updateSettings = useServerFn(updateInstagramSettings);
   const syncPosts = useServerFn(syncInstagramPosts);
   const getLogs = useServerFn(getInstagramLogs);
