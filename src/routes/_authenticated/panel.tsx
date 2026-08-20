@@ -8,7 +8,7 @@ import {
   ShieldCheck, Users, Globe2, Inbox, History, Download, Upload,
   Search, BarChart3, TrendingUp, MapPin, Smartphone,
   ArrowRight, GripVertical, Check, Wand2, FileJson,
-  Layout, ShoppingBag, FileText, Activity
+  Layout, ShoppingBag, FileText, Activity, Mail
 } from "lucide-react";
 import { SiGooglechrome as Chrome } from "react-icons/si";
 import {
@@ -665,15 +665,15 @@ function ThemeStudio() {
           </label>
         </div>
 
-        {history.length > 0 && (
+        {localHistory.length > 0 && (
           <div className="space-y-2">
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-1">
-              <History size={10} /> History / Rollback
+              <History size={10} /> Local Session History
             </p>
             <div className="flex flex-wrap gap-2">
-              {history.map((h, i) => (
+              {localHistory.map((h, i) => (
                 <button key={i} onClick={() => setDraft(h)} className="glass rounded-full px-3 py-1 text-[9px] font-bold uppercase tracking-widest border border-border hover:border-primary">
-                  Rev {history.length - i}
+                  Rev {localHistory.length - i}
                 </button>
               ))}
             </div>
