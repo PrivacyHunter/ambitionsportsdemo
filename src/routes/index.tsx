@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { useTheme } from "@/components/ThemeProvider";
 import { HeroSlider } from "@/components/HeroSlider";
 import { FeaturedProducts } from "@/components/FeaturedProducts";
 import { Testimonials } from "@/components/Testimonials";

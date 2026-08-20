@@ -81,8 +81,13 @@ const products = [
   },
 ];
 
+import { QuickViewModal } from "@/components/QuickViewModal";
+
 function Sportswear() {
   const submitInquiryFn = useServerFn(submitInquiry);
+  const [selectedProduct, setSelectedProduct] = useState<typeof products[0] | null>(null);
+  const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
+
   const handleInquiry = async (productName: string) => {
     toast.loading(`Processing inquiry for ${productName}...`, { id: "inquiry" });
     try {
@@ -104,6 +109,7 @@ function Sportswear() {
       toast.error("Failed to send inquiry. Please try again.", { id: "inquiry" });
     }
   };
+
 
 
   return (
@@ -172,8 +178,11 @@ function Sportswear() {
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
-                    <button className="bg-white/5 hover:bg-white/10 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all border border-white/10 flex items-center justify-center gap-2">
-                      <Info size={14} /> Spec Sheet
+                    <button 
+                      onClick={() => { setSelectedProduct(p); setIsQuickViewOpen(true); }}
+                      className="bg-white/5 hover:bg-white/10 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all border border-white/10 flex items-center justify-center gap-2"
+                    >
+                      <Info size={14} /> Quick View
                     </button>
                     <button 
                       onClick={() => handleInquiry(p.name)}
@@ -206,6 +215,12 @@ function Sportswear() {
       </main>
 
       <Footer />
+      <QuickViewModal 
+        product={selectedProduct} 
+        isOpen={isQuickViewOpen} 
+        onClose={() => setIsQuickViewOpen(false)} 
+        onInquire={handleInquiry} 
+      />
     </div>
   );
 }

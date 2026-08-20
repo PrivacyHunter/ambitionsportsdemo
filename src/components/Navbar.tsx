@@ -3,8 +3,10 @@ import { Link } from "@tanstack/react-router";
 import { Menu, X, Phone, Mail } from "lucide-react";
 import { FaFacebook, FaInstagram, FaTwitter, FaLinkedin } from "react-icons/fa";
 import { cn } from "@/lib/utils";
+import { useTheme } from "@/components/ThemeProvider";
 
 export function Navbar() {
+  const { branding } = useTheme();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -29,27 +31,33 @@ export function Navbar() {
   return (
     <>
       {/* Notification Bar */}
-      <div className="bg-neon-lime py-1 px-4 text-center text-xs font-bold text-background uppercase tracking-wider">
-        🔥 Premium Custom Sportswear - Worldwide Shipping Available!
-      </div>
+      {branding.showNotificationBar && (
+        <div className="bg-neon-lime py-1 px-4 text-center text-xs font-bold text-background uppercase tracking-wider">
+          {branding.notificationText}
+        </div>
+      )}
 
       {/* Top Info Bar */}
-      <div className="hidden lg:flex justify-between items-center px-8 py-2 text-xs border-b border-white/10 bg-background/50 backdrop-blur-md">
-        <div className="flex gap-6">
-          <a href="tel:+1234567890" className="flex items-center gap-2 hover:text-neon-cyan transition-colors">
-            <Phone size={14} className="text-neon-cyan" /> +1 (234) 567-890
-          </a>
-          <a href="mailto:info@ambitionsports.com" className="flex items-center gap-2 hover:text-neon-cyan transition-colors">
-            <Mail size={14} className="text-neon-cyan" /> info@ambitionsports.com
-          </a>
+      {branding.showTopInfoBar && (
+        <div className="hidden lg:flex justify-between items-center px-8 py-2 text-xs border-b border-white/10 bg-background/50 backdrop-blur-md">
+          <div className="flex gap-6">
+            <a href={`tel:${branding.phone}`} className="flex items-center gap-2 hover:text-neon-cyan transition-colors">
+              <Phone size={14} className="text-neon-cyan" /> {branding.phone}
+            </a>
+            <a href={`mailto:${branding.email}`} className="flex items-center gap-2 hover:text-neon-cyan transition-colors">
+              <Mail size={14} className="text-neon-cyan" /> {branding.email}
+            </a>
+          </div>
+          {branding.showSocialIcons && (
+            <div className="flex gap-4">
+              <a href="#" className="text-muted-foreground hover:text-neon-cyan transition-colors"><FaFacebook size={16} /></a>
+              <a href="#" className="text-muted-foreground hover:text-neon-cyan transition-colors"><FaInstagram size={16} /></a>
+              <a href="#" className="text-muted-foreground hover:text-neon-cyan transition-colors"><FaTwitter size={16} /></a>
+              <a href="#" className="text-muted-foreground hover:text-neon-cyan transition-colors"><FaLinkedin size={16} /></a>
+            </div>
+          )}
         </div>
-        <div className="flex gap-4">
-          <a href="#" className="text-muted-foreground hover:text-neon-cyan transition-colors"><FaFacebook size={16} /></a>
-          <a href="#" className="text-muted-foreground hover:text-neon-cyan transition-colors"><FaInstagram size={16} /></a>
-          <a href="#" className="text-muted-foreground hover:text-neon-cyan transition-colors"><FaTwitter size={16} /></a>
-          <a href="#" className="text-muted-foreground hover:text-neon-cyan transition-colors"><FaLinkedin size={16} /></a>
-        </div>
-      </div>
+      )}
 
       {/* Main Navbar */}
       <nav
