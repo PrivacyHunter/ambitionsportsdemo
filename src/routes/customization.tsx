@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { Palette, Layers, Cpu, Scissors, Play, Pause, Maximize, Subtitles } from 'lucide-react';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useServerFn } from '@tanstack/react-start';
 import { getCustomizationVideos, trackVideoEngagement } from '@/lib/customization.functions';
@@ -24,7 +24,9 @@ export const Route = createFileRoute('/customization')({
   component: CustomizationPage,
 });
 
-function VideoPlayer({ url, title, videoId, captions = [] }: { url: string; title: string; videoId: string; captions?: any[] }) {
+function VideoPlayer({ video }: { video: any }) {
+  const url = video.video_url;
+  const videoId = video.id;
   const videoRef = useRef<HTMLVideoElement>(null);
   const trackFn = useServerFn(trackVideoEngagement);
   const [isPlaying, setIsPlaying] = useState(true);
@@ -32,7 +34,7 @@ function VideoPlayer({ url, title, videoId, captions = [] }: { url: string; titl
   const [showCaptions, setShowCaptions] = useState(true);
   const [language, setLanguage] = useState("en");
 
-  const captions = useMemo(() => {
+  const activeCaptions = useMemo(() => {
     if (!video.captions) return [];
     return video.captions.filter((c: any) => !c.language || c.language === language);
   }, [video.captions, language]);
@@ -41,12 +43,12 @@ function VideoPlayer({ url, title, videoId, captions = [] }: { url: string; titl
   const lastTrackedTime = useRef(0);
 
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
+    const v = videoRef.current;
+    if (!v) return;
 
     const handleTimeUpdate = () => {
-      const time = video.currentTime;
-      const active = captions.find(c => time >= c.start && time <= c.end);
+      const time = v.currentTime;
+      const active = activeCaptions.find(c => time >= c.start && time <= c.end);
       setCurrentCaption(active ? active.text : "");
 
       // Track watch time every 5 seconds
@@ -56,9 +58,9 @@ function VideoPlayer({ url, title, videoId, captions = [] }: { url: string; titl
       }
     };
 
-    video.addEventListener('timeupdate', handleTimeUpdate);
-    return () => video.removeEventListener('timeupdate', handleTimeUpdate);
-  }, [captions, videoId]);
+    v.addEventListener('timeupdate', handleTimeUpdate);
+    return () => v.removeEventListener('timeupdate', handleTimeUpdate);
+  }, [activeCaptions, videoId]);
 
   const togglePlay = () => {
     if (videoRef.current) {
@@ -91,6 +93,7 @@ function VideoPlayer({ url, title, videoId, captions = [] }: { url: string; titl
         playsInline 
         autoPlay
         muted
+        poster={video.thumbnail_url}
         className="w-full h-full object-cover"
         onClick={togglePlay}
         onPlay={() => setIsPlaying(true)}
@@ -122,13 +125,13 @@ function VideoPlayer({ url, title, videoId, captions = [] }: { url: string; titl
       )}
 
       {/* Video Controls Overlay */}
-      <div className="absolute bottom-4 right-4 flex gap-2">
+      <div className="absolute bottom-4 right-4 flex gap-2 z-20">
         <button 
           onClick={() => setShowCaptions(!showCaptions)}
           className={`p-2 rounded-full backdrop-blur-md border transition-all ${showCaptions ? 'bg-primary border-primary text-primary-foreground' : 'bg-black/40 border-white/10 text-white/70'}`}
           title="Toggle Captions"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          <Subtitles size={16} />
         </button>
         {video.captions?.some((c: any) => c.language && c.language !== 'en') && (
            <select 
@@ -154,14 +157,7 @@ function VideoPlayer({ url, title, videoId, captions = [] }: { url: string; titl
         </button>
       </div>
 
-      <div className={`absolute bottom-4 right-4 flex gap-2 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
-        <button 
-          onClick={() => setShowCaptions(!showCaptions)}
-          className={`p-2 rounded-lg transition-colors ${showCaptions ? 'bg-primary text-primary-foreground' : 'bg-black/50 text-white hover:bg-black/70'}`}
-          title="Toggle Captions"
-        >
-          <Subtitles size={20} />
-        </button>
+      <div className={`absolute bottom-4 left-4 flex gap-2 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'} z-20`}>
         <button 
           onClick={toggleFullscreen}
           className="p-2 rounded-lg bg-black/50 text-white hover:bg-black/70 transition-colors"
@@ -248,12 +244,7 @@ function CustomizationPage() {
                   
                   <div className={`relative group ${i % 2 === 1 ? 'lg:order-1' : ''}`}>
                     <div className="absolute -inset-1 bg-gradient-to-r from-primary to-accent rounded-[2rem] blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
-                    <VideoPlayer 
-                      url={v.video_url} 
-                      title={v.title} 
-                      videoId={v.id}
-                      captions={v.captions}
-                    />
+                    <VideoPlayer video={v} />
                   </div>
                 </div>
               );
