@@ -274,6 +274,9 @@ function ProductsTab({ data, onDone }: { data: Dash; onDone: () => void }) {
           ["images", "Image URLs (comma separated)"], ["sizes", "Sizes (comma separated)"],
           ["colors", "Colors (comma separated)"],
         ] as const).map(([key, label]) => {
+          const value = form[key as keyof typeof form];
+          const isRequired = key === "name" || key === "slug";
+          
           if (key === "images") {
             const currentImages = form.images.split(",").map((s) => s.trim()).filter(Boolean);
             return (
@@ -287,14 +290,18 @@ function ProductsTab({ data, onDone }: { data: Dash; onDone: () => void }) {
                         {idx > 0 && (
                           <button type="button" onClick={() => {
                             const next = [...currentImages];
-                            [next[idx], next[idx-1]] = [next[idx-1], next[idx]];
+                            const temp = next[idx];
+                            next[idx] = next[idx-1];
+                            next[idx-1] = temp;
                             setForm({ ...form, images: next.join(",") });
                           }} className="p-1 bg-white/10 rounded hover:bg-white/20">←</button>
                         )}
                         {idx < currentImages.length - 1 && (
                           <button type="button" onClick={() => {
                             const next = [...currentImages];
-                            [next[idx], next[idx+1]] = [next[idx+1], next[idx]];
+                            const temp = next[idx];
+                            next[idx] = next[idx+1];
+                            next[idx+1] = temp;
                             setForm({ ...form, images: next.join(",") });
                           }} className="p-1 bg-white/10 rounded hover:bg-white/20">→</button>
                         )}
@@ -303,8 +310,8 @@ function ProductsTab({ data, onDone }: { data: Dash; onDone: () => void }) {
                   ))}
                 </div>
                 <input
-                  required={key === "name" || key === "slug"}
-                  value={form[key]}
+                  required={isRequired}
+                  value={String(value ?? "")}
                   onChange={(e) => setForm({ ...form, [key]: e.target.value })}
                   className="w-full rounded-lg border border-border bg-transparent px-3 py-2 text-sm outline-none focus:border-primary"
                   placeholder="URL 1, URL 2..."
@@ -316,14 +323,15 @@ function ProductsTab({ data, onDone }: { data: Dash; onDone: () => void }) {
             <label key={key} className="block">
               <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">{label}</span>
               <input
-                required={key === "name" || key === "slug"}
-                value={form[key]}
+                required={isRequired}
+                value={String(value ?? "")}
                 onChange={(e) => setForm({ ...form, [key]: e.target.value })}
                 className="mt-1 w-full rounded-lg border border-border bg-transparent px-3 py-2 text-sm outline-none focus:border-primary"
               />
             </label>
           );
         })}
+
 
         <div className="grid grid-cols-2 gap-3">
           <label className="block">
