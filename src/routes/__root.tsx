@@ -119,10 +119,10 @@ function RootComponent() {
         <QueryClientProvider client={queryClient}>
           <ThemeProvider>
             <Outlet />
+            <Toaster position="top-right" theme="dark" closeButton />
+            <ConsentBanner />
           </ThemeProvider>
         </QueryClientProvider>
-        <Toaster position="top-right" theme="dark" closeButton />
-        <ConsentBanner />
 
         <Scripts />
       </body>
