@@ -6,6 +6,9 @@ import { ArrowRight, ShoppingCart, Info, CheckCircle2, Zap } from "lucide-react"
 import { toast } from "sonner";
 import { submitInquiry } from "@/lib/inquiries.functions";
 import { useServerFn } from "@tanstack/react-start";
+import { useState } from "react";
+import { submitInquiry } from "@/lib/inquiries.functions";
+import { useServerFn } from "@tanstack/react-start";
 
 
 import { getPageSeo } from "@/lib/seo.functions";
