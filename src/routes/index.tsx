@@ -83,14 +83,14 @@ function Index() {
         <FeaturedProducts />
 
         {/* Facilities Section */}
-        <section className="bg-surface py-32 px-4 lg:px-8 border-y border-border relative overflow-hidden">
+        <section className="bg-white dark:bg-surface py-32 px-4 lg:px-8 border-y border-border relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,var(--primary),transparent_70%)] opacity-[0.03]" />
           <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-24 items-center">
             <div className="relative order-2 lg:order-1">
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-6">
                   <div className="h-72 bg-[url('https://images.unsplash.com/photo-1558444479-c8498274f9ad?q=80&w=1974&auto=format&fit=crop')] bg-cover bg-center rounded-3xl border border-white/10" />
-                  <div className="h-48 bg-primary/10 rounded-3xl border border-primary/20 flex items-center justify-center">
+                  <div className="h-48 bg-primary/5 dark:bg-primary/10 rounded-3xl border border-primary/10 dark:border-primary/20 flex items-center justify-center">
                     <Factory className="text-primary w-16 h-16" />
                   </div>
                 </div>
@@ -110,7 +110,7 @@ function Index() {
               <h2 className="text-5xl md:text-7xl font-black uppercase italic tracking-tighter mb-8 leading-[0.9]">
                 Advanced <br /><span className="text-primary">Facilities</span>
               </h2>
-              <p className="text-muted-foreground text-xl leading-relaxed mb-12">
+              <p className="text-slate-600 dark:text-muted-foreground text-xl leading-relaxed mb-12">
                 Operating from Sialkot's industrial hub, our facility integrates vertical production lines. We handle everything from high-tech sublimation to precision tailoring under one roof.
               </p>
               
@@ -121,7 +121,7 @@ function Index() {
                 <FacilityItem icon={<ShieldCheck className="text-primary" />} title="QC Protocol" desc="Triple-stage quality inspection." />
               </div>
 
-              <button className="bg-primary text-primary-foreground hover:bg-white hover:shadow-[0_0_30px_rgba(212,175,55,0.4)] px-10 py-5 rounded-xl font-black uppercase tracking-widest text-sm transition-all duration-300">
+              <button className="bg-primary text-white hover:bg-slate-900 dark:hover:bg-white hover:text-white dark:hover:text-background hover:shadow-xl px-10 py-5 rounded-xl font-black uppercase tracking-widest text-sm transition-all duration-300">
                 Explore Stitching Unit
               </button>
             </div>
@@ -129,7 +129,7 @@ function Index() {
         </section>
 
         {/* How We Build Section */}
-        <section className="py-32 px-4 lg:px-8 max-w-7xl mx-auto text-center">
+        <section className="py-32 px-4 lg:px-8 max-w-7xl mx-auto text-center bg-white dark:bg-background">
           <h3 className="text-primary font-black tracking-[0.3em] uppercase mb-6 text-sm">The Process</h3>
           <h2 className="text-5xl md:text-7xl font-black uppercase italic mb-24 tracking-tighter">Manufacturing <span className="text-primary">Workflow</span></h2>
           
