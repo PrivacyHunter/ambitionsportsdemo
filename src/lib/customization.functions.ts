@@ -45,12 +45,19 @@ export const upsertCustomizationVideo = createServerFn({ method: "POST" })
     thumbnail_url: z.string().optional(),
     display_order: z.number().optional(),
     is_published: z.boolean().optional(),
+    process_type: z.string().optional(),
     captions_url: z.string().optional(),
     captions_raw: z.string().optional(),
+    caption_style: z.object({
+      fontSize: z.string().optional(),
+      color: z.string().optional(),
+      position: z.string().optional(),
+    }).optional(),
     captions: z.array(z.object({
       start: z.number(),
       end: z.number(),
-      text: z.string()
+      text: z.string(),
+      language: z.string().optional(),
     })).optional()
   }).parse(data))
   .handler(async ({ data }) => {
