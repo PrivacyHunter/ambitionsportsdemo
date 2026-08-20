@@ -48,7 +48,7 @@ export function FeaturedProducts() {
   }, []);
 
   return (
-    <section className="py-24 px-4 lg:px-8 bg-background overflow-hidden">
+    <section className="py-24 px-4 lg:px-8 bg-white dark:bg-background overflow-hidden">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
         <div>
           <h3 className="text-primary font-black tracking-[0.2em] uppercase mb-4 text-sm">Most Wanted</h3>
@@ -56,7 +56,7 @@ export function FeaturedProducts() {
             Featured <br /><span className="text-primary">Collection</span>
           </h2>
         </div>
-        <Link to="/sportswear" className="text-white border-b-2 border-primary pb-2 font-black uppercase tracking-widest text-sm hover:text-primary transition-colors">
+        <Link to="/sportswear" className="text-slate-900 dark:text-white border-b-2 border-primary pb-2 font-black uppercase tracking-widest text-sm hover:text-primary transition-colors">
           Explore All Gear
         </Link>
       </div>
@@ -69,7 +69,7 @@ export function FeaturedProducts() {
           <motion.div 
             key={idx}
             whileHover={{ y: -15 }}
-            className="min-w-[320px] md:min-w-[400px] bg-surface rounded-3xl overflow-hidden border border-border relative group"
+            className="min-w-[320px] md:min-w-[400px] bg-slate-50 dark:bg-surface rounded-3xl overflow-hidden border border-slate-200 dark:border-border relative group"
           >
             <div className="h-[400px] bg-white/[0.03] flex items-center justify-center relative overflow-hidden">
                <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity z-10" />
@@ -81,15 +81,15 @@ export function FeaturedProducts() {
                />
 
                <div className="absolute top-6 left-6 flex gap-2 z-20">
-                  <span className="bg-primary text-primary-foreground px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest">{product.tag}</span>
+                  <span className="bg-primary text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest">{product.tag}</span>
                </div>
                
-               <button className="absolute top-6 right-6 p-3 bg-background/50 backdrop-blur-md rounded-full text-white hover:text-red-500 transition-colors z-20">
+               <button className="absolute top-6 right-6 p-3 bg-white/80 dark:bg-background/50 backdrop-blur-md rounded-full text-slate-900 dark:text-white hover:text-red-500 transition-colors z-20">
                   <Heart size={18} />
                </button>
 
                <div className="absolute bottom-8 left-8 right-8 z-20 translate-y-20 group-hover:translate-y-0 transition-transform duration-500">
-                  <Link to="/quote" className="w-full block text-center bg-primary text-primary-foreground py-4 rounded-xl font-black uppercase tracking-widest text-xs hover:bg-white transition-colors">
+                  <Link to="/quote" className="w-full block text-center bg-primary text-white py-4 rounded-xl font-black uppercase tracking-widest text-xs hover:bg-slate-900 dark:hover:bg-white transition-colors">
                     Request Quote
                   </Link>
                </div>
@@ -101,10 +101,10 @@ export function FeaturedProducts() {
                   <p className="text-primary text-[10px] font-black uppercase tracking-[0.2em] mb-2">{product.category}</p>
                   <h4 className="font-black uppercase tracking-tighter text-2xl group-hover:text-primary transition-colors">{product.name}</h4>
                 </div>
-                <span className="text-white font-black text-2xl tracking-tighter">{product.price}</span>
+                <span className="text-slate-900 dark:text-white font-black text-2xl tracking-tighter">{product.price}</span>
               </div>
-              <p className="text-muted-foreground text-sm mb-6 leading-relaxed">High-performance custom apparel engineered for elite athletes.</p>
-              <Link to="/quote" className="flex items-center gap-2 text-white font-black uppercase tracking-widest text-[10px] group/btn">
+              <p className="text-slate-600 dark:text-muted-foreground text-sm mb-6 leading-relaxed">High-performance custom apparel engineered for elite athletes.</p>
+              <Link to="/quote" className="flex items-center gap-2 text-slate-900 dark:text-white font-black uppercase tracking-widest text-[10px] group/btn">
                 Request Spec Sheet <ArrowRight size={14} className="group-hover/btn:translate-x-2 transition-transform" />
               </Link>
             </div>

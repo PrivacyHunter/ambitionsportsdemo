@@ -24,7 +24,7 @@ const testimonials = [
 
 export function Testimonials() {
   return (
-    <section className="py-24 bg-surface/30">
+    <section className="py-24 bg-slate-50 dark:bg-surface/30">
       <div className="max-w-7xl mx-auto px-4">
         <h2 className="text-4xl font-black italic uppercase text-center mb-16">
           What Our <span className="text-primary">Clients Say</span>
@@ -36,17 +36,17 @@ export function Testimonials() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
-              className="bg-surface border border-border p-8 rounded-xl"
+              className="bg-white dark:bg-surface border border-slate-200 dark:border-border p-8 rounded-xl shadow-sm dark:shadow-none"
             >
               <div className="flex gap-1 mb-4">
                 {[...Array(t.rating)].map((_, i) => (
                   <Star key={i} size={16} className="fill-primary text-primary" />
                 ))}
               </div>
-              <p className="text-muted-foreground italic mb-6">"{t.content}"</p>
+              <p className="text-slate-600 dark:text-muted-foreground italic mb-6">"{t.content}"</p>
               <div>
                 <p className="font-bold text-primary">{t.name}</p>
-                <p className="text-xs uppercase tracking-widest text-white/40">{t.role}</p>
+                <p className="text-xs uppercase tracking-widest text-slate-400 dark:text-white/40">{t.role}</p>
               </div>
             </motion.div>
           ))}

@@ -82,7 +82,7 @@ export function HeroSlider() {
           transition={{ duration: 1.2, ease: "easeOut" }}
           className="absolute inset-0 z-0"
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/60 to-transparent z-10" />
+          <div className="absolute inset-0 bg-gradient-to-r from-white dark:from-background via-white/40 dark:via-background/60 to-transparent z-10" />
           <div 
             className="w-full h-full bg-cover bg-center" 
             style={{ backgroundImage: `url(${activeBanner?.image})` }} 
@@ -107,20 +107,20 @@ export function HeroSlider() {
             >
               <span className="w-12 h-[2px] bg-primary" /> {activeBanner?.subtitle}
             </motion.p>
-            <h1 className="text-6xl md:text-8xl lg:text-9xl font-black uppercase italic leading-[0.85] tracking-tighter mb-10">
+            <h1 className="text-6xl md:text-8xl lg:text-9xl font-black uppercase italic leading-[0.85] tracking-tighter mb-10 text-slate-900 dark:text-foreground">
               {activeBanner?.title1} <br />
-              <span className={activeBanner?.accent}>{activeBanner?.title2}</span>
+              <span className={activeBanner?.accent === 'text-white' ? 'text-slate-900 dark:text-white' : activeBanner?.accent}>{activeBanner?.title2}</span>
             </h1>
             <div className="flex flex-wrap gap-6">
               <Link
                 to="/sportswear"
-                className="bg-primary hover:bg-white text-primary-foreground px-10 py-5 rounded-sm font-black uppercase transition-all hover:scale-105 hover:shadow-[0_0_40px_rgba(212,175,55,0.5)] flex items-center gap-3"
+                className="bg-primary hover:bg-slate-900 dark:hover:bg-white text-white dark:text-primary-foreground px-10 py-5 rounded-sm font-black uppercase transition-all hover:scale-105 hover:shadow-xl flex items-center gap-3"
               >
                 Shop Now <ArrowRight size={22} />
               </Link>
               <Link
                 to="/contact"
-                className="border-2 border-white/20 text-white hover:border-primary hover:text-primary px-10 py-5 rounded-sm font-black uppercase transition-all backdrop-blur-sm"
+                className="border-2 border-slate-900/20 dark:border-white/20 text-slate-900 dark:text-white hover:border-primary hover:text-primary px-10 py-5 rounded-sm font-black uppercase transition-all backdrop-blur-sm"
               >
                 Custom Order
               </Link>
@@ -136,15 +136,15 @@ export function HeroSlider() {
             <button
               key={i}
               onClick={() => setCurrent(i)}
-              className={`h-1 transition-all duration-500 ${i === current ? "w-16 bg-primary" : "w-6 bg-white/20"}`}
+              className={`h-1 transition-all duration-500 ${i === current ? "w-16 bg-primary" : "w-6 bg-slate-900/20 dark:bg-white/20"}`}
             />
           ))}
         </div>
         <div className="hidden lg:flex gap-4 ml-8">
-          <button onClick={prev} className="p-2 border border-white/10 rounded-full hover:bg-primary hover:text-primary-foreground transition-all">
+          <button onClick={prev} className="p-2 border border-slate-900/10 dark:border-white/10 rounded-full hover:bg-primary hover:text-white transition-all text-slate-900 dark:text-white">
             <ChevronLeft size={20} />
           </button>
-          <button onClick={next} className="p-2 border border-white/10 rounded-full hover:bg-primary hover:text-primary-foreground transition-all">
+          <button onClick={next} className="p-2 border border-slate-900/10 dark:border-white/10 rounded-full hover:bg-primary hover:text-white transition-all text-slate-900 dark:text-white">
             <ChevronRight size={20} />
           </button>
         </div>
