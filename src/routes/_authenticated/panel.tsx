@@ -9,7 +9,7 @@ import {
   Search, BarChart3, TrendingUp, MapPin, Smartphone,
   ArrowRight, GripVertical, Check, Wand2, FileJson,
   Layout, ShoppingBag, FileText, Activity, Mail, Layers, Play, Subtitles, X,
-  Trash2, CheckSquare, Square, DownloadCloud, RefreshCw, Link, ExternalLink
+  Trash2, CheckSquare, Square, DownloadCloud, RefreshCw, Link, ExternalLink, AlertCircle
 } from "lucide-react";
 
 import { SiGooglechrome as Chrome, SiInstagram as Instagram } from "react-icons/si";
@@ -60,6 +60,9 @@ import {
   syncInstagramPosts 
 } from "@/lib/instagram.functions";
 import { DEFAULT_BRANDING, DEFAULT_THEME, FONT_PRESETS, THEME_PRESETS, type BrandingConfig, type ThemeConfig } from "@/lib/theme";
+import { getInstagramLogs } from "@/lib/instagram.functions";
+import { CaptionPreview } from "@/components/CaptionPreview";
+
 
 // PDF export will be handled by dynamic import in AnalyticsDashboard
 
@@ -2094,8 +2097,17 @@ function CustomizationTab({ onDone }: { onDone: () => void }) {
               <div className="space-y-4">
                 <div className="glass p-4 rounded-2xl border border-white/5 space-y-4">
                    <h3 className="text-[10px] font-bold uppercase tracking-widest text-primary flex items-center gap-2">
-                     <Palette size={12} /> Caption Styling
+                     <Palette size={12} /> Caption Studio & Preview
                    </h3>
+                   
+                   {editing.video_url && (
+                     <CaptionPreview 
+                       videoUrl={editing.video_url}
+                       captions={editing.captions || []}
+                       style={editing.caption_style || { fontSize: 'text-sm', color: '#ffffff', position: 'bottom' }}
+                     />
+                   )}
+
                    <div className="grid grid-cols-2 gap-4">
                      <div className="space-y-1">
                        <label className="text-[8px] font-bold uppercase text-muted-foreground">Font Size</label>
@@ -2127,6 +2139,16 @@ function CustomizationTab({ onDone }: { onDone: () => void }) {
                            <button 
                              key={pos}
                              onClick={() => setEditing({...editing, caption_style: {...(editing.caption_style || {}), position: pos}})}
+                             className={`flex-1 py-1.5 rounded-lg border text-[8px] font-bold uppercase transition-all ${editing.caption_style?.position === pos ? 'bg-primary border-primary text-primary-foreground' : 'bg-black/20 border-white/10 text-muted-foreground hover:bg-black/40'}`}
+                           >
+                             {pos}
+                           </button>
+                         ))}
+                       </div>
+                     </div>
+                   </div>
+                </div>
+
                              className={`flex-1 py-1 rounded border text-[8px] uppercase font-bold transition-all ${editing.caption_style?.position === pos ? 'border-primary bg-primary/10 text-primary' : 'border-white/10 text-muted-foreground'}`}
                            >
                              {pos}
