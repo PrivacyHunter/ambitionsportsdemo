@@ -1612,6 +1612,7 @@ function BackupButton() {
 }
 
 function RestoreButton() {
+  const [dryRunData, setDryRunData] = useState<any>(null);
   const restore = useServerFn(restoreSettings);
   const mutation = useMutation({
     mutationFn: (data: any) => restore({ data }),
@@ -1629,9 +1630,7 @@ function RestoreButton() {
     reader.onload = (event) => {
       try {
         const data = JSON.parse(event.target?.result as string);
-        if (confirm("This will overwrite current settings and SEO templates. Continue?")) {
-          mutation.mutate(data);
-        }
+        setDryRunData(data);
       } catch {
         toast.error("Invalid backup file");
       }
@@ -1640,11 +1639,48 @@ function RestoreButton() {
   };
 
   return (
-    <label className="flex items-center gap-2 px-5 py-3 rounded-xl border border-border text-muted-foreground text-[10px] font-bold uppercase hover:border-primary hover:text-foreground cursor-pointer transition-colors">
-      {mutation.isPending ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />} 
-      Restore from Backup
-      <input type="file" accept=".json" onChange={handleFile} className="hidden" />
-    </label>
+    <>
+      <label className="flex items-center gap-2 px-5 py-3 rounded-xl border border-border text-muted-foreground text-[10px] font-bold uppercase hover:border-primary hover:text-foreground cursor-pointer transition-colors">
+        {mutation.isPending ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />} 
+        Restore from Backup
+        <input type="file" accept=".json" onChange={handleFile} className="hidden" />
+      </label>
+
+      {dryRunData && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="glass w-full max-w-2xl rounded-[2rem] p-8 border border-primary/20 max-h-[80vh] overflow-y-auto">
+            <h3 className="text-xl font-black uppercase tracking-widest text-primary mb-4">Restore Dry-Run Preview</h3>
+            <p className="text-xs text-muted-foreground mb-6 uppercase tracking-wider">The following sections will be overwritten:</p>
+            
+            <div className="space-y-4 mb-8">
+              {Object.keys(dryRunData).map(key => (
+                <div key={key} className="p-4 bg-white/5 rounded-2xl border border-white/10">
+                  <p className="text-[10px] font-bold uppercase text-primary mb-2">{key}</p>
+                  <pre className="text-[9px] font-mono text-muted-foreground overflow-x-auto whitespace-pre-wrap">
+                    {JSON.stringify(dryRunData[key], null, 2).slice(0, 300)}...
+                  </pre>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex gap-4">
+              <button 
+                onClick={() => mutation.mutate(dryRunData)}
+                className="flex-1 bg-primary text-primary-foreground py-3 rounded-xl text-[10px] font-bold uppercase tracking-[0.2em] hover:scale-[1.02] transition-all"
+              >
+                Confirm Restore
+              </button>
+              <button 
+                onClick={() => setDryRunData(null)}
+                className="flex-1 bg-white/5 text-foreground py-3 rounded-xl text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-white/10 transition-all"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
