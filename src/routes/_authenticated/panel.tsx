@@ -38,12 +38,15 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { useTheme } from "@/components/ThemeProvider";
 import {
   deleteProduct, getDashboard, saveSetting, setUserRole, updateStatus, upsertProduct,
+  inviteUser, backupSettings, restoreSettings,
 } from "@/lib/admin.functions";
 import { getPageSeo, savePageSeo } from "@/lib/seo.functions";
 import { getSeoBulk, saveSeoBulk, autoGenerateSeo } from "@/lib/seo-bulk.functions";
 import { logAuditAction, getAuditLogs, getEmailLogs } from "@/lib/logs.functions";
 import { applyTemplate } from "@/lib/templates.functions";
 import { DEFAULT_BRANDING, DEFAULT_THEME, FONT_PRESETS, THEME_PRESETS, type BrandingConfig, type ThemeConfig } from "@/lib/theme";
+
+// PDF export will be handled by dynamic import in AnalyticsDashboard
 
 export const Route = createFileRoute("/_authenticated/panel")({
   head: () => ({
@@ -185,6 +188,19 @@ function Overview({ data }: { data: Dash }) {
   const countries = new Set(data.tracking.map((t) => t.country).filter(Boolean)).size;
   return (
     <div className="space-y-6">
+      <div className="glass rounded-3xl p-6">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h2 className="text-lg font-extrabold uppercase">System Control</h2>
+            <p className="text-xs text-muted-foreground">Manage site-wide backups and templates.</p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <BackupButton />
+            <RestoreButton />
+          </div>
+        </div>
+      </div>
+
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <Card title="Inquiries" value={data.inquiries.length} />
         <Card title="Quote Requests" value={data.quotes.length} hint={`${data.quotes.filter(q => q.status === 'pending').length} pending`} />
@@ -437,7 +453,7 @@ function ProductsTab({ data, onDone }: { data: Dash; onDone: () => void }) {
               </div>
             );
           }
-          return (
+  return (
             <label key={key} className="block">
               <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">{label}</span>
               <input
@@ -523,6 +539,44 @@ function ThemeStudio() {
   const [draft, setDraft] = useState<ThemeConfig>(savedTheme);
   const [previewOn, setPreviewOn] = useState(false);
   const [history, setHistory] = useState<ThemeConfig[]>([]);
+  const [diffMode, setDiffMode] = useState(false);
+  const [diffPreset, setDiffPreset] = useState<ThemeConfig | null>(null);
+
+  const themeKeys: (keyof ThemeConfig)[] = [
+    "goldAccent", "cyanAccent", "darkBackground", "lightBackground",
+    "displayFont", "bodyFont", "radius", "sectionSpace", "containerWidth",
+    "glassOpacity", "displayTracking"
+  ];
+
+  const DiffView = ({ oldTheme, newTheme }: { oldTheme: ThemeConfig, newTheme: ThemeConfig }) => (
+    <div className="space-y-4 p-4 glass border border-primary/20 rounded-2xl">
+      <div className="flex justify-between items-center mb-2">
+        <h4 className="text-[10px] font-bold uppercase tracking-widest text-primary">Visual Diff</h4>
+        <button onClick={() => setDiffMode(false)} className="text-[10px] text-muted-foreground hover:text-foreground">Close</button>
+      </div>
+      <div className="grid gap-2">
+        {themeKeys.map(key => {
+          const oldVal = oldTheme[key];
+          const newVal = newTheme[key];
+          if (oldVal === newVal) return null;
+          return (
+            <div key={key} className="grid grid-cols-3 gap-2 text-[10px] items-center border-b border-border/50 pb-2 last:border-0">
+              <span className="font-bold uppercase tracking-tighter opacity-70">{key.replace(/([A-Z])/g, ' $1')}</span>
+              <span className="line-through text-red-500/70 truncate">{String(oldVal)}</span>
+              <span className="text-green-500 font-bold truncate">→ {String(newVal)}</span>
+            </div>
+          );
+        })}
+      </div>
+      <button 
+        onClick={() => { setDraft(newTheme); setDiffMode(false); }}
+        className="w-full mt-2 py-2 rounded-xl bg-primary text-primary-foreground text-[10px] font-bold uppercase"
+      >
+        Apply Changes
+      </button>
+    </div>
+  );
+
   const persist = useServerFn(saveSetting);
 
   useEffect(() => setDraft(savedTheme), [savedTheme]);
@@ -615,13 +669,20 @@ function ThemeStudio() {
           </div>
         )}
 
+        {diffMode && diffPreset && (
+          <DiffView oldTheme={draft} newTheme={diffPreset} />
+        )}
+
         <div className="flex flex-wrap gap-2">
           {Object.entries(THEME_PRESETS).map(([id, preset]) => (
             <button key={id}
-              onClick={() => setDraft(preset)}
+              onClick={() => {
+                setDiffPreset(preset);
+                setDiffMode(true);
+              }}
               className="rounded-full border border-border px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest hover:border-primary"
             >
-              Preset: {id}
+              Preview: {id}
             </button>
           ))}
         </div>
@@ -1116,13 +1177,26 @@ function SeoBulkEditor() {
 }
 
 function AnalyticsDashboard({ data }: { data: Dash }) {
-  const [filter, setFilter] = useState({ country: "all", device: "all" });
+  const [filter, setFilter] = useState({ 
+    country: "all", 
+    device: "all", 
+    startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    endDate: new Date().toISOString().split('T')[0]
+  });
+  const [exportWizardOpen, setExportWizardOpen] = useState(false);
+  const [exportColumns, setExportColumns] = useState(["When", "Location", "Device", "Browser", "Page"]);
 
   const filteredData = useMemo(() => {
     return data.tracking.filter(t => {
       const countryMatch = filter.country === "all" || t.country === filter.country;
       const deviceMatch = filter.device === "all" || t.device === filter.device;
-      return countryMatch && deviceMatch;
+      
+      const date = t.created_at ? new Date(t.created_at).getTime() : 0;
+      const start = new Date(filter.startDate || 0).getTime();
+      const end = new Date(filter.endDate || 0).getTime() + (24 * 60 * 60 * 1000); // end of day
+      const dateMatch = date >= start && date <= end;
+      
+      return countryMatch && deviceMatch && dateMatch;
     });
   }, [data.tracking, filter]);
 
@@ -1155,25 +1229,57 @@ function AnalyticsDashboard({ data }: { data: Dash }) {
   const COLORS = ['#d4af37', '#7fe9ff', '#39ff14', '#00f3ff', '#ff00ff'];
 
   const exportToCsv = () => {
-    const headers = ["When", "Location", "Device", "Browser", "Page"];
-    const rows = filteredData.map(t => [
-      t.created_at ? new Date(t.created_at).toLocaleString() : "",
-      [t.city, t.region, t.country].filter(Boolean).join(", "),
-      `${t.device ?? ""}${t.os ? ` · ${t.os}` : ""}`,
-      t.browser ?? "",
-      t.page_path ?? ""
-    ]);
+    const rows = filteredData.map(t => {
+      const allData: Record<string, string> = {
+        "When": t.created_at ? new Date(t.created_at).toLocaleString() : "",
+        "Location": [t.city, t.region, t.country].filter(Boolean).join(", "),
+        "Device": `${t.device ?? ""}${t.os ? ` · ${t.os}` : ""}`,
+        "Browser": t.browser ?? "",
+        "Page": t.page_path ?? ""
+      };
+      return exportColumns.map(col => allData[col]);
+    });
     
-    const csvContent = [headers, ...rows].map(e => e.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(",")).join("\n");
+    const csvContent = [exportColumns, ...rows].map(e => e.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(",")).join("\n");
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.setAttribute("href", url);
     link.setAttribute("download", `ambition-analytics-${new Date().toISOString().split('T')[0]}.csv`);
-    link.style.visibility = "hidden";
-    document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
+    toast.success("CSV Exported");
+    setExportWizardOpen(false);
+  };
+
+  const exportToPdf = async () => {
+    const { jsPDF } = await import("jspdf");
+    const autoTable = (await import("jspdf-autotable")).default;
+    
+    const doc = new jsPDF();
+    doc.text("Ambition Sports Analytics Report", 14, 15);
+    doc.setFontSize(10);
+    doc.text(`Range: ${filter.startDate} to ${filter.endDate}`, 14, 22);
+    
+    const rows = filteredData.map(t => {
+      const allData: Record<string, string> = {
+        "When": t.created_at ? new Date(t.created_at).toLocaleString() : "",
+        "Location": [t.city, t.region, t.country].filter(Boolean).join(", "),
+        "Device": `${t.device ?? ""}${t.os ? ` · ${t.os}` : ""}`,
+        "Browser": t.browser ?? "",
+        "Page": t.page_path ?? ""
+      };
+      return exportColumns.map(col => allData[col]);
+    });
+
+    (doc as any).autoTable({
+      head: [exportColumns],
+      body: rows,
+      startY: 30,
+    });
+
+    doc.save(`ambition-analytics-${new Date().toISOString().split('T')[0]}.pdf`);
+    toast.success("PDF Exported");
+    setExportWizardOpen(false);
   };
 
   return (
@@ -1181,12 +1287,52 @@ function AnalyticsDashboard({ data }: { data: Dash }) {
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-extrabold uppercase">Visitor Analytics</h2>
         <button 
-          onClick={exportToCsv}
+          onClick={() => setExportWizardOpen(true)}
           className="flex items-center gap-2 px-4 py-2 rounded-xl border border-primary/30 text-primary text-[10px] font-bold uppercase hover:bg-primary/10 transition-colors"
         >
-          <FileText size={14} /> Export CSV
+          <FileText size={14} /> Export Wizard
         </button>
       </div>
+
+      {exportWizardOpen && (
+        <div className="glass p-6 rounded-3xl border border-primary/20 space-y-4">
+          <div className="flex justify-between items-center">
+            <h3 className="text-sm font-bold uppercase tracking-widest">Export Wizard</h3>
+            <button onClick={() => setExportWizardOpen(false)} className="text-xs text-muted-foreground">Cancel</button>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div>
+              <span className="text-[10px] font-bold uppercase text-muted-foreground block mb-2">Date Range</span>
+              <div className="flex gap-2">
+                <input type="date" value={filter.startDate} onChange={(e) => setFilter(prev => ({ ...prev, startDate: e.target.value }))} className="bg-transparent border border-border rounded px-2 py-1 text-xs w-full" />
+                <input type="date" value={filter.endDate} onChange={(e) => setFilter(prev => ({ ...prev, endDate: e.target.value }))} className="bg-transparent border border-border rounded px-2 py-1 text-xs w-full" />
+              </div>
+            </div>
+            <div>
+              <span className="text-[10px] font-bold uppercase text-muted-foreground block mb-2">Columns</span>
+              <div className="flex flex-wrap gap-2">
+                {["When", "Location", "Device", "Browser", "Page"].map(col => (
+                  <button 
+                    key={col}
+                    onClick={() => setExportColumns(prev => prev.includes(col) ? prev.filter(c => c !== col) : [...prev, col])}
+                    className={`px-2 py-1 rounded-full border text-[9px] uppercase font-bold ${exportColumns.includes(col) ? "border-primary text-primary" : "border-border text-muted-foreground"}`}
+                  >
+                    {col}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="flex items-end gap-2">
+              <button onClick={exportToCsv} className="flex-1 py-2 rounded-lg bg-white/5 border border-border text-[10px] font-bold uppercase hover:bg-white/10 transition-colors flex items-center justify-center gap-2">
+                <Download size={12} /> CSV
+              </button>
+              <button onClick={exportToPdf} className="flex-1 py-2 rounded-lg bg-primary text-primary-foreground text-[10px] font-bold uppercase flex items-center justify-center gap-2">
+                <FileText size={12} /> PDF
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="glass p-6 rounded-3xl">
           <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Filtered Visits</p>
@@ -1270,7 +1416,7 @@ function AnalyticsDashboard({ data }: { data: Dash }) {
                 dataKey="value"
               >
                 {stats.devices.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length] || "#d4af37"} />
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length] as string} />
                 ))}
               </Pie>
               <ReTooltip contentStyle={{ background: '#080a0f', border: '1px solid #ffffff20', borderRadius: '12px' }} />
@@ -1279,7 +1425,7 @@ function AnalyticsDashboard({ data }: { data: Dash }) {
           <div className="flex flex-wrap justify-center gap-4 mt-4">
             {stats.devices.map((d, i) => (
               <div key={d.name} className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full" style={{ background: COLORS[i % COLORS.length] }} />
+                <div className="w-2 h-2 rounded-full" style={{ background: COLORS[i % COLORS.length] as string }} />
                 <span className="text-[10px] uppercase font-bold text-muted-foreground">{d.name} ({d.value})</span>
               </div>
             ))}
@@ -1348,6 +1494,71 @@ function LogsTab() {
         </table>
       </div>
     </div>
+  );
+}
+
+function BackupButton() {
+  const backup = useServerFn(backupSettings);
+  const mutation = useMutation({
+    mutationFn: () => backup(),
+    onSuccess: (data) => {
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `ambition-backup-${new Date().toISOString().split('T')[0]}.json`;
+      link.click();
+      toast.success("Backup downloaded");
+    },
+    onError: (e) => toast.error("Backup failed"),
+  });
+
+  return (
+    <button 
+      onClick={() => mutation.mutate()}
+      disabled={mutation.isPending}
+      className="flex items-center gap-2 px-5 py-3 rounded-xl border border-primary/30 text-primary text-[10px] font-bold uppercase hover:bg-primary/10 transition-colors"
+    >
+      {mutation.isPending ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />} 
+      Export Site Backup
+    </button>
+  );
+}
+
+function RestoreButton() {
+  const restore = useServerFn(restoreSettings);
+  const mutation = useMutation({
+    mutationFn: (data: any) => restore({ data }),
+    onSuccess: () => {
+      toast.success("Settings restored! Reloading...");
+      setTimeout(() => window.location.reload(), 1500);
+    },
+    onError: (e) => toast.error("Restore failed"),
+  });
+
+  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const data = JSON.parse(event.target?.result as string);
+        if (confirm("This will overwrite current settings and SEO templates. Continue?")) {
+          mutation.mutate(data);
+        }
+      } catch {
+        toast.error("Invalid backup file");
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  return (
+    <label className="flex items-center gap-2 px-5 py-3 rounded-xl border border-border text-muted-foreground text-[10px] font-bold uppercase hover:border-primary hover:text-foreground cursor-pointer transition-colors">
+      {mutation.isPending ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />} 
+      Restore from Backup
+      <input type="file" accept=".json" onChange={handleFile} className="hidden" />
+    </label>
   );
 }
 
