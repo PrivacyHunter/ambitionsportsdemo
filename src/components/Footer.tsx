@@ -23,7 +23,7 @@ export function Footer() {
             </span>
           </Link>
           <p className="text-slate-600 dark:text-muted-foreground text-sm leading-relaxed">
-            Change the Featured collection product colors in dark mode to a non-white scheme so they look readable and match the desired branding.
+            Error: Unauthorized: No authorization header provided at eval (/dev-server/src/integrations/supabase/auth-middleware.ts:58:13)
           </p>
           {branding.showSocialIcons && (
             <div className="flex gap-4">

@@ -56,7 +56,7 @@ export function FeaturedProducts() {
             Featured <br /><span className="text-primary">Collection</span>
           </h2>
           <p className="text-muted-foreground text-[10px] font-bold uppercase tracking-widest max-w-xl">
-            Ensure the newsletter/customer review bar is fully visible and responsive on mobile so it no longer disappears or gets clipped.
+            {"{ \"timestamp\": 1787294753138, \"error_type\": \"RUNTIME_ERROR\", \"filename\": \"http://localhost:8080/_serverFn/...\" }"}
           </p>
         </div>
         <Link to="/sportswear" className="text-slate-900 dark:text-white border-b-2 border-primary pb-2 font-black uppercase tracking-widest text-sm hover:text-primary transition-colors flex items-center gap-2 group/all">

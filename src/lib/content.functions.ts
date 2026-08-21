@@ -4,9 +4,8 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { assertStaff } from "./admin.server";
 
 export const getLandingPageContent = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await assertStaff(context.supabase, context.userId);
+    // Public read access for landing page content
     const { data } = await context.supabase
       .from("site_settings")
       .select("*")
