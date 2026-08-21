@@ -23,7 +23,7 @@ export function Footer() {
             </span>
           </Link>
           <p className="text-slate-600 dark:text-muted-foreground text-sm leading-relaxed">
-            Implement automatic authorization header injection for my Supabase server functions so I no longer get "Unauthorized: No authorization header provided". Add detailed auth middleware logging that shows which request is missing the authorization header and what token/header was expected. Add a setup screen to configure Supabase auth (API keys/secrets and auth mode) and verify the settings at startup. Enable a guest/anonymous access path for the landing page content function when no authorization header is provided. Implement a user-friendly error page that explains the unauthorized failure and provides actionable steps to resolve it.
+            Roles are granted in the database — the control panel opens only for owner, admin and developer accounts. Add an element picker so I can reliably select the exact UI node to target for my text replacement. Add a live diff preview for every visual text replacement before it applies so I can confirm what will change. Implement a safe literal text mode that inserts my provided phrases as-is after sanitizing any disallowed content. Improve the error response when a visual edit is blocked by showing which text triggered the block and what specific change would let it proceed. Implement a draft preview that shows exactly how my visual text replacement will render before I apply it.
           </p>
           {branding.showSocialIcons && (
             <div className="flex gap-4">
