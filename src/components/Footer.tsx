@@ -12,7 +12,7 @@ export function Footer() {
         <div className="space-y-6">
           <Link to="/" className="flex items-center gap-2">
             {branding.logoUrl ? (
-              <img src={branding.logoUrl} alt={branding.logoText} className="h-14 md:h-20 w-auto object-contain" />
+              <img src={branding.logoUrl} alt={branding.logoText} className="h-12 md:h-16 w-auto object-contain" />
             ) : (
               <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center font-black text-primary-foreground text-2xl">
                 {branding.logoText?.[0] || 'A'}
