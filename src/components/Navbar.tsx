@@ -90,7 +90,7 @@ export function Navbar() {
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <Link to="/" className="flex items-center gap-2 group">
             {branding.logoUrl ? (
-              <img src={branding.logoUrl} alt={branding.logoText} className="h-20 md:h-28 w-auto object-contain" />
+              <img src={branding.logoUrl} alt={branding.logoText} className="h-10 md:h-12 w-auto object-contain" />
             ) : (
               <>
                 <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center font-black text-primary-foreground text-2xl group-hover:shadow-[0_0_20px_rgba(212,175,55,0.5)] transition-all">
@@ -118,7 +118,7 @@ export function Navbar() {
             <Link
               to="/quote"
               className="bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded font-black text-sm uppercase transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(211,26,35,0.3)]"
-              title="'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n\nLOGO K SATH COLORS MATCH KRNE HAIN PURE LOGO MEIN NAVY COLOR NHI HAI AUR TUM NE SITE MEIN NAVY ADD KR DIYA"
+              
             >
               Get a Quote
             </Link>
