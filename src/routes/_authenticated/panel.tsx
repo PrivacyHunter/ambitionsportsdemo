@@ -39,7 +39,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useTheme } from "@/components/ThemeProvider";
 import {
-  deleteProduct, getDashboard, saveSetting, setUserRole, updateStatus, upsertProduct,
+  deleteProduct, getDashboard, updateStatus, upsertProduct,
   inviteUser, backupSettings, restoreSettings, listSettings, saveSetting,
 } from "@/lib/admin.functions";
 import { getLandingPageContent, saveLandingPageContent } from "@/lib/content.functions";
