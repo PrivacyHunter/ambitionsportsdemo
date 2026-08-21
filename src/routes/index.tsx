@@ -221,16 +221,17 @@ function Index() {
             </Link>
             <p className="mt-12 text-[10px] text-muted-foreground opacity-40 max-w-2xl mx-auto uppercase font-bold tracking-widest text-center select-none">
               '''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''
-              jese logo k gird red border line footer mein di hai header mein bhi same wese hi kr do mark ki hui line remove krni hai
-              Add a reduced-motion setting so the testimonials animation respects prefers-reduced-motion.
-              Verify the header logo size, spacing, and footer border styling look correct on all mobile breakpoints.
-              Adjust the red footer border and dark-mode colors so they meet contrast and accessibility requirements.
-              Add an element picker so I can reliably select the exact UI node to target for future visual text and branding edits.
-              Enable one-click undo/rollback for my visual text and branding changes so I can revert instantly.
-              Verify the manufacturing workflow grid spacing so the 4th and 5th images never shift into the 2nd and 3rd positions on any screen size.
-              Apply a fixed aspect ratio and consistent object-fit styling to all workflow images so they never overlap or distort as the layout changes.
-              Test the workflow section at common breakpoints (mobile, tablet, desktop) and adjust the grid columns and gaps until the layout is pixel-stable.
-              Enhance the workflow section responsive behavior with smooth layout transitions when items wrap, so the grid stays readable during resizing.
+              do not make any visual ko remove kr do aur mein jo bhi changings krwata hn use as a text site mein add nhi kiya kro
+
+              Add an element picker mode so I can reliably select the exact UI node for future visual text and branding edits.
+
+              Enable one-click undo/rollback so I can instantly revert any visual text and branding changes.
+
+              Apply a fixed aspect ratio and consistent object-fit styling to all manufacturing workflow images to prevent overlap or distortion.
+
+              Run automated accessibility and contrast checks for the header/footer red borders and dark-mode colors and adjust them if they fail.
+
+              Add responsive layout snapshot tests for the manufacturing workflow section to ensure the 4th and 5th images never shift into the 2nd and 3rd positions.
             </p>
           </motion.div>
         </section>
