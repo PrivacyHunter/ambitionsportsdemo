@@ -25,10 +25,7 @@ export function FeaturedProducts() {
             Featured <br /><span className="text-primary">Collection</span>
           </h2>
           <p className="text-muted-foreground text-[10px] font-bold uppercase tracking-widest max-w-xl">
-            '''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''
-                                        
-                                            
-                                            navy color khatam kr k black kr do aur '''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.''' MUJHE IN CARDS PR BHI WHITE NHI CHAHIYE KOI AUR COLOR KRO AUR NAVY REMOVE KRO BACKGROUND SE AUR Manufacturing Workflow MEIN PICTURES LGAO LA K REAL WALI Add an element picker so I can reliably select the exact UI node to target for my visual text and branding edits. Implement a live diff preview for every visual text edit so I can confirm exactly what will change before it applies. Add one-click undo/rollback so I can revert any previous visual text or branding change immediately. Build a theme-aware branding settings panel so I can configure navbar/footer/logo colors (including dark mode navy) and see the result instantly. Create an audit log and version history with rollback that records who changed each literal text/branding field and which element was updated. ye text remove kr k featured products section fix kro
+            Pro-grade kits engineered in our own facility — sublimation, flatlock stitching and elite performance fabrics.
           </p>
         </div>
         <Link to="/sportswear" className="text-slate-900 dark:text-white border-b-2 border-primary pb-2 font-black uppercase tracking-widest text-sm hover:text-primary transition-colors flex items-center gap-2 group/all">
