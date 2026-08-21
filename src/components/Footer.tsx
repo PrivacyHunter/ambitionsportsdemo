@@ -12,7 +12,7 @@ export function Footer() {
         <div className="space-y-6">
           <Link to="/" className="flex items-center gap-2">
             {branding.logoUrl ? (
-              <img src={branding.logoUrl} alt={branding.logoText} className="h-12 md:h-16 w-auto object-contain" />
+              <img src={branding.logoUrl} alt={branding.logoText} className="h-20 md:h-28 w-auto object-contain" />
             ) : (
               <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center font-black text-primary-foreground text-2xl">
                 {branding.logoText?.[0] || 'A'}
@@ -23,9 +23,7 @@ export function Footer() {
             </span>
           </Link>
           <p className="text-slate-600 dark:text-muted-foreground text-sm leading-relaxed">
-            '''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''
-
-            LOGO K SATH COLORS MATCH KRNE HAIN PURE LOGO MEIN NAVY COLOR NHI HAI AUR TUM NE SITE MEIN NAVY ADD KR DIYA
+            Leading manufacturer of high-performance custom sportswear and activewear. Exporting excellence from Sialkot to the world.
           </p>
           {branding.showSocialIcons && (
             <div className="flex gap-4">
