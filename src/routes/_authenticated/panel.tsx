@@ -81,7 +81,7 @@ export const Route = createFileRoute("/_authenticated/panel")({
   component: PanelPage,
 });
 
-type Tab = "overview" | "inbox" | "products" | "theme" | "branding" | "seo" | "customization" | "visitors" | "analytics" | "instagram" | "accounts" | "logs";
+type Tab = "overview" | "inbox" | "products" | "theme" | "branding" | "seo" | "customization" | "visitors" | "analytics" | "instagram" | "accounts" | "logs" | "content";
 
 const TABS: { id: Tab; label: string; icon: any; roles?: ("owner" | "admin" | "developer")[] }[] = [
   { id: "overview", label: "Overview", icon: ShieldCheck },
@@ -96,6 +96,7 @@ const TABS: { id: Tab; label: string; icon: any; roles?: ("owner" | "admin" | "d
   { id: "instagram", label: "Instagram", icon: Instagram, roles: ["owner", "admin", "developer"] },
   { id: "accounts", label: "Accounts", icon: Users, roles: ["developer"] },
   { id: "logs", label: "Logs", icon: Activity, roles: ["developer"] },
+  { id: "content", label: "Content", icon: FileText, roles: ["owner", "developer"] },
 ];
 
 function PanelPage() {
@@ -155,6 +156,8 @@ function PanelPage() {
           <span className="hidden rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-primary sm:inline">
             {role}
           </span>
+          <ThemeToggle className="sm:hidden" />
+          <AdminThemeManager />
           <ThemeToggle />
           <button onClick={signOut} aria-label="Sign out" className="glass grid h-9 w-9 place-items-center rounded-full">
             <LogOut size={15} />
