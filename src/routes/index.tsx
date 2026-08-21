@@ -184,7 +184,7 @@ function Index() {
               Start Your <br /><span className="text-primary">Custom Order</span>
             </h2>
             <p className="text-muted-foreground text-[10px] sm:text-lg mb-12 max-w-2xl mx-auto uppercase font-bold tracking-widest">
-              Implement role-based access so only landing page content is public while other server functions still require authorization. Add a user-friendly error boundary and fallback UI that shows an actionable message instead of a blank screen when a server function fails. Implement structured logging for serverFn authorization failures (request id, endpoint, and user context) so I can diagnose issues faster. Create automated tests that verify public landing reads work and protected routes correctly reject requests without an authorization header.
+              Implement an admin screen that lets me manage landing page literal text content with previews and a publish step. Create end-to-end tests that verify landing page content is public while all other server functions reject requests without an authorization header. Add an audit log that records who made each visual text edit and what element/text was changed. Implement a version history with rollback for every literal text change I make on the landing page.
             </p>
             <Link to="/quote" className="inline-block bg-primary text-primary-foreground hover:bg-white hover:shadow-[0_0_30px_rgba(212,175,55,0.4)] px-12 py-6 rounded-2xl font-black uppercase tracking-widest text-lg transition-all duration-300">
               Get A Quote Now

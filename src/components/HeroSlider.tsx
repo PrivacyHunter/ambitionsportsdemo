@@ -114,7 +114,7 @@ export function HeroSlider() {
               animate={{ opacity: 1, y: 0 }}
               className="text-primary font-black tracking-widest uppercase mb-4 flex items-center gap-3 text-[10px] md:text-sm"
             >
-              <span className="w-12 h-[2px] bg-primary" /> Roles are granted in the database — the control panel opens only for owner, admin and developer accounts. Add an element picker so I can reliably select the exact UI node to target for my text replacement. Add a live diff preview for every visual text replacement before it applies so I can confirm what will change. Implement a safe literal text mode that inserts my provided phrases as-is after sanitizing any disallowed content. Improve the error response when a visual edit is blocked by showing which text triggered the block and what specific change would let it proceed. Implement a draft preview that shows exactly how my visual text replacement will render before I apply it.
+              <span className="w-12 h-[2px] bg-primary" /> Premium Custom Gear
             </motion.p>
             <h1 className="text-3xl sm:text-4xl md:text-7xl lg:text-8xl font-black uppercase italic leading-[0.85] tracking-tighter mb-10 text-slate-900 dark:text-foreground">
               {current === 0 ? (content?.hero?.title || activeBanner?.title1) : activeBanner?.title1} <br />
