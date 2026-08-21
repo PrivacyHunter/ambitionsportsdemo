@@ -12,6 +12,11 @@ import { ShieldCheck, Zap, Scissors, Truck, Globe, Award, Factory, Users, Loader
 import { useEffect } from "react";
 import { getPageSeo } from "@/lib/seo.functions";
 import { getLandingPageContent } from "@/lib/content.functions";
+import stitchingImg from "@/assets/file-38.jpg.asset.json";
+import qcImg from "@/assets/file-40.jpg.asset.json";
+import shippingImg from "@/assets/file-41.jpg.asset.json";
+import materialImg from "@/assets/file-43.jpg.asset.json";
+import designImg from "@/assets/file-44.jpg.asset.json";
 
 export const Route = createFileRoute("/")({
   loader: async ({ context }) => {
