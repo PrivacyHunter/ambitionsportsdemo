@@ -82,7 +82,7 @@ export const Route = createFileRoute("/_authenticated/panel")({
   component: PanelPage,
 });
 
-type Tab = "overview" | "inbox" | "products" | "theme" | "branding" | "seo" | "customization" | "visitors" | "analytics" | "instagram" | "accounts" | "logs" | "content";
+type Tab = "overview" | "inbox" | "products" | "theme" | "branding" | "seo" | "customization" | "visitors" | "analytics" | "instagram" | "accounts" | "logs" | "content" | "settings";
 
 const TABS: { id: Tab; label: string; icon: any; roles?: ("owner" | "admin" | "developer")[] }[] = [
   { id: "overview", label: "Overview", icon: ShieldCheck },
@@ -98,6 +98,7 @@ const TABS: { id: Tab; label: string; icon: any; roles?: ("owner" | "admin" | "d
   { id: "accounts", label: "Accounts", icon: Users, roles: ["developer"] },
   { id: "logs", label: "Logs", icon: Activity, roles: ["developer"] },
   { id: "content", label: "Content", icon: FileText, roles: ["owner", "developer"] },
+  { id: "settings", label: "Settings", icon: Settings2, roles: ["owner", "developer"] },
 ];
 
 function PanelPage() {
@@ -194,6 +195,7 @@ function PanelPage() {
         { tab === "accounts" && role === "developer" && <AccountsTab data={data!} onDone={() => void refetch()} />}
         { tab === "logs" && role === "developer" && <LogsTab />}
         { tab === "content" && (role === "owner" || role === "developer") && <ContentTab />}
+        { tab === "settings" && (role === "owner" || role === "developer") && <AlertSettingsTab />}
       </section>
     </main>
   );
@@ -2709,6 +2711,129 @@ function ContentTab() {
               className="flex-1 bg-primary text-primary-foreground py-4 rounded-2xl font-black uppercase tracking-[0.2em] shadow-lg hover:scale-[1.02] transition-all"
             >
               {mutation.isPending ? "Saving..." : "Apply Changes"}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AlertSettingsTab() {
+  const getSettings = useServerFn(useServerFn(async () => {
+    const { getAlertSettings } = await import("@/lib/admin-alerts.functions");
+    return getAlertSettings();
+  }));
+  
+  const updateSettings = useServerFn(useServerFn(async (data: any) => {
+    const { updateAlertSettings } = await import("@/lib/admin-alerts.functions");
+    return updateAlertSettings({ data });
+  }));
+
+  const testAlerts = useServerFn(useServerFn(async () => {
+    const { testAlerts } = await import("@/lib/admin-alerts.functions");
+    return testAlerts();
+  }));
+
+  const { data: settings, refetch } = useQuery({
+    queryKey: ["alert-settings"],
+    queryFn: () => getSettings(),
+  });
+
+  const [form, setForm] = useState<any>(null);
+
+  useEffect(() => {
+    if (settings) setForm(settings);
+  }, [settings]);
+
+  const saveMutation = useMutation({
+    mutationFn: () => updateSettings(form),
+    onSuccess: () => {
+      toast.success("Settings saved");
+      refetch();
+    },
+  });
+
+  const testMutation = useMutation({
+    mutationFn: () => testAlerts(),
+    onSuccess: (res: any) => toast.success(res.message),
+  });
+
+  if (!form) return <Loader2 className="animate-spin mx-auto" />;
+
+  return (
+    <div className="space-y-6">
+      <div className="glass rounded-[2rem] p-8 border border-white/5">
+        <h2 className="text-xl font-black uppercase italic mb-8">System Settings</h2>
+        
+        <div className="space-y-8">
+          {/* Thresholds */}
+          <div className="p-6 rounded-3xl bg-white/5 border border-white/10 space-y-4">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-primary flex items-center gap-2">
+              <Activity size={14} /> Alert Thresholds
+            </h3>
+            <div className="grid gap-6 md:grid-cols-2">
+              <label className="block space-y-2">
+                <span className="text-[10px] font-bold uppercase text-muted-foreground">Failure Rate Threshold (%)</span>
+                <input 
+                  type="number"
+                  value={form.failure_rate_pct}
+                  onChange={(e) => setForm({ ...form, failure_rate_pct: Number(e.target.value) })}
+                  className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-primary outline-none"
+                />
+              </label>
+              <label className="block space-y-2">
+                <span className="text-[10px] font-bold uppercase text-muted-foreground">Latency Threshold (ms)</span>
+                <input 
+                  type="number"
+                  value={form.latency_ms}
+                  onChange={(e) => setForm({ ...form, latency_ms: Number(e.target.value) })}
+                  className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-primary outline-none"
+                />
+              </label>
+            </div>
+          </div>
+
+          {/* Notifications */}
+          <div className="p-6 rounded-3xl bg-white/5 border border-white/10 space-y-4">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-primary flex items-center gap-2">
+              <Mail size={14} /> Notification Channels
+            </h3>
+            <div className="grid gap-4">
+              <label className="block space-y-2">
+                <span className="text-[10px] font-bold uppercase text-muted-foreground">Admin Email</span>
+                <input 
+                  type="email"
+                  value={form.notification_email}
+                  onChange={(e) => setForm({ ...form, notification_email: e.target.value })}
+                  className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-primary outline-none"
+                />
+              </label>
+              <label className="block space-y-2">
+                <span className="text-[10px] font-bold uppercase text-muted-foreground">Slack Webhook URL</span>
+                <input 
+                  value={form.slack_webhook_url}
+                  onChange={(e) => setForm({ ...form, slack_webhook_url: e.target.value })}
+                  className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-primary outline-none"
+                />
+              </label>
+            </div>
+          </div>
+
+          <div className="flex gap-4">
+            <button 
+              onClick={() => saveMutation.mutate()}
+              disabled={saveMutation.isPending}
+              className="flex-1 bg-primary text-primary-foreground py-4 rounded-2xl font-black uppercase tracking-[0.2em] shadow-lg hover:scale-[1.02] transition-all"
+            >
+              {saveMutation.isPending ? "Saving..." : "Save Settings"}
+            </button>
+            <button 
+              onClick={() => testMutation.mutate()}
+              disabled={testMutation.isPending}
+              className="px-8 border border-white/10 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-white/5 transition-all"
+            >
+              {testMutation.isPending ? <Loader2 className="animate-spin" /> : "Test Alerts"}
             </button>
           </div>
         </div>
