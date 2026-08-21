@@ -117,6 +117,7 @@ export function themeVars(theme: ThemeConfig, mode: ThemeMode): Record<string, s
     "--container-width": theme.containerWidth,
     "--surface": `rgb(${isDark ? "255 255 255" : "15 23 42"} / ${theme.glassOpacity}%)`,
     "--surface-strong": `rgb(${isDark ? "255 255 255" : "15 23 42"} / ${theme.glassOpacity * 1.5}%)`,
+    "--surface-soft": `rgb(${isDark ? "255 255 255" : "15 23 42"} / ${theme.glassOpacity * 0.5}%)`,
   };
 }
 
