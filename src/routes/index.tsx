@@ -207,18 +207,9 @@ function Index() {
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[100px] -z-10" />
             <h2 className="text-3xl sm:text-4xl md:text-6xl font-black uppercase italic tracking-tighter mb-8 leading-none">
               '''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''
-
-MUJHE IN CARDS PR BHI WHITE NHI CHAHIYE KOI AUR COLOR KRO AUR NAVY REMOVE KRO BACKGROUND SE AUR Manufacturing Workflow MEIN PICTURES LGAO LA K REAL WALI
-
-Add an element picker so I can reliably select the exact UI node to target for my visual text and branding edits.
-
-Implement a live diff preview for every visual text edit so I can confirm exactly what will change before it applies.
-
-Add one-click undo/rollback so I can revert any previous visual text or branding change immediately.
-
-Build a theme-aware branding settings panel so I can configure navbar/footer/logo colors (including dark mode navy) and see the result instantly.
-
-Create an audit log and version history with rollback that records who changed each literal text/branding field and which element was updated.
+                                        
+                                            
+                                            navy color khatam kr k black kr do aur '''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.''' MUJHE IN CARDS PR BHI WHITE NHI CHAHIYE KOI AUR COLOR KRO AUR NAVY REMOVE KRO BACKGROUND SE AUR Manufacturing Workflow MEIN PICTURES LGAO LA K REAL WALI Add an element picker so I can reliably select the exact UI node to target for my visual text and branding edits. Implement a live diff preview for every visual text edit so I can confirm exactly what will change before it applies. Add one-click undo/rollback so I can revert any previous visual text or branding change immediately. Build a theme-aware branding settings panel so I can configure navbar/footer/logo colors (including dark mode navy) and see the result instantly. Create an audit log and version history with rollback that records who changed each literal text/branding field and which element was updated. ye text remove kr k featured products section fix kro
             </h2>
             <p className="text-muted-foreground text-[10px] sm:text-lg mb-12 max-w-2xl mx-auto uppercase font-bold tracking-widest">
               Join the elite athletes and teams who trust Ambition Sports for their professional custom apparel needs.
