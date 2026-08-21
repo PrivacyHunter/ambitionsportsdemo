@@ -60,6 +60,12 @@ const banners: Banner[] = [
 ];
 
 export function HeroSlider() {
+  const getContent = useServerFn(getLandingPageContent);
+  const { data: content } = useQuery({
+    queryKey: ["landing-page-content"],
+    queryFn: () => getContent(),
+  });
+
   const [current, setCurrent] = useState(0);
 
   useEffect(() => {
