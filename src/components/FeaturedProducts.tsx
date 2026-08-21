@@ -101,8 +101,8 @@ export function FeaturedProducts() {
             <div className="p-8">
               <div className="flex justify-between items-start mb-4">
                 <div>
-                  <p className="text-primary group-hover:text-amber-500 transition-colors text-[10px] font-black uppercase tracking-[0.2em] mb-2">{product.category}</p>
-                  <h4 className="font-black uppercase tracking-tighter text-2xl group-hover:text-amber-500 transition-colors">{product.name}</h4>
+                  <p className="text-primary group-hover:text-primary/80 transition-colors text-[10px] font-black uppercase tracking-[0.2em] mb-2">{product.category}</p>
+                  <h4 className="font-black uppercase tracking-tighter text-2xl group-hover:text-primary transition-colors">{product.name}</h4>
                 </div>
                 <span className="text-slate-900 dark:text-white font-black text-2xl tracking-tighter">{product.price}</span>
               </div>
