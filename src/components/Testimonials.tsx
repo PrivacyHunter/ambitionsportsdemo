@@ -47,11 +47,12 @@ export function Testimonials() {
           {testimonials.map((t, i) => (
             <motion.div 
               key={i}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              className="relative bg-white dark:bg-zinc-900 border border-slate-200 dark:border-white/5 p-8 rounded-3xl shadow-sm dark:shadow-none hover:border-primary/40 transition-colors"
+              transition={{ delay: i * 0.15, duration: 0.5, ease: "easeOut" }}
+              whileHover={{ y: -10 }}
+              className="relative bg-white dark:bg-zinc-900 border border-slate-200 dark:border-white/5 p-8 rounded-3xl shadow-sm dark:shadow-none hover:border-primary/40 hover:shadow-[0_20px_50px_-20px_rgba(239,24,34,0.35)] transition-all duration-300"
             >
               <Quote className="absolute top-6 right-6 text-primary/15" size={48} />
               <div className="flex gap-1 mb-5">
