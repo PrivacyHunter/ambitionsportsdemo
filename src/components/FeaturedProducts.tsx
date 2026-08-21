@@ -52,7 +52,7 @@ export function FeaturedProducts() {
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
         <div>
           <h3 className="text-primary font-black tracking-[0.2em] uppercase mb-4 text-sm">Most Wanted</h3>
-          <h2 className="text-5xl md:text-7xl font-black uppercase italic tracking-tighter leading-none">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black uppercase italic tracking-tighter leading-none">
             Featured <br /><span className="text-primary">Collection</span>
           </h2>
         </div>
