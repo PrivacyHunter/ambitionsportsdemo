@@ -38,6 +38,14 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const getContent = useServerFn(getLandingPageContent);
+  const { data: content } = useQuery({
+    queryKey: ["landing-page-content"],
+    queryFn: () => getContent(),
+  });
+
+  const heroCta = content?.hero?.ctaText || "I have approved the plan";
+
   useEffect(() => {
     const track = async () => {
       const consent = localStorage.getItem("ambition_tracking_consent");
