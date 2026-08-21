@@ -145,31 +145,31 @@ function Index() {
               num="01" 
               title="Design" 
               desc="Digital mockups & 3D tech packs." 
-              image="https://images.unsplash.com/photo-1558655146-d09347e92766?q=80&w=2000&auto=format&fit=crop"
+              image={designImg.url}
             />
             <WorkflowStep 
               num="02" 
               title="Material" 
               desc="Elite performance fabrics selection." 
-              image="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=2000&auto=format&fit=crop"
+              image={materialImg.url}
             />
             <WorkflowStep 
               num="03" 
               title="Stitching" 
               desc="High-density flatlock precision." 
-              image="https://images.unsplash.com/photo-1556906781-9a412961c28c?q=80&w=2000&auto=format&fit=crop"
+              image={stitchingImg.url}
             />
             <WorkflowStep 
               num="04" 
               title="QC Check" 
               desc="Rigorous final quality assurance." 
-              image="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=2000&auto=format&fit=crop"
+              image={qcImg.url}
             />
             <WorkflowStep 
               num="05" 
               title="Shipping" 
               desc="Express global logistics delivery." 
-              image="https://images.unsplash.com/photo-1566576721346-d4a3b4eaad5b?q=80&w=2000&auto=format&fit=crop"
+              image={shippingImg.url}
             />
           </div>
         </section>
