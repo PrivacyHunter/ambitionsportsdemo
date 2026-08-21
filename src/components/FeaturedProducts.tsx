@@ -15,37 +15,6 @@ const products = [
 export function FeaturedProducts() {
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const scrollContainer = scrollRef.current;
-    if (!scrollContainer) return;
-
-    let animationId: number;
-    const speed = 1;
-
-    const animate = () => {
-      scrollContainer.scrollLeft += speed;
-      if (scrollContainer.scrollLeft >= (scrollContainer.scrollWidth - scrollContainer.clientWidth)) {
-        scrollContainer.scrollLeft = 0;
-      }
-      animationId = requestAnimationFrame(animate);
-    };
-
-    animationId = requestAnimationFrame(animate);
-    
-    const stopScroll = () => cancelAnimationFrame(animationId);
-    const startScroll = () => {
-      animationId = requestAnimationFrame(animate);
-    };
-
-    scrollContainer.addEventListener("mouseenter", stopScroll);
-    scrollContainer.addEventListener("mouseleave", startScroll);
-
-    return () => {
-      cancelAnimationFrame(animationId);
-      scrollContainer.removeEventListener("mouseenter", stopScroll);
-      scrollContainer.removeEventListener("mouseleave", startScroll);
-    };
-  }, []);
 
   return (
     <section className="py-24 px-4 lg:px-8 bg-white dark:bg-background overflow-hidden">
@@ -65,14 +34,13 @@ export function FeaturedProducts() {
       </div>
 
       <div 
-        ref={scrollRef}
-        className="flex gap-8 overflow-x-hidden py-10"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 py-10"
       >
-        {[...products, ...products].map((product, idx) => (
+        {products.map((product, idx) => (
           <motion.div 
             key={idx}
             whileHover={{ y: -15 }}
-            className="min-w-[320px] md:min-w-[400px] bg-slate-50 dark:bg-surface-soft rounded-3xl overflow-hidden border border-slate-200 dark:border-border relative group"
+            className="w-full bg-slate-50 dark:bg-surface-soft rounded-3xl overflow-hidden border border-slate-200 dark:border-border relative group"
           >
             <div className="h-[400px] bg-white/[0.03] flex items-center justify-center relative overflow-hidden">
                <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity z-10" />
