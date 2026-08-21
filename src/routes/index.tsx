@@ -113,7 +113,7 @@ function Index() {
 
             <div className="order-1 lg:order-2">
               <h3 className="text-primary font-black tracking-[0.3em] uppercase mb-6 text-sm">Industrial Excellence</h3>
-              <h2 className="text-5xl md:text-7xl font-black uppercase italic tracking-tighter mb-8 leading-[0.9]">
+              <h2 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter mb-8 leading-[0.9]">
                 Advanced <br /><span className="text-primary">Facilities</span>
               </h2>
               <p className="text-slate-600 dark:text-muted-foreground text-xl leading-relaxed mb-12">
@@ -137,7 +137,7 @@ function Index() {
         {/* How We Build Section */}
         <section className="py-32 px-4 lg:px-8 max-w-7xl mx-auto text-center bg-white dark:bg-background">
           <h3 className="text-primary font-black tracking-[0.3em] uppercase mb-6 text-sm">The Process</h3>
-          <h2 className="text-5xl md:text-7xl font-black uppercase italic mb-24 tracking-tighter">Manufacturing <span className="text-primary">Workflow</span></h2>
+          <h2 className="text-4xl md:text-6xl font-black uppercase italic mb-24 tracking-tighter">Manufacturing <span className="text-primary">Workflow</span></h2>
           
           <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-12 relative">
             <div className="hidden lg:block absolute top-12 left-0 w-full h-[2px] bg-border -z-10" />
@@ -180,11 +180,11 @@ function Index() {
             className="max-w-4xl mx-auto p-12 md:p-20 rounded-[3rem] bg-primary/5 border border-primary/10 relative overflow-hidden"
           >
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[100px] -z-10" />
-            <h2 className="text-4xl sm:text-5xl md:text-7xl font-black uppercase italic tracking-tighter mb-8 leading-none">
+            <h2 className="text-3xl sm:text-4xl md:text-6xl font-black uppercase italic tracking-tighter mb-8 leading-none">
               Start Your <br /><span className="text-primary">Custom Order</span>
             </h2>
             <p className="text-muted-foreground text-[10px] sm:text-lg mb-12 max-w-2xl mx-auto uppercase font-bold tracking-widest">
-              Implement an admin screen that lets me manage landing page literal text content with previews and a publish step. Create end-to-end tests that verify landing page content is public while all other server functions reject requests without an authorization header. Add an audit log that records who made each visual text edit and what element/text was changed. Implement a version history with rollback for every literal text change I make on the landing page.
+              Join the elite athletes and teams who trust Ambition Sports for their professional custom apparel needs.
             </p>
             <Link to="/quote" className="inline-block bg-primary text-primary-foreground hover:bg-white hover:shadow-[0_0_30px_rgba(212,175,55,0.4)] px-12 py-6 rounded-2xl font-black uppercase tracking-widest text-lg transition-all duration-300">
               Get A Quote Now

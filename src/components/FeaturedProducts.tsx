@@ -15,48 +15,17 @@ const products = [
 export function FeaturedProducts() {
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const scrollContainer = scrollRef.current;
-    if (!scrollContainer) return;
-
-    let animationId: number;
-    const speed = 1;
-
-    const animate = () => {
-      scrollContainer.scrollLeft += speed;
-      if (scrollContainer.scrollLeft >= (scrollContainer.scrollWidth - scrollContainer.clientWidth)) {
-        scrollContainer.scrollLeft = 0;
-      }
-      animationId = requestAnimationFrame(animate);
-    };
-
-    animationId = requestAnimationFrame(animate);
-    
-    const stopScroll = () => cancelAnimationFrame(animationId);
-    const startScroll = () => {
-      animationId = requestAnimationFrame(animate);
-    };
-
-    scrollContainer.addEventListener("mouseenter", stopScroll);
-    scrollContainer.addEventListener("mouseleave", startScroll);
-
-    return () => {
-      cancelAnimationFrame(animationId);
-      scrollContainer.removeEventListener("mouseenter", stopScroll);
-      scrollContainer.removeEventListener("mouseleave", startScroll);
-    };
-  }, []);
 
   return (
     <section className="py-24 px-4 lg:px-8 bg-white dark:bg-background overflow-hidden">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
         <div>
           <h3 className="text-primary font-black tracking-[0.2em] uppercase mb-4 text-sm">Most Wanted</h3>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black uppercase italic tracking-tighter leading-none mb-4">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-black uppercase italic tracking-tighter leading-none mb-4">
             Featured <br /><span className="text-primary">Collection</span>
           </h2>
           <p className="text-muted-foreground text-[10px] font-bold uppercase tracking-widest max-w-xl">
-            Implement an admin screen that lets me manage landing page literal text content with previews and a publish step. Create end-to-end tests that verify landing page content is public while all other server functions reject requests without an authorization header. Add an audit log that records who made each visual text edit and what element/text was changed. Implement a version history with rollback for every literal text change I make on the landing page.
+            High-performance custom apparel engineered for elite athletes. Precision manufacturing for global export.
           </p>
         </div>
         <Link to="/sportswear" className="text-slate-900 dark:text-white border-b-2 border-primary pb-2 font-black uppercase tracking-widest text-sm hover:text-primary transition-colors flex items-center gap-2 group/all">
@@ -65,14 +34,13 @@ export function FeaturedProducts() {
       </div>
 
       <div 
-        ref={scrollRef}
-        className="flex gap-8 overflow-x-hidden py-10"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 py-10"
       >
-        {[...products, ...products].map((product, idx) => (
+        {products.map((product, idx) => (
           <motion.div 
             key={idx}
             whileHover={{ y: -15 }}
-            className="min-w-[320px] md:min-w-[400px] bg-slate-50 dark:bg-surface-soft rounded-3xl overflow-hidden border border-slate-200 dark:border-border relative group"
+            className="w-full bg-slate-50 dark:bg-surface-soft rounded-3xl overflow-hidden border border-slate-200 dark:border-border relative group"
           >
             <div className="h-[400px] bg-white/[0.03] flex items-center justify-center relative overflow-hidden">
                <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity z-10" />
@@ -101,8 +69,8 @@ export function FeaturedProducts() {
             <div className="p-8">
               <div className="flex justify-between items-start mb-4">
                 <div>
-                  <p className="text-primary group-hover:text-amber-500 transition-colors text-[10px] font-black uppercase tracking-[0.2em] mb-2">{product.category}</p>
-                  <h4 className="font-black uppercase tracking-tighter text-2xl group-hover:text-amber-500 transition-colors">{product.name}</h4>
+                  <p className="text-primary group-hover:text-primary/80 transition-colors text-[10px] font-black uppercase tracking-[0.2em] mb-2">{product.category}</p>
+                  <h4 className="font-black uppercase tracking-tighter text-2xl group-hover:text-primary transition-colors">{product.name}</h4>
                 </div>
                 <span className="text-slate-900 dark:text-white font-black text-2xl tracking-tighter">{product.price}</span>
               </div>

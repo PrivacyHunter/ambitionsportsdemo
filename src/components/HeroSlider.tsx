@@ -81,7 +81,7 @@ export function HeroSlider() {
   const activeBanner = banners[current] || banners[0];
 
   return (
-    <section className="relative h-[85vh] w-full overflow-hidden bg-background">
+    <section className="relative h-[60vh] md:h-[85vh] w-full overflow-hidden bg-background">
       <AnimatePresence mode="wait">
         <motion.div
           key={current}
@@ -114,9 +114,9 @@ export function HeroSlider() {
               animate={{ opacity: 1, y: 0 }}
               className="text-primary font-black tracking-widest uppercase mb-4 flex items-center gap-3 text-[10px] md:text-sm"
             >
-              <span className="w-12 h-[2px] bg-primary" /> Premium Custom Gear
+              <span className="w-12 h-[2px] bg-primary" /> {current === 0 ? (content?.hero?.subtitle || activeBanner?.subtitle) : activeBanner?.subtitle}
             </motion.p>
-            <h1 className="text-3xl sm:text-4xl md:text-7xl lg:text-8xl font-black uppercase italic leading-[0.85] tracking-tighter mb-10 text-slate-900 dark:text-foreground">
+            <h1 className="text-xl sm:text-2xl md:text-5xl lg:text-6xl font-black uppercase italic leading-[0.85] tracking-tighter mb-10 text-slate-900 dark:text-foreground">
               {current === 0 ? (content?.hero?.title || activeBanner?.title1) : activeBanner?.title1} <br />
               <span className={activeBanner?.accent === 'text-white' ? 'text-slate-900 dark:text-white' : activeBanner?.accent}>{activeBanner?.title2}</span>
             </h1>
