@@ -56,7 +56,7 @@ export function FeaturedProducts() {
             Featured <br /><span className="text-primary">Collection</span>
           </h2>
           <p className="text-muted-foreground text-[10px] font-bold uppercase tracking-widest max-w-xl">
-            Adjust the banner and product text styling so it no longer makes the full banners/products appear hidden or obscured.
+            Implement a publish workflow that lets me preview landing page text changes in a draft mode before they go live.
           </p>
         </div>
         <Link to="/sportswear" className="text-slate-900 dark:text-white border-b-2 border-primary pb-2 font-black uppercase tracking-widest text-sm hover:text-primary transition-colors flex items-center gap-2 group/all">
@@ -101,8 +101,8 @@ export function FeaturedProducts() {
             <div className="p-8">
               <div className="flex justify-between items-start mb-4">
                 <div>
-                  <p className="text-primary text-[10px] font-black uppercase tracking-[0.2em] mb-2">{product.category}</p>
-                  <h4 className="font-black uppercase tracking-tighter text-2xl group-hover:text-primary transition-colors">{product.name}</h4>
+                  <p className="text-primary group-hover:text-amber-500 transition-colors text-[10px] font-black uppercase tracking-[0.2em] mb-2">{product.category}</p>
+                  <h4 className="font-black uppercase tracking-tighter text-2xl group-hover:text-amber-500 transition-colors">{product.name}</h4>
                 </div>
                 <span className="text-slate-900 dark:text-white font-black text-2xl tracking-tighter">{product.price}</span>
               </div>

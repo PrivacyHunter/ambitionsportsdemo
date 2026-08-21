@@ -112,11 +112,11 @@ export function HeroSlider() {
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-primary font-black tracking-widest uppercase mb-4 flex items-center gap-3"
+              className="text-primary font-black tracking-widest uppercase mb-4 flex items-center gap-3 text-[10px] md:text-sm"
             >
-              <span className="w-12 h-[2px] bg-primary" /> Implement a simple theme customizer in settings to adjust my primary color and dark background shades and preview the changes instantly.
+              <span className="w-12 h-[2px] bg-primary" /> Verify that CTA click analytics events are correctly firing and that conversion reporting by page section works end to end.
             </motion.p>
-            <h1 className="text-4xl md:text-7xl lg:text-8xl font-black uppercase italic leading-[0.85] tracking-tighter mb-10 text-slate-900 dark:text-foreground">
+            <h1 className="text-3xl sm:text-4xl md:text-7xl lg:text-8xl font-black uppercase italic leading-[0.85] tracking-tighter mb-10 text-slate-900 dark:text-foreground">
               {current === 0 ? (content?.hero?.title || activeBanner?.title1) : activeBanner?.title1} <br />
               <span className={activeBanner?.accent === 'text-white' ? 'text-slate-900 dark:text-white' : activeBanner?.accent}>{activeBanner?.title2}</span>
             </h1>

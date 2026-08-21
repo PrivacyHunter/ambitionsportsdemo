@@ -23,7 +23,7 @@ export function Footer() {
             </span>
           </Link>
           <p className="text-slate-600 dark:text-muted-foreground text-sm leading-relaxed">
-            Verify WCAG color contrast across dark mode so text and navigation stay clearly readable.
+            Generate a responsive QA checklist and screenshot report for the hero banners and FeaturedProducts on common phone widths to confirm the text scaling looks correct.
           </p>
           {branding.showSocialIcons && (
             <div className="flex gap-4">
