@@ -56,7 +56,7 @@ export function FeaturedProducts() {
             Featured <br /><span className="text-primary">Collection</span>
           </h2>
           <p className="text-muted-foreground text-[10px] font-bold uppercase tracking-widest max-w-xl">
-            {"{ \"timestamp\": 1787294753138, \"error_type\": \"RUNTIME_ERROR\", \"filename\": \"http://localhost:8080/_serverFn/...\" }"}
+            Add an element picker so I can reliably select the exact UI node for my text replacement. Implement a live diff preview that shows every visual text change before I apply it. Add a safe literal text mode that inserts my provided phrases verbatim after sanitizing any disallowed content. Improve the blocked-edit error message by showing which text triggered the block and what change would let it proceed. Create a draft preview with an undo option so I can review how my text replacement renders before I apply it.
           </p>
         </div>
         <Link to="/sportswear" className="text-slate-900 dark:text-white border-b-2 border-primary pb-2 font-black uppercase tracking-widest text-sm hover:text-primary transition-colors flex items-center gap-2 group/all">

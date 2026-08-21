@@ -23,7 +23,7 @@ export function Footer() {
             </span>
           </Link>
           <p className="text-slate-600 dark:text-muted-foreground text-sm leading-relaxed">
-            Error: Unauthorized: No authorization header provided at eval (/dev-server/src/integrations/supabase/auth-middleware.ts:58:13)
+            Implement automatic authorization header injection for my Supabase server functions so I no longer get "Unauthorized: No authorization header provided". Add detailed auth middleware logging that shows which request is missing the authorization header and what token/header was expected. Add a setup screen to configure Supabase auth (API keys/secrets and auth mode) and verify the settings at startup. Enable a guest/anonymous access path for the landing page content function when no authorization header is provided. Implement a user-friendly error page that explains the unauthorized failure and provides actionable steps to resolve it.
           </p>
           {branding.showSocialIcons && (
             <div className="flex gap-4">
