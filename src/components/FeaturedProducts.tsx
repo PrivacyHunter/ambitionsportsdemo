@@ -17,7 +17,7 @@ export function FeaturedProducts() {
 
 
   return (
-    <section className="py-24 px-4 lg:px-8 bg-white dark:bg-background overflow-hidden">
+    <section className="py-24 px-4 lg:px-8 bg-slate-50 dark:bg-slate-900/50 overflow-hidden">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
         <div>
           <h3 className="text-primary font-black tracking-[0.2em] uppercase mb-4 text-sm">Most Wanted</h3>
