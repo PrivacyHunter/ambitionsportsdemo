@@ -23,7 +23,7 @@ export function Footer() {
             </span>
           </Link>
           <p className="text-slate-600 dark:text-muted-foreground text-sm leading-relaxed">
-            Generate a responsive QA checklist and screenshot report for the hero banners and FeaturedProducts on common phone widths to confirm the text scaling looks correct.
+            Change the Featured collection product colors in dark mode to a non-white scheme so they look readable and match the desired branding.
           </p>
           {branding.showSocialIcons && (
             <div className="flex gap-4">
