@@ -114,7 +114,7 @@ export function HeroSlider() {
               animate={{ opacity: 1, y: 0 }}
               className="text-primary font-black tracking-widest uppercase mb-4 flex items-center gap-3 text-[10px] md:text-sm"
             >
-              <span className="w-12 h-[2px] bg-primary" /> Fix my hero and banner text so it scales down correctly on phone widths and never cuts off or overflows the banner on mobile.
+              <span className="w-12 h-[2px] bg-primary" /> For the code present, I get the error below. Please think step-by-step in order to resolve it. Error: Unauthorized: No authorization header provided. {"{ \"timestamp\": 1787294753138, \"error_type\": \"RUNTIME_ERROR\" }"}
             </motion.p>
             <h1 className="text-3xl sm:text-4xl md:text-7xl lg:text-8xl font-black uppercase italic leading-[0.85] tracking-tighter mb-10 text-slate-900 dark:text-foreground">
               {current === 0 ? (content?.hero?.title || activeBanner?.title1) : activeBanner?.title1} <br />

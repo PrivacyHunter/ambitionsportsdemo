@@ -43,7 +43,7 @@ export function Testimonials() {
                   <Star key={i} size={16} className="fill-primary text-primary" />
                 ))}
               </div>
-              <p className="text-slate-600 dark:text-muted-foreground italic mb-6">Implement a draft-mode publish workflow that lets me preview landing page text changes before going live, and block publishing if any CTA text deviates from the approved wording exactly.</p>
+              <p className="text-slate-600 dark:text-muted-foreground italic mb-6">stack: Error: Unauthorized: No authorization header provided at eval (/dev-server/src/integrations/supabase/auth-middleware.ts:58:13)</p>
               <div>
                 <p className="font-bold text-primary">{t.name}</p>
                 <p className="text-xs uppercase tracking-widest text-slate-400 dark:text-white/40">{t.role}</p>

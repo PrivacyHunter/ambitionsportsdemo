@@ -184,7 +184,7 @@ function Index() {
               Start Your <br /><span className="text-primary">Custom Order</span>
             </h2>
             <p className="text-muted-foreground text-[10px] sm:text-lg mb-12 max-w-2xl mx-auto uppercase font-bold tracking-widest">
-              Verify that CTA click analytics events fire correctly end to end and that conversion reporting by page section works, while also adding automated WCAG contrast checks that fail the build for dark-mode color pairs.
+              {"at callNextMiddleware (/dev-server/node_modules/@tanstack/start-client-core/src/createServerFn.ts:322:30)"}
             </p>
             <Link to="/quote" className="inline-block bg-primary text-primary-foreground hover:bg-white hover:shadow-[0_0_30px_rgba(212,175,55,0.4)] px-12 py-6 rounded-2xl font-black uppercase tracking-widest text-lg transition-all duration-300">
               Get A Quote Now
