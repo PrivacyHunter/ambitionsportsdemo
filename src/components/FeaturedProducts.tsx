@@ -52,7 +52,7 @@ export function FeaturedProducts() {
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
         <div>
           <h3 className="text-primary font-black tracking-[0.2em] uppercase mb-4 text-sm">Most Wanted</h3>
-          <h2 className="text-5xl md:text-7xl font-black uppercase italic tracking-tighter leading-none">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black uppercase italic tracking-tighter leading-none">
             Featured <br /><span className="text-primary">Collection</span>
           </h2>
         </div>
@@ -69,7 +69,7 @@ export function FeaturedProducts() {
           <motion.div 
             key={idx}
             whileHover={{ y: -15 }}
-            className="min-w-[320px] md:min-w-[400px] bg-slate-50 dark:bg-surface rounded-3xl overflow-hidden border border-slate-200 dark:border-border relative group"
+            className="min-w-[320px] md:min-w-[400px] bg-slate-50 dark:bg-surface-soft rounded-3xl overflow-hidden border border-slate-200 dark:border-border relative group"
           >
             <div className="h-[400px] bg-white/[0.03] flex items-center justify-center relative overflow-hidden">
                <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity z-10" />

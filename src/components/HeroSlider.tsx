@@ -1,7 +1,10 @@
 import { useState, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { getLandingPageContent } from "@/lib/content.functions";
 
 interface Banner {
   image: string;
@@ -57,6 +60,12 @@ const banners: Banner[] = [
 ];
 
 export function HeroSlider() {
+  const getContent = useServerFn(getLandingPageContent);
+  const { data: content } = useQuery({
+    queryKey: ["landing-page-content"],
+    queryFn: () => getContent(),
+  });
+
   const [current, setCurrent] = useState(0);
 
   useEffect(() => {
@@ -107,8 +116,8 @@ export function HeroSlider() {
             >
               <span className="w-12 h-[2px] bg-primary" /> {activeBanner?.subtitle}
             </motion.p>
-            <h1 className="text-6xl md:text-8xl lg:text-9xl font-black uppercase italic leading-[0.85] tracking-tighter mb-10 text-slate-900 dark:text-foreground">
-              {activeBanner?.title1} <br />
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black uppercase italic leading-[0.85] tracking-tighter mb-10 text-slate-900 dark:text-foreground">
+              {current === 0 ? (content?.hero?.title || activeBanner?.title1) : activeBanner?.title1} <br />
               <span className={activeBanner?.accent === 'text-white' ? 'text-slate-900 dark:text-white' : activeBanner?.accent}>{activeBanner?.title2}</span>
             </h1>
             <div className="flex flex-wrap gap-6">

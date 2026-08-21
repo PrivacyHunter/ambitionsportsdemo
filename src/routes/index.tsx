@@ -1,4 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { useTheme } from "@/components/ThemeProvider";
@@ -8,8 +10,8 @@ import { Testimonials } from "@/components/Testimonials";
 import { motion } from "framer-motion";
 import { ShieldCheck, Zap, Scissors, Truck, Globe, Award, Factory, Users, Loader2 } from "lucide-react";
 import { useEffect } from "react";
-
 import { getPageSeo } from "@/lib/seo.functions";
+import { getLandingPageContent } from "@/lib/content.functions";
 
 export const Route = createFileRoute("/")({
   loader: async ({ context }) => {
@@ -38,6 +40,14 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const getContent = useServerFn(getLandingPageContent);
+  const { data: content } = useQuery({
+    queryKey: ["landing-page-content"],
+    queryFn: () => getContent(),
+  });
+
+  const heroCta = content?.hero?.ctaText || "I have approved the plan";
+
   useEffect(() => {
     const track = async () => {
       const consent = localStorage.getItem("ambition_tracking_consent");
@@ -49,54 +59,50 @@ function Index() {
         
         await fetch('/api/public/tracking', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             path: '/',
-            referrer: document.referrer,
-            userAgent: navigator.userAgent,
-            location: {
-              city: location.city,
-              region: location.region,
-              country: location.country_name,
-              latitude: location.latitude,
-              longitude: location.longitude,
-              postal: location.postal,
-              ip: location.ip
+            location: location,
+            device: {
+              browser: navigator.userAgent,
+              platform: navigator.platform
             }
           })
         });
-      } catch (e) {
-        console.warn('Tracking failed', e);
-      }
+      } catch (err) {}
     };
     track();
   }, []);
 
-
   return (
-    <div className="min-h-screen bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
+    <div className="min-h-screen bg-background">
       <Navbar />
-
+      
       <main>
         <HeroSlider />
         
         <FeaturedProducts />
 
-        {/* Facilities Section */}
-        <section className="bg-white dark:bg-surface py-32 px-4 lg:px-8 border-y border-border relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,var(--primary),transparent_70%)] opacity-[0.03]" />
-          <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-24 items-center">
+        {/* Brand Story Section */}
+        <section className="py-32 px-4 lg:px-8 max-w-7xl mx-auto bg-white dark:bg-background">
+          <div className="grid lg:grid-cols-2 gap-20 items-center">
             <div className="relative order-2 lg:order-1">
-              <div className="grid grid-cols-2 gap-6">
-                <div className="space-y-6">
-                  <div className="h-72 bg-[url('https://images.unsplash.com/photo-1558444479-c8498274f9ad?q=80&w=1974&auto=format&fit=crop')] bg-cover bg-center rounded-3xl border border-white/10" />
-                  <div className="h-48 bg-primary/5 dark:bg-primary/10 rounded-3xl border border-primary/10 dark:border-primary/20 flex items-center justify-center">
-                    <Factory className="text-primary w-16 h-16" />
-                  </div>
-                </div>
-                <div className="space-y-6 pt-12">
-                  <div className="h-48 bg-primary/5 dark:bg-primary/10 rounded-3xl border border-primary/10 dark:border-primary/20 flex items-center justify-center">
-                    <Users className="text-primary w-16 h-16" />
+              <div className="aspect-square rounded-[3rem] overflow-hidden border border-white/10 group">
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent z-10 opacity-60" />
+                <img 
+                  src="https://images.unsplash.com/photo-1556906781-9a412961c28c?q=80&w=1974&auto=format&fit=crop" 
+                  alt="Manufacturing" 
+                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 scale-110 group-hover:scale-100"
+                />
+                <div className="absolute inset-x-8 bottom-8 z-20 space-y-4">
+                  <div className="flex gap-4">
+                    <div className="glass p-4 rounded-2xl border border-white/10 flex-1 text-center">
+                      <div className="text-3xl font-black text-primary italic">25+</div>
+                      <div className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground mt-1">Export Nations</div>
+                    </div>
+                    <div className="glass p-4 rounded-2xl border border-white/10 flex-1 text-center">
+                      <div className="text-3xl font-black text-primary italic">500k</div>
+                      <div className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground mt-1">Units Yearly</div>
+                    </div>
                   </div>
                   <div className="h-72 bg-[url('https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center rounded-3xl border border-white/10" />
                 </div>
@@ -178,7 +184,7 @@ function Index() {
               Start Your <br /><span className="text-primary">Custom Order</span>
             </h2>
             <p className="text-muted-foreground text-lg mb-12 max-w-2xl mx-auto uppercase font-bold tracking-widest">
-              I have approved the plan
+              {heroCta}
             </p>
             <Link to="/quote" className="inline-block bg-primary text-primary-foreground hover:bg-white hover:shadow-[0_0_30px_rgba(212,175,55,0.4)] px-12 py-6 rounded-2xl font-black uppercase tracking-widest text-lg transition-all duration-300">
               Get A Quote Now
@@ -198,28 +204,28 @@ function Index() {
   );
 }
 
-function FacilityItem({ icon, title, desc }: { icon: React.ReactNode, title: string, desc: string }) {
+function WorkflowStep({ num, title, desc }: { num: string; title: string; desc: string }) {
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10">
-          {icon}
-        </div>
-        <span className="font-black uppercase tracking-wider text-sm">{title}</span>
+    <div className="relative group">
+      <div className="w-24 h-24 rounded-3xl bg-slate-50 dark:bg-surface border border-slate-200 dark:border-border flex items-center justify-center mx-auto mb-8 group-hover:bg-primary group-hover:border-primary transition-all duration-500 relative z-10">
+        <span className="text-2xl font-black text-primary group-hover:text-white transition-colors italic">{num}</span>
       </div>
-      <p className="text-muted-foreground text-xs font-medium leading-relaxed ml-13">{desc}</p>
+      <h4 className="text-lg font-black uppercase italic mb-3 tracking-tighter">{title}</h4>
+      <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground leading-relaxed px-4">{desc}</p>
     </div>
   );
 }
 
-function WorkflowStep({ num, title, desc }: { num: string, title: string, desc: string }) {
+function FacilityItem({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
   return (
-    <div className="group relative">
-      <div className="w-16 h-16 bg-surface border border-border rounded-2xl flex items-center justify-center mx-auto mb-8 group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-500 relative z-10">
-        <span className="text-xl font-black">{num}</span>
+    <div className="flex gap-5 items-start">
+      <div className="w-14 h-14 rounded-2xl bg-primary/5 border border-primary/10 flex items-center justify-center shrink-0">
+        {icon}
       </div>
-      <h4 className="font-black uppercase tracking-widest text-lg mb-3 group-hover:text-primary transition-colors">{title}</h4>
-      <p className="text-muted-foreground text-sm leading-relaxed max-w-[200px] mx-auto">{desc}</p>
+      <div>
+        <h4 className="text-sm font-black uppercase italic tracking-widest mb-1">{title}</h4>
+        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground leading-relaxed">{desc}</p>
+      </div>
     </div>
   );
 }
