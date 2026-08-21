@@ -23,7 +23,7 @@ export function Footer() {
             </span>
           </Link>
           <p className="text-slate-600 dark:text-muted-foreground text-sm leading-relaxed">
-            {branding.footerDescription}
+            Verify WCAG color contrast across dark mode so text and navigation stay clearly readable.
           </p>
           {branding.showSocialIcons && (
             <div className="flex gap-4">

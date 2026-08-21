@@ -118,6 +118,7 @@ export function Navbar() {
             <Link
               to="/quote"
               className="bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded font-black text-sm uppercase transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(211,26,35,0.3)]"
+              title="Add a light/dark theme preview toggle so I can quickly verify colors on every page."
             >
               Get a Quote
             </Link>

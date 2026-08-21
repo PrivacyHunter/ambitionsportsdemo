@@ -52,9 +52,12 @@ export function FeaturedProducts() {
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
         <div>
           <h3 className="text-primary font-black tracking-[0.2em] uppercase mb-4 text-sm">Most Wanted</h3>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black uppercase italic tracking-tighter leading-none">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black uppercase italic tracking-tighter leading-none mb-4">
             Featured <br /><span className="text-primary">Collection</span>
           </h2>
+          <p className="text-muted-foreground text-[10px] font-bold uppercase tracking-widest max-w-xl">
+            Adjust the banner and product text styling so it no longer makes the full banners/products appear hidden or obscured.
+          </p>
         </div>
         <Link to="/sportswear" className="text-slate-900 dark:text-white border-b-2 border-primary pb-2 font-black uppercase tracking-widest text-sm hover:text-primary transition-colors">
           Explore All Gear
