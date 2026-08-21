@@ -184,7 +184,7 @@ function Index() {
               Start Your <br /><span className="text-primary">Custom Order</span>
             </h2>
             <p className="text-muted-foreground text-[10px] sm:text-lg mb-12 max-w-2xl mx-auto uppercase font-bold tracking-widest">
-              {"at callNextMiddleware (/dev-server/node_modules/@tanstack/start-client-core/src/createServerFn.ts:322:30)"}
+              Implement role-based access so only landing page content is public while other server functions still require authorization. Add a user-friendly error boundary and fallback UI that shows an actionable message instead of a blank screen when a server function fails. Implement structured logging for serverFn authorization failures (request id, endpoint, and user context) so I can diagnose issues faster. Create automated tests that verify public landing reads work and protected routes correctly reject requests without an authorization header.
             </p>
             <Link to="/quote" className="inline-block bg-primary text-primary-foreground hover:bg-white hover:shadow-[0_0_30px_rgba(212,175,55,0.4)] px-12 py-6 rounded-2xl font-black uppercase tracking-widest text-lg transition-all duration-300">
               Get A Quote Now
