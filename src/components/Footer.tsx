@@ -10,9 +10,11 @@ export function Footer() {
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-20">
         {/* Brand & Inquiry Info */}
         <div className="space-y-6">
-          <Link to="/" className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-3">
             {branding.logoUrl ? (
-              <img src={branding.logoUrl} alt={branding.logoText} className="h-20 md:h-28 w-auto object-contain" />
+              <span className="inline-flex items-center justify-center p-2 rounded-xl border-2 border-primary bg-white">
+                <img src={branding.logoUrl} alt={branding.logoText} className="h-10 md:h-12 w-auto object-contain" />
+              </span>
             ) : (
               <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center font-black text-primary-foreground text-2xl">
                 {branding.logoText?.[0] || 'A'}
