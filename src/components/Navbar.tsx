@@ -90,7 +90,9 @@ export function Navbar() {
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <Link to="/" className="flex items-center gap-2 group">
             {branding.logoUrl ? (
-              <img src={branding.logoUrl} alt={branding.logoText} className="h-10 md:h-12 w-auto object-contain" />
+              <span className="inline-flex items-center justify-center p-1.5 rounded-xl border-2 border-primary bg-white">
+                <img src={branding.logoUrl} alt={branding.logoText} className="h-8 md:h-10 w-auto object-contain" />
+              </span>
             ) : (
               <>
                 <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center font-black text-primary-foreground text-2xl group-hover:shadow-[0_0_20px_rgba(212,175,55,0.5)] transition-all">

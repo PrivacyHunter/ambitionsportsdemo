@@ -1,5 +1,5 @@
 import { Star, Quote } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 
 const testimonials = [
   {
@@ -23,11 +23,12 @@ const testimonials = [
 ];
 
 export function Testimonials() {
+  const shouldReduceMotion = useReducedMotion();
   return (
     <section className="py-24 bg-slate-50 dark:bg-zinc-950">
       <div className="max-w-7xl mx-auto px-4">
         <motion.h3
-          initial={{ opacity: 0, y: -10 }}
+          initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: -10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="text-primary font-black tracking-[0.3em] uppercase mb-4 text-center text-xs"
@@ -35,7 +36,7 @@ export function Testimonials() {
           Trusted Worldwide
         </motion.h3>
         <motion.h2
-          initial={{ opacity: 0, scale: 0.92 }}
+          initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.92 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, ease: "easeOut" }}
@@ -47,11 +48,11 @@ export function Testimonials() {
           {testimonials.map((t, i) => (
             <motion.div 
               key={i}
-              initial={{ opacity: 0, y: 40 }}
+              initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.15, duration: 0.5, ease: "easeOut" }}
-              whileHover={{ y: -10 }}
+              transition={shouldReduceMotion ? { duration: 0 } : { delay: i * 0.15, duration: 0.5, ease: "easeOut" }}
+              whileHover={shouldReduceMotion ? {} : { y: -10 }}
               className="relative bg-white dark:bg-zinc-900 border border-slate-200 dark:border-white/5 p-8 rounded-3xl shadow-sm dark:shadow-none hover:border-primary/40 hover:shadow-[0_20px_50px_-20px_rgba(239,24,34,0.35)] transition-all duration-300"
             >
               <Quote className="absolute top-6 right-6 text-primary/15" size={48} />
@@ -72,3 +73,4 @@ export function Testimonials() {
     </section>
   );
 }
+
