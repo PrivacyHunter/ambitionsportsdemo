@@ -40,8 +40,9 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { useTheme } from "@/components/ThemeProvider";
 import {
   deleteProduct, getDashboard, saveSetting, setUserRole, updateStatus, upsertProduct,
-  inviteUser, backupSettings, restoreSettings, listSettings,
+  inviteUser, backupSettings, restoreSettings, listSettings, saveSetting,
 } from "@/lib/admin.functions";
+import { getLandingPageContent, saveLandingPageContent } from "@/lib/content.functions";
 import { saveThemeVersion, getThemeHistory, scheduleReport } from "@/lib/history.functions";
 import { getPageSeo, savePageSeo } from "@/lib/seo.functions";
 import { getSeoBulk, saveSeoBulk, autoGenerateSeo } from "@/lib/seo-bulk.functions";
@@ -192,6 +193,7 @@ function PanelPage() {
         { tab === "instagram" && <InstagramTab />}
         { tab === "accounts" && role === "developer" && <AccountsTab data={data!} onDone={() => void refetch()} />}
         { tab === "logs" && role === "developer" && <LogsTab />}
+        { tab === "content" && (role === "owner" || role === "developer") && <ContentTab />}
       </section>
     </main>
   );
@@ -2603,6 +2605,114 @@ function Detail({ label, value }: { label: string; value: string }) {
     <div className="flex items-start justify-between gap-4">
       <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground shrink-0">{label}</span>
       <span className="text-right break-words">{value}</span>
+    </div>
+  );
+}
+
+function AdminThemeManager() {
+  const { theme, setPreview, savedTheme } = useTheme();
+  const save = useServerFn(saveSetting);
+  
+  const handleSave = async () => {
+    try {
+      await save({ data: { key: "theme", value: JSON.stringify(theme) } });
+      toast.success("Theme saved successfully");
+    } catch (e) {
+      toast.error("Failed to save theme");
+    }
+  };
+
+  return (
+    <div className="hidden sm:flex items-center gap-2 glass px-3 py-1.5 rounded-full border border-primary/20">
+      <div className="flex items-center gap-1.5 mr-2">
+        <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+        <span className="text-[9px] font-black uppercase tracking-widest">Live Studio</span>
+      </div>
+      <input 
+        type="color" 
+        value={theme.goldAccent}
+        onChange={(e) => setPreview({ theme: { ...theme, goldAccent: e.target.value } })}
+        className="w-4 h-4 rounded-full overflow-hidden bg-transparent cursor-pointer border-none p-0"
+      />
+      <button 
+        onClick={handleSave}
+        className="text-[9px] font-black uppercase tracking-widest hover:text-primary transition-colors ml-2"
+      >
+        Push Changes
+      </button>
+    </div>
+  );
+}
+
+function ContentTab() {
+  const getContent = useServerFn(getLandingPageContent);
+  const saveContent = useServerFn(saveLandingPageContent);
+  const queryClient = useQueryClient();
+
+  const { data: content, isPending } = useQuery({
+    queryKey: ["landing-page-content"],
+    queryFn: () => getContent(),
+  });
+
+  const [form, setForm] = useState<any>(null);
+
+  useEffect(() => {
+    if (content) setForm(content);
+  }, [content]);
+
+  const mutation = useMutation({
+    mutationFn: () => saveContent({ data: form }),
+    onSuccess: () => {
+      toast.success("Content saved");
+      queryClient.invalidateQueries({ queryKey: ["landing-page-content"] });
+    },
+  });
+
+  if (isPending || !form) return <Loader2 className="animate-spin mx-auto" />;
+
+  return (
+    <div className="space-y-6">
+      <div className="glass rounded-[2rem] p-8 border border-white/5">
+        <h2 className="text-xl font-black uppercase italic mb-8">Landing Page Content</h2>
+        
+        <div className="space-y-6">
+          <div className="p-6 rounded-3xl bg-white/5 border border-white/10 space-y-4">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-primary flex items-center gap-2">
+              <Layout size={14} /> Hero Section
+            </h3>
+            
+            <div className="grid gap-4">
+              <label className="block space-y-2">
+                <span className="text-[10px] font-bold uppercase text-muted-foreground">Hero Title</span>
+                <input 
+                  value={form.hero.title}
+                  onChange={(e) => setForm({ ...form, hero: { ...form.hero, title: e.target.value } })}
+                  className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-primary outline-none"
+                />
+              </label>
+              
+              <label className="block space-y-2">
+                <span className="text-[10px] font-bold uppercase text-muted-foreground">CTA Button Text</span>
+                <input 
+                  value={form.hero.ctaText}
+                  onChange={(e) => setForm({ ...form, hero: { ...form.hero, ctaText: e.target.value } })}
+                  className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-primary outline-none"
+                />
+              </label>
+            </div>
+          </div>
+
+          <div className="flex gap-4">
+            <button 
+              onClick={() => mutation.mutate()}
+              disabled={mutation.isPending}
+              className="flex-1 bg-primary text-primary-foreground py-4 rounded-2xl font-black uppercase tracking-[0.2em] shadow-lg hover:scale-[1.02] transition-all"
+            >
+              {mutation.isPending ? "Saving..." : "Apply Changes"}
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
