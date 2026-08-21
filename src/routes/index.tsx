@@ -141,11 +141,36 @@ function Index() {
           
           <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-12 relative">
             <div className="hidden lg:block absolute top-12 left-0 w-full h-[2px] bg-border -z-10" />
-            <WorkflowStep num="01" title="Design" desc="Digital mockups & 3D tech packs." />
-            <WorkflowStep num="02" title="Material" desc="Elite performance fabrics selection." />
-            <WorkflowStep num="03" title="Stitching" desc="High-density flatlock precision." />
-            <WorkflowStep num="04" title="QC Check" desc="Rigorous final quality assurance." />
-            <WorkflowStep num="05" title="Shipping" desc="Express global logistics delivery." />
+            <WorkflowStep 
+              num="01" 
+              title="Design" 
+              desc="Digital mockups & 3D tech packs." 
+              image="https://images.unsplash.com/photo-1558655146-d09347e92766?q=80&w=2000&auto=format&fit=crop"
+            />
+            <WorkflowStep 
+              num="02" 
+              title="Material" 
+              desc="Elite performance fabrics selection." 
+              image="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=2000&auto=format&fit=crop"
+            />
+            <WorkflowStep 
+              num="03" 
+              title="Stitching" 
+              desc="High-density flatlock precision." 
+              image="https://images.unsplash.com/photo-1556906781-9a412961c28c?q=80&w=2000&auto=format&fit=crop"
+            />
+            <WorkflowStep 
+              num="04" 
+              title="QC Check" 
+              desc="Rigorous final quality assurance." 
+              image="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=2000&auto=format&fit=crop"
+            />
+            <WorkflowStep 
+              num="05" 
+              title="Shipping" 
+              desc="Express global logistics delivery." 
+              image="https://images.unsplash.com/photo-1566576721346-d4a3b4eaad5b?q=80&w=2000&auto=format&fit=crop"
+            />
           </div>
         </section>
 
@@ -181,7 +206,19 @@ function Index() {
           >
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[100px] -z-10" />
             <h2 className="text-3xl sm:text-4xl md:text-6xl font-black uppercase italic tracking-tighter mb-8 leading-none">
-              Start Your <br /><span className="text-primary">Custom Order</span>
+              '''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''
+
+MUJHE IN CARDS PR BHI WHITE NHI CHAHIYE KOI AUR COLOR KRO AUR NAVY REMOVE KRO BACKGROUND SE AUR Manufacturing Workflow MEIN PICTURES LGAO LA K REAL WALI
+
+Add an element picker so I can reliably select the exact UI node to target for my visual text and branding edits.
+
+Implement a live diff preview for every visual text edit so I can confirm exactly what will change before it applies.
+
+Add one-click undo/rollback so I can revert any previous visual text or branding change immediately.
+
+Build a theme-aware branding settings panel so I can configure navbar/footer/logo colors (including dark mode navy) and see the result instantly.
+
+Create an audit log and version history with rollback that records who changed each literal text/branding field and which element was updated.
             </h2>
             <p className="text-muted-foreground text-[10px] sm:text-lg mb-12 max-w-2xl mx-auto uppercase font-bold tracking-widest">
               Join the elite athletes and teams who trust Ambition Sports for their professional custom apparel needs.
@@ -204,11 +241,18 @@ function Index() {
   );
 }
 
-function WorkflowStep({ num, title, desc }: { num: string; title: string; desc: string }) {
+function WorkflowStep({ num, title, desc, image }: { num: string; title: string; desc: string; image: string }) {
   return (
     <div className="relative group">
-      <div className="w-24 h-24 rounded-3xl bg-slate-50 dark:bg-surface border border-slate-200 dark:border-border flex items-center justify-center mx-auto mb-8 group-hover:bg-primary group-hover:border-primary transition-all duration-500 relative z-10">
-        <span className="text-2xl font-black text-primary group-hover:text-white transition-colors italic">{num}</span>
+      <div className="w-full aspect-square rounded-3xl overflow-hidden mb-8 border border-slate-200 dark:border-white/10 relative">
+        <img 
+          src={image} 
+          alt={title} 
+          className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-110"
+        />
+        <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+          <span className="text-4xl font-black text-white italic">{num}</span>
+        </div>
       </div>
       <h4 className="text-lg font-black uppercase italic mb-3 tracking-tighter">{title}</h4>
       <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground leading-relaxed px-4">{desc}</p>
