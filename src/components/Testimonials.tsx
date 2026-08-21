@@ -24,7 +24,7 @@ const testimonials = [
 
 export function Testimonials() {
   const shouldReduceMotion = useReducedMotion();
-
+  return (
     <section className="py-24 bg-slate-50 dark:bg-zinc-950">
       <div className="max-w-7xl mx-auto px-4">
         <motion.h3
