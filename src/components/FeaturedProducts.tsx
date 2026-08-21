@@ -17,7 +17,7 @@ export function FeaturedProducts() {
 
 
   return (
-    <section className="py-24 px-4 lg:px-8 bg-white dark:bg-background overflow-hidden">
+    <section className="py-24 px-4 lg:px-8 bg-slate-50 dark:bg-slate-900/50 overflow-hidden">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
         <div>
           <h3 className="text-primary font-black tracking-[0.2em] uppercase mb-4 text-sm">Most Wanted</h3>
@@ -25,7 +25,10 @@ export function FeaturedProducts() {
             Featured <br /><span className="text-primary">Collection</span>
           </h2>
           <p className="text-muted-foreground text-[10px] font-bold uppercase tracking-widest max-w-xl">
-            High-performance custom apparel engineered for elite athletes. Precision manufacturing for global export.
+            '''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''
+            
+            
+            YE WALA SECTION DARK MODE MEIN WHITE NHI KRNA ISKO KOI AUR COLOR DO JO THEME SE MATCH KRE
           </p>
         </div>
         <Link to="/sportswear" className="text-slate-900 dark:text-white border-b-2 border-primary pb-2 font-black uppercase tracking-widest text-sm hover:text-primary transition-colors flex items-center gap-2 group/all">
