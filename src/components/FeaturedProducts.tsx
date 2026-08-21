@@ -25,10 +25,7 @@ export function FeaturedProducts() {
             Featured <br /><span className="text-primary">Collection</span>
           </h2>
           <p className="text-muted-foreground text-[10px] font-bold uppercase tracking-widest max-w-xl">
-            '''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''
-            
-            
-            YE WALA SECTION DARK MODE MEIN WHITE NHI KRNA ISKO KOI AUR COLOR DO JO THEME SE MATCH KRE
+            High-performance custom apparel engineered for elite athletes. Precision manufacturing for global export.
           </p>
         </div>
         <Link to="/sportswear" className="text-slate-900 dark:text-white border-b-2 border-primary pb-2 font-black uppercase tracking-widest text-sm hover:text-primary transition-colors flex items-center gap-2 group/all">
