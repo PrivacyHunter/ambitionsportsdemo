@@ -178,7 +178,7 @@ function Index() {
               Start Your <br /><span className="text-primary">Custom Order</span>
             </h2>
             <p className="text-muted-foreground text-lg mb-12 max-w-2xl mx-auto uppercase font-bold tracking-widest">
-              Ready to create something legendary? Our team is standing by to bring your vision to life.
+              I have approved the plan
             </p>
             <Link to="/quote" className="inline-block bg-primary text-primary-foreground hover:bg-white hover:shadow-[0_0_30px_rgba(212,175,55,0.4)] px-12 py-6 rounded-2xl font-black uppercase tracking-widest text-lg transition-all duration-300">
               Get A Quote Now
