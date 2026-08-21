@@ -23,7 +23,7 @@ export function Footer() {
             </span>
           </Link>
           <p className="text-slate-600 dark:text-muted-foreground text-sm leading-relaxed">
-            Roles are granted in the database — the control panel opens only for owner, admin and developer accounts. Add an element picker so I can reliably select the exact UI node to target for my text replacement. Add a live diff preview for every visual text replacement before it applies so I can confirm what will change. Implement a safe literal text mode that inserts my provided phrases as-is after sanitizing any disallowed content. Improve the error response when a visual edit is blocked by showing which text triggered the block and what specific change would let it proceed. Implement a draft preview that shows exactly how my visual text replacement will render before I apply it.
+            Leading manufacturer of high-performance custom sportswear and activewear. Exporting excellence from Sialkot to the world.
           </p>
           {branding.showSocialIcons && (
             <div className="flex gap-4">

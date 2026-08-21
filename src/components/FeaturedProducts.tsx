@@ -56,7 +56,7 @@ export function FeaturedProducts() {
             Featured <br /><span className="text-primary">Collection</span>
           </h2>
           <p className="text-muted-foreground text-[10px] font-bold uppercase tracking-widest max-w-xl">
-            Implement an admin screen that lets me manage landing page literal text content with previews and a publish step. Create end-to-end tests that verify landing page content is public while all other server functions reject requests without an authorization header. Add an audit log that records who made each visual text edit and what element/text was changed. Implement a version history with rollback for every literal text change I make on the landing page.
+            High-performance custom apparel engineered for elite athletes. Precision manufacturing for global export.
           </p>
         </div>
         <Link to="/sportswear" className="text-slate-900 dark:text-white border-b-2 border-primary pb-2 font-black uppercase tracking-widest text-sm hover:text-primary transition-colors flex items-center gap-2 group/all">
