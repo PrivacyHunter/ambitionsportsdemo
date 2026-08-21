@@ -59,8 +59,8 @@ export function FeaturedProducts() {
             Adjust the banner and product text styling so it no longer makes the full banners/products appear hidden or obscured.
           </p>
         </div>
-        <Link to="/sportswear" className="text-slate-900 dark:text-white border-b-2 border-primary pb-2 font-black uppercase tracking-widest text-sm hover:text-primary transition-colors">
-          Explore All Gear
+        <Link to="/sportswear" className="text-slate-900 dark:text-white border-b-2 border-primary pb-2 font-black uppercase tracking-widest text-sm hover:text-primary transition-colors flex items-center gap-2 group/all">
+          Explore All Gear <ArrowRight size={16} className="group-hover/all:translate-x-2 transition-transform text-primary" />
         </Link>
       </div>
 
