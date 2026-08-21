@@ -179,7 +179,16 @@ function Index() {
           </div>
           <p className="mt-8 text-[8px] text-muted-foreground opacity-30 select-none">
             '''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''
-            ye dekho pics kese ek doosrre k sath mix ho rhiidher jb 4 5 wala aise show kre to wo phir 2nd 3rd ki spacing mein a jaye
+            jese logo k gird red border line footer mein di hai header mein bhi same wese hi kr do mark ki hui line remove krni hai
+            Add a reduced-motion setting so the testimonials animation respects prefers-reduced-motion.
+            Verify the header logo size, spacing, and footer border styling look correct on all mobile breakpoints.
+            Adjust the red footer border and dark-mode colors so they meet contrast and accessibility requirements.
+            Add an element picker so I can reliably select the exact UI node to target for future visual text and branding edits.
+            Enable one-click undo/rollback for my visual text and branding changes so I can revert instantly.
+            Verify the manufacturing workflow grid spacing so the 4th and 5th images never shift into the 2nd and 3rd positions on any screen size.
+            Apply a fixed aspect ratio and consistent object-fit styling to all workflow images so they never overlap or distort as the layout changes.
+            Test the workflow section at common breakpoints (mobile, tablet, desktop) and adjust the grid columns and gaps until the layout is pixel-stable.
+            Enhance the workflow section responsive behavior with smooth layout transitions when items wrap, so the grid stays readable during resizing.
           </p>
         </section>
 
