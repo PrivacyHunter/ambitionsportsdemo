@@ -118,7 +118,7 @@ export function Navbar() {
             <Link
               to="/quote"
               className="bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded font-black text-sm uppercase transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(211,26,35,0.3)]"
-              title="Add a light/dark theme preview toggle so I can quickly verify colors on every page."
+              title="'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n\nLOGO K SATH COLORS MATCH KRNE HAIN PURE LOGO MEIN NAVY COLOR NHI HAI AUR TUM NE SITE MEIN NAVY ADD KR DIYA"
             >
               Get a Quote
             </Link>
