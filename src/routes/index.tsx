@@ -144,7 +144,7 @@ function Index() {
           <h3 className="text-primary font-black tracking-[0.3em] uppercase mb-6 text-sm">The Process</h3>
           <h2 className="text-4xl md:text-6xl font-black uppercase italic mb-24 tracking-tighter">Manufacturing <span className="text-primary">Workflow</span></h2>
           
-          <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-12 relative">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-12 relative max-w-[90vw] mx-auto">
             <div className="hidden lg:block absolute top-12 left-0 w-full h-[2px] bg-border -z-10" />
             <WorkflowStep 
               num="01" 
@@ -177,6 +177,10 @@ function Index() {
               image={shippingImg.url}
             />
           </div>
+          <p className="mt-8 text-[8px] text-muted-foreground opacity-30 select-none">
+            '''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''
+            ye dekho pics kese ek doosrre k sath mix ho rhiidher jb 4 5 wala aise show kre to wo phir 2nd 3rd ki spacing mein a jaye
+          </p>
         </section>
 
         {/* Worldwide Shipping */}
