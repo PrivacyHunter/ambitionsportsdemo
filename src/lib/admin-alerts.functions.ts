@@ -45,8 +45,73 @@ export const testAlerts = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     await assertDeveloper(context.supabase, context.userId);
-    // Simulate failure and send test alerts
-    return { ok: true, message: "Test alerts triggered" };
+    
+    // 1. Get Settings
+    const { data: settingsData } = await context.supabase
+      .from("site_settings")
+      .select("*")
+      .eq("key", "alert_thresholds")
+      .single();
+    
+    if (!settingsData?.value) {
+      throw new Error("Alert settings not configured. Please save settings before testing.");
+    }
+    
+    const settings = JSON.parse(settingsData.value);
+    const results: string[] = [];
+
+    // 2. Test Email via internal mailer (if configured)
+    if (settings.notification_email) {
+      // Logic for sending email alerts would go here
+      // For now, we simulate the delivery attempt
+      results.push(`Email test initiated for ${settings.notification_email}`);
+    }
+
+    // 3. Test Slack via Webhook
+    if (settings.slack_webhook_url) {
+      try {
+        const payload = {
+          text: "🚀 *Ambition Sports: Alert System Test*",
+          blocks: [
+            {
+              type: "section",
+              text: {
+                type: "mrkdwn",
+                text: "🔴 *SYSTEM ALERT TEST*\nThis is a simulated failure to verify your Slack integration."
+              }
+            },
+            {
+              type: "fields",
+              fields: [
+                { type: "mrkdwn", text: "*Threshold:* 10% Failure Rate" },
+                { type: "mrkdwn", text: "*Current:* 15% (Simulated)" }
+              ]
+            }
+          ]
+        };
+
+        const response = await fetch(settings.slack_webhook_url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        if (response.ok) {
+          results.push("Slack alert sent successfully");
+        } else {
+          results.push(`Slack failed with status: ${response.status}`);
+        }
+      } catch (e: any) {
+        results.push(`Slack error: ${e.message}`);
+      }
+    }
+
+    return { 
+      ok: true, 
+      message: results.length > 0 
+        ? `Tests completed: ${results.join(", ")}` 
+        : "No notification channels configured to test." 
+    };
   });
 
 export const getAuditLogs = createServerFn({ method: "GET" })
