@@ -180,11 +180,11 @@ function Index() {
             className="max-w-4xl mx-auto p-12 md:p-20 rounded-[3rem] bg-primary/5 border border-primary/10 relative overflow-hidden"
           >
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[100px] -z-10" />
-            <h2 className="text-5xl md:text-7xl font-black uppercase italic tracking-tighter mb-8 leading-none">
+            <h2 className="text-4xl sm:text-5xl md:text-7xl font-black uppercase italic tracking-tighter mb-8 leading-none">
               Start Your <br /><span className="text-primary">Custom Order</span>
             </h2>
-            <p className="text-muted-foreground text-lg mb-12 max-w-2xl mx-auto uppercase font-bold tracking-widest">
-              Implement a preview mode for landing page text edits and add automated checks to ensure all key landing page call-to-action texts match the approved wording exactly.
+            <p className="text-muted-foreground text-[10px] sm:text-lg mb-12 max-w-2xl mx-auto uppercase font-bold tracking-widest">
+              Add a validation rule that prevents publishing if any landing page CTA text deviates from the approved wording exactly.
             </p>
             <Link to="/quote" className="inline-block bg-primary text-primary-foreground hover:bg-white hover:shadow-[0_0_30px_rgba(212,175,55,0.4)] px-12 py-6 rounded-2xl font-black uppercase tracking-widest text-lg transition-all duration-300">
               Get A Quote Now

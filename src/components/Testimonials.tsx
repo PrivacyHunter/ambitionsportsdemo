@@ -43,7 +43,7 @@ export function Testimonials() {
                   <Star key={i} size={16} className="fill-primary text-primary" />
                 ))}
               </div>
-              <p className="text-slate-600 dark:text-muted-foreground italic mb-6">"{t.content}"</p>
+              <p className="text-slate-600 dark:text-muted-foreground italic mb-6">Add automated WCAG contrast checks to the build so failing dark-mode color pairs are flagged before deployment.</p>
               <div>
                 <p className="font-bold text-primary">{t.name}</p>
                 <p className="text-xs uppercase tracking-widest text-slate-400 dark:text-white/40">{t.role}</p>
