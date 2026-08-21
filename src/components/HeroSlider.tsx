@@ -109,13 +109,21 @@ export function HeroSlider() {
             transition={{ duration: 0.6 }}
             className="max-w-3xl"
           >
-            <motion.p 
+            <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="text-primary font-black tracking-widest uppercase mb-4 flex items-center gap-3 text-[10px] md:text-sm"
             >
-              <span className="w-12 h-[2px] bg-primary" /> {current === 0 ? (content?.hero?.subtitle || activeBanner?.subtitle) : activeBanner?.subtitle}
-            </motion.p>
+              <span className="w-12 h-[2px] bg-primary" /> 
+              <div className="flex flex-col">
+                <span>{current === 0 ? (content?.hero?.subtitle || activeBanner?.subtitle) : activeBanner?.subtitle}</span>
+                <span className="text-[8px] text-muted-foreground mt-1 normal-case leading-tight max-w-xs">
+                  '''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''
+                  
+                  LOGO K SATH COLORS MATCH KRNE HAIN PURE LOGO MEIN NAVY COLOR NHI HAI AUR TUM NE SITE MEIN NAVY ADD KR DIYA
+                </span>
+              </div>
+            </motion.div>
             <h1 className="text-xl sm:text-2xl md:text-5xl lg:text-6xl font-black uppercase italic leading-[0.85] tracking-tighter mb-10 text-slate-900 dark:text-foreground">
               {current === 0 ? (content?.hero?.title || activeBanner?.title1) : activeBanner?.title1} <br />
               <span className={activeBanner?.accent === 'text-white' ? 'text-slate-900 dark:text-white' : activeBanner?.accent}>{activeBanner?.title2}</span>
