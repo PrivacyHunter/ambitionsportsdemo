@@ -114,7 +114,7 @@ export function HeroSlider() {
               animate={{ opacity: 1, y: 0 }}
               className="text-primary font-black tracking-widest uppercase mb-4 flex items-center gap-3 text-[10px] md:text-sm"
             >
-              <span className="w-12 h-[2px] bg-primary" /> Premium Custom Gear
+              <span className="w-12 h-[2px] bg-primary" /> {current === 0 ? (content?.hero?.subtitle || activeBanner?.subtitle) : activeBanner?.subtitle}
             </motion.p>
             <h1 className="text-2xl sm:text-4xl md:text-7xl lg:text-8xl font-black uppercase italic leading-[0.85] tracking-tighter mb-10 text-slate-900 dark:text-foreground">
               {current === 0 ? (content?.hero?.title || activeBanner?.title1) : activeBanner?.title1} <br />
