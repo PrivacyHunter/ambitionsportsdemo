@@ -252,19 +252,19 @@ function Index() {
 
 function WorkflowStep({ num, title, desc, image }: { num: string; title: string; desc: string; image: string }) {
   return (
-    <div className="relative group">
-      <div className="w-full aspect-square rounded-3xl overflow-hidden mb-8 border border-slate-200 dark:border-white/10 relative">
+    <div className="relative group w-full">
+      <div className="w-full aspect-square rounded-2xl md:rounded-3xl overflow-hidden mb-4 md:mb-8 border border-slate-200 dark:border-white/10 relative">
         <img 
           src={image} 
           alt={title} 
           className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-110"
         />
         <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-          <span className="text-4xl font-black text-white italic">{num}</span>
+          <span className="text-2xl md:text-4xl font-black text-white italic">{num}</span>
         </div>
       </div>
-      <h4 className="text-lg font-black uppercase italic mb-3 tracking-tighter">{title}</h4>
-      <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground leading-relaxed px-4">{desc}</p>
+      <h4 className="text-base md:text-lg font-black uppercase italic mb-2 md:mb-3 tracking-tighter">{title}</h4>
+      <p className="text-[8px] md:text-[10px] font-bold uppercase tracking-widest text-muted-foreground leading-relaxed px-2 md:px-4">{desc}</p>
     </div>
   );
 }
