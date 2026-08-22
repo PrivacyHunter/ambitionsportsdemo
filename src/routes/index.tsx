@@ -17,6 +17,10 @@ import qcImg from "@/assets/file-40.jpg.asset.json";
 import shippingImg from "@/assets/file-41.jpg.asset.json";
 import materialImg from "@/assets/file-43.jpg.asset.json";
 import designImg from "@/assets/file-44.jpg.asset.json";
+import dhlLogo from "@/assets/dhl.png.asset.json";
+import fedexLogo from "@/assets/fedex.png.asset.json";
+import upsLogo from "@/assets/ups.png.asset.json";
+import aramexLogo from "@/assets/aramex.png.asset.json";
 
 export const Route = createFileRoute("/")({
   loader: async ({ context }) => {
