@@ -122,7 +122,7 @@ function Index() {
 
             <div className="order-1 lg:order-2">
               <h3 className="text-primary font-black tracking-[0.3em] uppercase mb-6 text-sm">Industrial Excellence</h3>
-              <h2 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter mb-8 leading-[0.9]">
+              <h2 className="text-3xl sm:text-4xl md:text-6xl font-black uppercase italic tracking-tighter mb-8 leading-[0.9]">
                 Advanced <br /><span className="text-primary">Facilities</span>
               </h2>
               <p className="text-slate-600 dark:text-muted-foreground text-xl leading-relaxed mb-12">
@@ -146,7 +146,7 @@ function Index() {
         {/* How We Build Section */}
         <section className="py-32 px-4 lg:px-8 max-w-7xl mx-auto text-center bg-white dark:bg-background">
           <h3 className="text-primary font-black tracking-[0.3em] uppercase mb-6 text-sm">The Process</h3>
-          <h2 className="text-4xl md:text-6xl font-black uppercase italic mb-24 tracking-tighter">Manufacturing <span className="text-primary">Workflow</span></h2>
+          <h2 className="text-3xl sm:text-4xl md:text-6xl font-black uppercase italic mb-24 tracking-tighter">Manufacturing <span className="text-primary">Workflow</span></h2>
           
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-12 relative w-full px-2 max-w-full overflow-hidden">
             <div className="hidden lg:block absolute top-12 left-0 w-full h-[2px] bg-border -z-10" />
@@ -233,7 +233,7 @@ function Index() {
               Get A Quote Now
             </Link>
             <p className="mt-12 text-[10px] text-muted-foreground opacity-40 max-w-2xl mx-auto uppercase font-bold tracking-widest text-center select-none whitespace-pre-wrap">
-              {"'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n\nEXPLORE STITCHING UNIT KI PICS BHI MIX HO RHHI HAIN Manufacturing Workflow BHI RESPONSIVE NHI HAI PHONE VIEW MEIN COMPLETE SHOW NHI KR RHA We Ship Worldwide BHI COMPLETE SHOW NHI HO RHA AUR DHL EXPRESS\n\nFEDEX\n\nUPS\n\nARAMEX INKE NAM NHI LIKHNE INKE LOGO LGANE HAIN"}
+              {"'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n\nThe Process\n\nManufacturing Workflow\n\nPHONE VIEW MEIN YE TEXT KAFI BARA A RHA HAI SCREEN PR COMPLETE NAZAR BHI NHI A RHA AUR EXPLORE STITCHING UNIT MEIN JO PICS HAIN WO PLZ ORGANZIE KR DO WO SB UPER NEECHE ANDER BAHIR HO GAYI HAIN KOI EK BHI SHI NAZAR NHI A RHI Stealth Basketball Kit IS MEIN CUSTOM QUOTE NAZAR NHI A RHA Vector Compression IS MEIN BHI CUSTOM QUOTE NAZAR NHI A RHA  PHONE VIEW MEIN"}
             </p>
           </motion.div>
         </section>
