@@ -72,7 +72,7 @@ export function FeaturedProducts() {
                   <p className="text-primary group-hover:text-primary/80 transition-colors text-[10px] font-black uppercase tracking-[0.2em] mb-2">{product.category}</p>
                   <h4 className="font-black uppercase tracking-tighter text-2xl group-hover:text-primary transition-colors">{product.name}</h4>
                 </div>
-                <span className="text-slate-900 dark:text-white font-black text-2xl tracking-tighter">{product.price}</span>
+                <span className="text-slate-900 dark:text-white font-black text-xl sm:text-2xl tracking-tighter">{product.price}</span>
               </div>
               <p className="text-slate-600 dark:text-muted-foreground text-sm mb-6 leading-relaxed">High-performance custom apparel engineered for elite athletes.</p>
               <Link to="/quote" className="flex items-center gap-2 text-slate-900 dark:text-white font-black uppercase tracking-widest text-[10px] group/btn">
