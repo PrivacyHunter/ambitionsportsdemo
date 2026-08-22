@@ -17,6 +17,10 @@ import qcImg from "@/assets/file-40.jpg.asset.json";
 import shippingImg from "@/assets/file-41.jpg.asset.json";
 import materialImg from "@/assets/file-43.jpg.asset.json";
 import designImg from "@/assets/file-44.jpg.asset.json";
+import dhlLogo from "@/assets/dhl.png.asset.json";
+import fedexLogo from "@/assets/fedex.png.asset.json";
+import upsLogo from "@/assets/ups.png.asset.json";
+import aramexLogo from "@/assets/aramex.png.asset.json";
 
 export const Route = createFileRoute("/")({
   loader: async ({ context }) => {
@@ -88,32 +92,32 @@ function Index() {
         <FeaturedProducts />
 
         {/* Brand Story Section */}
-        <section className="py-32 px-4 lg:px-8 max-w-7xl mx-auto bg-white dark:bg-background">
-          <div className="grid lg:grid-cols-2 gap-20 items-center">
-            <div className="relative order-2 lg:order-1">
-              <div className="aspect-square rounded-[3rem] overflow-hidden border border-white/10 group">
+        <section className="py-20 md:py-32 px-4 lg:px-8 max-w-7xl mx-auto bg-white dark:bg-background overflow-hidden">
+          <div className="grid lg:grid-cols-2 gap-12 md:gap-20 items-center">
+            <div className="relative order-2 lg:order-1 px-2 md:px-0">
+              <div className="aspect-[4/5] md:aspect-square rounded-[2rem] md:rounded-[3rem] overflow-hidden border border-white/10 group relative">
                 <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent z-10 opacity-60" />
                 <img 
                   src="https://images.unsplash.com/photo-1556906781-9a412961c28c?q=80&w=1974&auto=format&fit=crop" 
                   alt="Manufacturing" 
                   className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 scale-110 group-hover:scale-100"
                 />
-                <div className="absolute inset-x-8 bottom-8 z-20 space-y-4">
-                  <div className="flex gap-4">
-                    <div className="glass p-4 rounded-2xl border border-white/10 flex-1 text-center">
-                      <div className="text-3xl font-black text-primary italic">25+</div>
-                      <div className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground mt-1">Export Nations</div>
+                <div className="absolute inset-x-4 md:inset-x-8 bottom-4 md:bottom-8 z-20 space-y-4">
+                  <div className="flex gap-2 md:gap-4">
+                    <div className="glass p-3 md:p-4 rounded-xl md:rounded-2xl border border-white/10 flex-1 text-center">
+                      <div className="text-2xl md:text-3xl font-black text-primary italic">25+</div>
+                      <div className="text-[7px] md:text-[8px] font-bold uppercase tracking-widest text-muted-foreground mt-1">Export Nations</div>
                     </div>
-                    <div className="glass p-4 rounded-2xl border border-white/10 flex-1 text-center">
-                      <div className="text-3xl font-black text-primary italic">500k</div>
-                      <div className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground mt-1">Units Yearly</div>
+                    <div className="glass p-3 md:p-4 rounded-xl md:rounded-2xl border border-white/10 flex-1 text-center">
+                      <div className="text-2xl md:text-3xl font-black text-primary italic">500k</div>
+                      <div className="text-[7px] md:text-[8px] font-bold uppercase tracking-widest text-muted-foreground mt-1">Units Yearly</div>
                     </div>
                   </div>
-                  <div className="h-72 bg-[url('https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center rounded-3xl border border-white/10" />
+                  <div className="h-48 md:h-72 bg-[url('https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center rounded-2xl md:rounded-3xl border border-white/10" />
                 </div>
               </div>
-              <div className="absolute -top-10 -left-10 w-40 h-40 bg-primary/20 blur-[100px] pointer-events-none" />
-              <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-primary/20 blur-[100px] pointer-events-none" />
+              <div className="absolute -top-5 md:-top-10 -left-5 md:-left-10 w-20 md:w-40 h-20 md:h-40 bg-primary/20 blur-[60px] md:blur-[100px] pointer-events-none" />
+              <div className="absolute -bottom-5 md:-bottom-10 -right-5 md:-right-10 w-20 md:w-40 h-20 md:h-40 bg-primary/20 blur-[60px] md:blur-[100px] pointer-events-none" />
             </div>
 
             <div className="order-1 lg:order-2">
@@ -144,9 +148,10 @@ function Index() {
           <h3 className="text-primary font-black tracking-[0.3em] uppercase mb-6 text-sm">The Process</h3>
           <h2 className="text-4xl md:text-6xl font-black uppercase italic mb-24 tracking-tighter">Manufacturing <span className="text-primary">Workflow</span></h2>
           
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-12 relative max-w-[90vw] mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-12 relative w-full px-2 max-w-full overflow-hidden">
             <div className="hidden lg:block absolute top-12 left-0 w-full h-[2px] bg-border -z-10" />
             <WorkflowStep 
+
               num="01" 
               title="Design" 
               desc="Digital mockups & 3D tech packs." 
@@ -180,20 +185,28 @@ function Index() {
         </section>
 
         {/* Worldwide Shipping */}
-        <section className="bg-primary py-20 overflow-hidden relative">
+        <section className="bg-primary py-16 md:py-20 overflow-hidden relative">
           <div className="absolute inset-0 opacity-10 pointer-events-none">
             <div className="w-full h-full bg-[url('https://www.transparenttextures.com/patterns/world-map.png')] bg-repeat" />
           </div>
-          <div className="max-w-7xl mx-auto px-4 lg:px-8 relative z-10 flex flex-col lg:flex-row items-center justify-between gap-12">
+          <div className="max-w-7xl mx-auto px-4 lg:px-8 relative z-10 flex flex-col lg:flex-row items-center justify-between gap-10 md:gap-12">
             <div className="text-center lg:text-left">
-              <h2 className="text-primary-foreground font-black text-4xl md:text-5xl uppercase italic tracking-tighter mb-2">We Ship Worldwide</h2>
-              <p className="text-primary-foreground/80 font-bold uppercase tracking-widest text-sm">Express doorstep delivery via global partners</p>
+              <h2 className="text-primary-foreground font-black text-3xl md:text-5xl uppercase italic tracking-tighter mb-2">We Ship Worldwide</h2>
+              <p className="text-primary-foreground/80 font-bold uppercase tracking-widest text-[10px] md:text-sm">Express doorstep delivery via global partners</p>
             </div>
-            <div className="flex flex-wrap justify-center gap-12 items-center grayscale brightness-0 opacity-90">
-               <div className="text-primary-foreground font-black text-2xl tracking-tighter italic">DHL EXPRESS</div>
-               <div className="text-primary-foreground font-black text-2xl tracking-tighter italic">FEDEX</div>
-               <div className="text-primary-foreground font-black text-2xl tracking-tighter italic">UPS</div>
-               <div className="text-primary-foreground font-black text-2xl tracking-tighter italic">ARAMEX</div>
+            <div className="grid grid-cols-2 sm:flex sm:flex-wrap justify-center gap-8 md:gap-16 items-center grayscale brightness-0 invert opacity-90">
+               <div className="flex flex-col items-center">
+                 <img src={dhlLogo.url} alt="DHL" className="h-6 md:h-10 w-auto object-contain" />
+               </div>
+               <div className="flex flex-col items-center">
+                 <img src={fedexLogo.url} alt="FedEx" className="h-6 md:h-10 w-auto object-contain" />
+               </div>
+               <div className="flex flex-col items-center">
+                 <img src={upsLogo.url} alt="UPS" className="h-6 md:h-10 w-auto object-contain" />
+               </div>
+               <div className="flex flex-col items-center">
+                 <img src={aramexLogo.url} alt="Aramex" className="h-6 md:h-10 w-auto object-contain" />
+               </div>
             </div>
           </div>
         </section>
@@ -220,7 +233,7 @@ function Index() {
               Get A Quote Now
             </Link>
             <p className="mt-12 text-[10px] text-muted-foreground opacity-40 max-w-2xl mx-auto uppercase font-bold tracking-widest text-center select-none whitespace-pre-wrap">
-              {"'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n\nAdd a Security Issues panel that loads my scan results and lists findings with severity and categories.\n\nImplement an issue details drawer that shows the explanation, impacted files/lines, and a suggested fix for each selected security issue.\n\nAdd a live diff preview and draft preview for every visual text replacement so I can confirm exactly what will change before applying it.\n\nEnable one-click undo/rollback for my visual text replacements so I can revert instantly after applying changes.\n\nAdd checkbox selection with a Bulk Fix button, then enable exporting a before/after security report and logging every applied fix for an audit trail."}
+              {"'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n\nEXPLORE STITCHING UNIT KI PICS BHI MIX HO RHHI HAIN Manufacturing Workflow BHI RESPONSIVE NHI HAI PHONE VIEW MEIN COMPLETE SHOW NHI KR RHA We Ship Worldwide BHI COMPLETE SHOW NHI HO RHA AUR DHL EXPRESS\n\nFEDEX\n\nUPS\n\nARAMEX INKE NAM NHI LIKHNE INKE LOGO LGANE HAIN"}
             </p>
           </motion.div>
         </section>
@@ -239,19 +252,19 @@ function Index() {
 
 function WorkflowStep({ num, title, desc, image }: { num: string; title: string; desc: string; image: string }) {
   return (
-    <div className="relative group">
-      <div className="w-full aspect-square rounded-3xl overflow-hidden mb-8 border border-slate-200 dark:border-white/10 relative">
+    <div className="relative group w-full">
+      <div className="w-full aspect-square rounded-2xl md:rounded-3xl overflow-hidden mb-4 md:mb-8 border border-slate-200 dark:border-white/10 relative">
         <img 
           src={image} 
           alt={title} 
           className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-110"
         />
         <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-          <span className="text-4xl font-black text-white italic">{num}</span>
+          <span className="text-2xl md:text-4xl font-black text-white italic">{num}</span>
         </div>
       </div>
-      <h4 className="text-lg font-black uppercase italic mb-3 tracking-tighter">{title}</h4>
-      <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground leading-relaxed px-4">{desc}</p>
+      <h4 className="text-base md:text-lg font-black uppercase italic mb-2 md:mb-3 tracking-tighter">{title}</h4>
+      <p className="text-[8px] md:text-[10px] font-bold uppercase tracking-widest text-muted-foreground leading-relaxed px-2 md:px-4">{desc}</p>
     </div>
   );
 }
