@@ -67,12 +67,12 @@ export function FeaturedProducts() {
             </div>
             
             <div className="p-8">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <p className="text-primary group-hover:text-primary/80 transition-colors text-[10px] font-black uppercase tracking-[0.2em] mb-2">{product.category}</p>
-                  <h4 className="font-black uppercase tracking-tighter text-lg sm:text-2xl group-hover:text-primary transition-colors leading-tight">{product.name}</h4>
+              <div className="flex flex-col gap-2 mb-4">
+                <div className="flex justify-between items-start">
+                  <p className="text-primary group-hover:text-primary/80 transition-colors text-[10px] font-black uppercase tracking-[0.2em]">{product.category}</p>
+                  <span className="text-slate-900 dark:text-white font-black text-xs sm:text-xl tracking-tighter shrink-0">{product.price}</span>
                 </div>
-                <span className="text-slate-900 dark:text-white font-black text-sm sm:text-xl tracking-tighter shrink-0 ml-2">{product.price}</span>
+                <h4 className="font-black uppercase tracking-tighter text-lg sm:text-2xl group-hover:text-primary transition-colors leading-tight">{product.name}</h4>
               </div>
               <p className="text-slate-600 dark:text-muted-foreground text-sm mb-6 leading-relaxed">High-performance custom apparel engineered for elite athletes.</p>
               <Link to="/quote" className="flex items-center gap-2 text-slate-900 dark:text-white font-black uppercase tracking-widest text-[10px] group/btn">

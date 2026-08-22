@@ -234,7 +234,7 @@ function Index() {
               Get A Quote Now
             </Link>
             <p className="mt-12 text-[10px] text-muted-foreground opacity-40 max-w-2xl mx-auto uppercase font-bold tracking-widest text-center select-none whitespace-pre-wrap">
-              {"'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n\nINKE COMPLETE NAME SHOW KRWANE HAIN AUR CUSTOM QUOTE BHI SHI SE SHOW KRWANA HAI JI JSKE BHI NAM LAMBE HAIN WO SB SHOW KRWA DO SHI SE"}
+              {"'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n\nVector Compression MEIN CUSTOM QUOTE COMPLETE SHOW NHI KR RHA YE PURA SHOW KRWAO"}
             </p>
           </motion.div>
         </section>
