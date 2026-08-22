@@ -201,17 +201,17 @@ function Index() {
               <h2 className="text-primary-foreground font-black text-3xl md:text-5xl uppercase italic tracking-tighter mb-2">We Ship Worldwide</h2>
               <p className="text-primary-foreground/80 font-bold uppercase tracking-widest text-[10px] md:text-sm">Express doorstep delivery via global partners</p>
             </div>
-            <div className="grid grid-cols-2 sm:flex sm:flex-wrap justify-center gap-8 md:gap-16 items-center grayscale brightness-0 invert opacity-90">
-               <div className="flex flex-col items-center">
+            <div className="grid grid-cols-2 sm:flex sm:flex-wrap justify-center gap-8 md:gap-16 items-center">
+               <div className="flex flex-col items-center bg-white p-2 rounded-lg border-2 border-white shadow-[0_0_15px_rgba(255,255,255,0.3)]">
                  <img src={dhlLogo.url} alt="DHL" className="h-6 md:h-10 w-auto object-contain" />
                </div>
-               <div className="flex flex-col items-center">
+               <div className="flex flex-col items-center bg-white p-2 rounded-lg border-2 border-white shadow-[0_0_15px_rgba(255,255,255,0.3)]">
                  <img src={fedexLogo.url} alt="FedEx" className="h-6 md:h-10 w-auto object-contain" />
                </div>
-               <div className="flex flex-col items-center">
-                 <img src={upsLogo.url} alt="UPS" className="h-6 md:h-10 w-auto object-contain" />
+               <div className="flex flex-col items-center bg-white p-2 rounded-lg border-2 border-white shadow-[0_0_15px_rgba(255,255,255,0.3)]">
+                 <img src={upsLogo.url} alt="UPS" className="h-6 md:h-10 w-auto object-contain mix-blend-multiply" />
                </div>
-               <div className="flex flex-col items-center">
+               <div className="flex flex-col items-center bg-white p-2 rounded-lg border-2 border-white shadow-[0_0_15px_rgba(255,255,255,0.3)]">
                  <img src={aramexLogo.url} alt="Aramex" className="h-6 md:h-10 w-auto object-contain" />
                </div>
             </div>
@@ -240,7 +240,7 @@ function Index() {
               Get A Quote Now
             </Link>
             <p className="mt-12 text-[10px] text-muted-foreground opacity-40 max-w-2xl mx-auto uppercase font-bold tracking-widest text-center select-none whitespace-pre-wrap">
-              {"'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n\nThe Process\n\nManufacturing Workflow\n\nPHONE VIEW MEIN YE TEXT KAFI BARA A RHA HAI SCREEN PR COMPLETE NAZAR BHI NHI A RHA AUR EXPLORE STITCHING UNIT MEIN JO PICS HAIN WO PLZ ORGANZIE KR DO WO SB UPER NEECHE ANDER BAHIR HO GAYI HAIN KOI EK BHI SHI NAZAR NHI A RHI Stealth Basketball Kit IS MEIN CUSTOM QUOTE NAZAR NHI A RHA Vector Compression IS MEIN BHI CUSTOM QUOTE NAZAR NHI A RHA  PHONE VIEW MEIN"}
+              {"'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n\nWe Ship Worldwide MEIN YE LOGO LGAO UPS LOGO KA BACKGROUND REMOVE KR K LGANA AUR INKE GIRD WHITE CLOR KI BORDER LINE KR DO"}
             </p>
           </motion.div>
         </section>
