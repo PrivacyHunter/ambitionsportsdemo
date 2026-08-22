@@ -95,25 +95,32 @@ function Index() {
         <section className="py-20 md:py-32 px-4 lg:px-8 max-w-7xl mx-auto bg-white dark:bg-background overflow-hidden">
           <div className="grid lg:grid-cols-2 gap-12 md:gap-20 items-center">
             <div className="relative order-2 lg:order-1 px-2 md:px-0">
-              <div className="aspect-[4/5] md:aspect-square rounded-[2rem] md:rounded-[3rem] overflow-hidden border border-white/10 group relative">
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent z-10 opacity-60" />
-                <img 
-                  src="https://images.unsplash.com/photo-1556906781-9a412961c28c?q=80&w=1974&auto=format&fit=crop" 
-                  alt="Manufacturing" 
-                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 scale-110 group-hover:scale-100"
-                />
-                <div className="absolute inset-x-4 md:inset-x-8 bottom-4 md:bottom-8 z-20 space-y-4">
-                  <div className="flex gap-2 md:gap-4">
-                    <div className="glass p-3 md:p-4 rounded-xl md:rounded-2xl border border-white/10 flex-1 text-center">
-                      <div className="text-2xl md:text-3xl font-black text-primary italic">25+</div>
-                      <div className="text-[7px] md:text-[8px] font-bold uppercase tracking-widest text-muted-foreground mt-1">Export Nations</div>
-                    </div>
-                    <div className="glass p-3 md:p-4 rounded-xl md:rounded-2xl border border-white/10 flex-1 text-center">
-                      <div className="text-2xl md:text-3xl font-black text-primary italic">500k</div>
-                      <div className="text-[7px] md:text-[8px] font-bold uppercase tracking-widest text-muted-foreground mt-1">Units Yearly</div>
-                    </div>
+              <div className="grid grid-cols-2 gap-4 rounded-[2rem] md:rounded-[3rem] overflow-hidden group">
+                <div className="space-y-4">
+                  <div className="aspect-[4/5] rounded-2xl md:rounded-3xl overflow-hidden border border-white/10 relative">
+                    <img 
+                      src="https://images.unsplash.com/photo-1556906781-9a412961c28c?q=80&w=1974&auto=format&fit=crop" 
+                      alt="Manufacturing" 
+                      className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 hover:scale-105"
+                    />
                   </div>
-                  <div className="h-48 md:h-72 bg-[url('https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center rounded-2xl md:rounded-3xl border border-white/10" />
+                  <div className="glass p-3 md:p-4 rounded-xl md:rounded-2xl border border-white/10 text-center">
+                    <div className="text-2xl md:text-3xl font-black text-primary italic">25+</div>
+                    <div className="text-[7px] md:text-[8px] font-bold uppercase tracking-widest text-muted-foreground mt-1">Export Nations</div>
+                  </div>
+                </div>
+                <div className="space-y-4 pt-8">
+                  <div className="glass p-3 md:p-4 rounded-xl md:rounded-2xl border border-white/10 text-center">
+                    <div className="text-2xl md:text-3xl font-black text-primary italic">500k</div>
+                    <div className="text-[7px] md:text-[8px] font-bold uppercase tracking-widest text-muted-foreground mt-1">Units Yearly</div>
+                  </div>
+                  <div className="aspect-[4/5] rounded-2xl md:rounded-3xl overflow-hidden border border-white/10 relative">
+                    <img 
+                      src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=2070&auto=format&fit=crop" 
+                      alt="Facility" 
+                      className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 hover:scale-105"
+                    />
+                  </div>
                 </div>
               </div>
               <div className="absolute -top-5 md:-top-10 -left-5 md:-left-10 w-20 md:w-40 h-20 md:h-40 bg-primary/20 blur-[60px] md:blur-[100px] pointer-events-none" />
