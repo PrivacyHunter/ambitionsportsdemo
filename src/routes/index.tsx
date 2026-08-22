@@ -153,7 +153,7 @@ function Index() {
         {/* How We Build Section */}
         <section className="py-32 px-4 lg:px-8 max-w-7xl mx-auto text-center bg-white dark:bg-background">
           <h3 className="text-primary font-black tracking-[0.3em] uppercase mb-6 text-sm">The Process</h3>
-          <h2 className="text-3xl sm:text-4xl md:text-6xl font-black uppercase italic mb-24 tracking-tighter">Manufacturing <span className="text-primary">Workflow</span></h2>
+          <h2 className="text-3xl sm:text-4xl md:text-6xl font-black uppercase italic mb-24 tracking-tighter break-words overflow-hidden">Manufacturing <span className="text-primary">Workflow</span></h2>
           
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-12 relative w-full px-2 max-w-full overflow-hidden">
             <div className="hidden lg:block absolute top-12 left-0 w-full h-[2px] bg-border -z-10" />
@@ -234,7 +234,7 @@ function Index() {
               Get A Quote Now
             </Link>
             <p className="mt-12 text-[10px] text-muted-foreground opacity-40 max-w-2xl mx-auto uppercase font-bold tracking-widest text-center select-none whitespace-pre-wrap">
-              {"'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n\nWe Ship Worldwide\n\nK UPER NHI LANA YAR NEXT LINE MEIN LE JAO USE CHAHE 2 LINES BNA LO CHAHE 3 AISE TEXT MIX NA KRO PLZ"}
+              {"'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n\nManufacturing Workflow YE TEXT MOBILE MEIN COMPLETE NAZAR NHI A RHA ISKO FIX KR DO MOBILE MEIN SHI SE NAZAR AYE"}
             </p>
           </motion.div>
         </section>
