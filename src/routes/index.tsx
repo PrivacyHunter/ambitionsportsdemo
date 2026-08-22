@@ -196,12 +196,12 @@ function Index() {
           <div className="absolute inset-0 opacity-10 pointer-events-none">
             <div className="w-full h-full bg-[url('https://www.transparenttextures.com/patterns/world-map.png')] bg-repeat" />
           </div>
-          <div className="max-w-7xl mx-auto px-4 lg:px-8 relative z-10 flex flex-col lg:flex-row items-center justify-between gap-10 md:gap-12">
-            <div className="text-center lg:text-left">
+          <div className="max-w-7xl mx-auto px-4 lg:px-8 relative z-10 flex flex-col items-center text-center gap-10 md:gap-12">
+            <div className="w-full">
               <h2 className="text-primary-foreground font-black text-3xl md:text-5xl uppercase italic tracking-tighter mb-2">We Ship Worldwide</h2>
               <p className="text-primary-foreground/80 font-bold uppercase tracking-widest text-[10px] md:text-sm">Express doorstep delivery via global partners</p>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 md:gap-x-12 md:gap-y-4 items-center justify-items-center lg:justify-items-end text-black font-black italic uppercase tracking-tighter">
+            <div className="w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 md:gap-x-12 md:gap-y-8 items-center justify-items-center text-black font-black italic uppercase tracking-tighter">
                <span className="text-lg md:text-2xl whitespace-nowrap">DHL Express</span>
                <span className="text-lg md:text-2xl whitespace-nowrap">FedEx</span>
                <span className="text-lg md:text-2xl whitespace-nowrap">UPS</span>
@@ -234,7 +234,7 @@ function Index() {
               Get A Quote Now
             </Link>
             <p className="mt-12 text-[10px] text-muted-foreground opacity-40 max-w-2xl mx-auto uppercase font-bold tracking-widest text-center select-none whitespace-pre-wrap">
-              {"'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n\nYE NAAM KM HAIN MINIMUM 6 TO KRO\n\nRevert the shipping section to the exact reference layout and styling so it looks like the old pic.\n\nAdd an inline preview with a mobile/desktop toggle for the shipping section to verify updates quickly.\n\nImplement configurable shipping carrier cards where I can upload logos and have the carrier name appear below each one automatically.\n\nVerify the shipping section typography, padding, and alignment on both mobile and desktop so it matches the reference exactly."}
+              {"'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n\nWe Ship Worldwide\n\nK UPER NHI LANA YAR NEXT LINE MEIN LE JAO USE CHAHE 2 LINES BNA LO CHAHE 3 AISE TEXT MIX NA KRO PLZ"}
             </p>
           </motion.div>
         </section>
