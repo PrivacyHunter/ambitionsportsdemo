@@ -1,6 +1,6 @@
-import { useRef, useEffect } from "react";
-import { motion } from "framer-motion";
-import { ArrowRight, Star, Heart, Info, ShoppingCart } from "lucide-react";
+import { useRef, useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowRight, Star, Heart, Info, ShoppingCart, Check } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
 const products = [
@@ -14,10 +14,34 @@ const products = [
 
 export function FeaturedProducts() {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [favorites, setFavorites] = useState<number[]>([]);
+  const [showFavoriteNotification, setShowFavoriteNotification] = useState(false);
+
+  const toggleFavorite = (idx: number) => {
+    setFavorites(prev => 
+      prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx]
+    );
+    if (!favorites.includes(idx)) {
+      setShowFavoriteNotification(true);
+      setTimeout(() => setShowFavoriteNotification(false), 2000);
+    }
+  };
 
 
   return (
-    <section className="py-24 px-4 lg:px-8 bg-slate-50 dark:bg-black overflow-hidden">
+    <section className="py-24 px-4 lg:px-8 bg-slate-50 dark:bg-black overflow-hidden relative">
+      <AnimatePresence>
+        {showFavoriteNotification && (
+          <motion.div 
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 20 }}
+            exit={{ opacity: 0, y: -50 }}
+            className="fixed top-20 left-1/2 -translate-x-1/2 z-[100] bg-primary text-white px-6 py-3 rounded-full font-black uppercase tracking-widest text-xs shadow-2xl flex items-center gap-3 border border-white/20"
+          >
+            <Check size={16} /> Added to Favorites
+          </motion.div>
+        )}
+      </AnimatePresence>
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
         <div>
           <h3 className="text-primary font-black tracking-[0.2em] uppercase mb-4 text-sm">Most Wanted</h3>
@@ -55,12 +79,22 @@ export function FeaturedProducts() {
                   <span className="bg-primary text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest">{product.tag}</span>
                </div>
                
-               <button className="absolute top-6 right-6 p-3 bg-white/80 dark:bg-background/50 backdrop-blur-md rounded-full text-slate-900 dark:text-white hover:text-red-500 transition-colors z-20">
-                  <Heart size={18} />
+               <button 
+                 onClick={(e) => {
+                   e.preventDefault();
+                   toggleFavorite(idx);
+                 }}
+                 className={`absolute top-6 right-6 p-3 backdrop-blur-md rounded-full transition-all duration-300 z-20 ${
+                   favorites.includes(idx) 
+                     ? "bg-primary text-white scale-110 shadow-lg" 
+                     : "bg-white/80 dark:bg-background/50 text-slate-900 dark:text-white hover:text-primary"
+                 }`}
+               >
+                  <Heart size={18} fill={favorites.includes(idx) ? "currentColor" : "none"} />
                </button>
 
                <div className="absolute bottom-8 left-8 right-8 z-20 translate-y-20 group-hover:translate-y-0 transition-transform duration-500">
-                  <Link to="/quote" className="w-full block text-center bg-primary text-white py-4 rounded-xl font-black uppercase tracking-widest text-xs hover:bg-slate-900 dark:hover:bg-white transition-colors">
+                  <Link to="/quote" className="w-full block text-center bg-primary text-white py-4 rounded-xl font-black uppercase tracking-widest text-xs hover:bg-black dark:hover:bg-white dark:hover:text-black transition-all duration-300 border border-primary/20">
                     Request Quote
                   </Link>
                </div>
