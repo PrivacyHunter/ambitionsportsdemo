@@ -236,7 +236,7 @@ function Index() {
               Get A Quote Now
             </Link>
             <p className="mt-12 text-[10px] text-muted-foreground opacity-40 max-w-2xl mx-auto uppercase font-bold tracking-widest text-center select-none whitespace-pre-wrap">
-              {"'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n\nAdd a Security Issues panel that loads my scan results and lists findings with severity and categories.\n\nImplement an issue details drawer that shows the explanation, impacted files/lines, and a suggested fix for each selected security issue.\n\nAdd a live diff preview and draft preview for every visual text replacement so I can confirm exactly what will change before applying it.\n\nEnable one-click undo/rollback for my visual text replacements so I can revert instantly after applying changes.\n\nAdd checkbox selection with a Bulk Fix button, then enable exporting a before/after security report and logging every applied fix for an audit trail."}
+              {"'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n\nEXPLORE STITCHING UNIT KI PICS BHI MIX HO RHHI HAIN Manufacturing Workflow BHI RESPONSIVE NHI HAI PHONE VIEW MEIN COMPLETE SHOW NHI KR RHA We Ship Worldwide BHI COMPLETE SHOW NHI HO RHA AUR DHL EXPRESS\n\nFEDEX\n\nUPS\n\nARAMEX INKE NAM NHI LIKHNE INKE LOGO LGANE HAIN"}
             </p>
           </motion.div>
         </section>
