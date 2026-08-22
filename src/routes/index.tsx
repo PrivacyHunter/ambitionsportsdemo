@@ -193,26 +193,18 @@ function Index() {
               <h2 className="text-primary-foreground font-black text-3xl md:text-5xl uppercase italic tracking-tighter mb-2">We Ship Worldwide</h2>
               <p className="text-primary-foreground/80 font-bold uppercase tracking-widest text-[10px] md:text-sm">Express doorstep delivery via global partners</p>
             </div>
-            <div className="grid grid-cols-2 sm:flex sm:flex-wrap justify-center gap-6 md:gap-12 items-center grayscale brightness-0 invert opacity-90">
-               <div className="flex flex-col items-center gap-2">
-                 <div className="h-8 md:h-12 w-auto flex items-center justify-center">
-                    <span className="text-primary-foreground font-black text-xl md:text-2xl tracking-tighter italic">DHL</span>
-                 </div>
+            <div className="grid grid-cols-2 sm:flex sm:flex-wrap justify-center gap-8 md:gap-16 items-center grayscale brightness-0 invert opacity-90">
+               <div className="flex flex-col items-center">
+                 <img src={dhlLogo.url} alt="DHL" className="h-6 md:h-10 w-auto object-contain" />
                </div>
-               <div className="flex flex-col items-center gap-2">
-                 <div className="h-8 md:h-12 w-auto flex items-center justify-center">
-                    <span className="text-primary-foreground font-black text-xl md:text-2xl tracking-tighter italic">FEDEX</span>
-                 </div>
+               <div className="flex flex-col items-center">
+                 <img src={fedexLogo.url} alt="FedEx" className="h-6 md:h-10 w-auto object-contain" />
                </div>
-               <div className="flex flex-col items-center gap-2">
-                 <div className="h-8 md:h-12 w-auto flex items-center justify-center">
-                    <span className="text-primary-foreground font-black text-xl md:text-2xl tracking-tighter italic">UPS</span>
-                 </div>
+               <div className="flex flex-col items-center">
+                 <img src={upsLogo.url} alt="UPS" className="h-6 md:h-10 w-auto object-contain" />
                </div>
-               <div className="flex flex-col items-center gap-2">
-                 <div className="h-8 md:h-12 w-auto flex items-center justify-center">
-                    <span className="text-primary-foreground font-black text-xl md:text-2xl tracking-tighter italic">ARAMEX</span>
-                 </div>
+               <div className="flex flex-col items-center">
+                 <img src={aramexLogo.url} alt="Aramex" className="h-6 md:h-10 w-auto object-contain" />
                </div>
             </div>
           </div>
