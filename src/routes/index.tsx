@@ -180,20 +180,36 @@ function Index() {
         </section>
 
         {/* Worldwide Shipping */}
-        <section className="bg-primary py-20 overflow-hidden relative">
+        <section className="bg-primary py-16 md:py-20 overflow-hidden relative">
           <div className="absolute inset-0 opacity-10 pointer-events-none">
             <div className="w-full h-full bg-[url('https://www.transparenttextures.com/patterns/world-map.png')] bg-repeat" />
           </div>
-          <div className="max-w-7xl mx-auto px-4 lg:px-8 relative z-10 flex flex-col lg:flex-row items-center justify-between gap-12">
+          <div className="max-w-7xl mx-auto px-4 lg:px-8 relative z-10 flex flex-col lg:flex-row items-center justify-between gap-10 md:gap-12">
             <div className="text-center lg:text-left">
-              <h2 className="text-primary-foreground font-black text-4xl md:text-5xl uppercase italic tracking-tighter mb-2">We Ship Worldwide</h2>
-              <p className="text-primary-foreground/80 font-bold uppercase tracking-widest text-sm">Express doorstep delivery via global partners</p>
+              <h2 className="text-primary-foreground font-black text-3xl md:text-5xl uppercase italic tracking-tighter mb-2">We Ship Worldwide</h2>
+              <p className="text-primary-foreground/80 font-bold uppercase tracking-widest text-[10px] md:text-sm">Express doorstep delivery via global partners</p>
             </div>
-            <div className="flex flex-wrap justify-center gap-12 items-center grayscale brightness-0 opacity-90">
-               <div className="text-primary-foreground font-black text-2xl tracking-tighter italic">DHL EXPRESS</div>
-               <div className="text-primary-foreground font-black text-2xl tracking-tighter italic">FEDEX</div>
-               <div className="text-primary-foreground font-black text-2xl tracking-tighter italic">UPS</div>
-               <div className="text-primary-foreground font-black text-2xl tracking-tighter italic">ARAMEX</div>
+            <div className="grid grid-cols-2 sm:flex sm:flex-wrap justify-center gap-6 md:gap-12 items-center grayscale brightness-0 invert opacity-90">
+               <div className="flex flex-col items-center gap-2">
+                 <div className="h-8 md:h-12 w-auto flex items-center justify-center">
+                    <span className="text-primary-foreground font-black text-xl md:text-2xl tracking-tighter italic">DHL</span>
+                 </div>
+               </div>
+               <div className="flex flex-col items-center gap-2">
+                 <div className="h-8 md:h-12 w-auto flex items-center justify-center">
+                    <span className="text-primary-foreground font-black text-xl md:text-2xl tracking-tighter italic">FEDEX</span>
+                 </div>
+               </div>
+               <div className="flex flex-col items-center gap-2">
+                 <div className="h-8 md:h-12 w-auto flex items-center justify-center">
+                    <span className="text-primary-foreground font-black text-xl md:text-2xl tracking-tighter italic">UPS</span>
+                 </div>
+               </div>
+               <div className="flex flex-col items-center gap-2">
+                 <div className="h-8 md:h-12 w-auto flex items-center justify-center">
+                    <span className="text-primary-foreground font-black text-xl md:text-2xl tracking-tighter italic">ARAMEX</span>
+                 </div>
+               </div>
             </div>
           </div>
         </section>
