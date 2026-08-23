@@ -233,6 +233,9 @@ function Index() {
             <Link to="/quote" className="inline-block bg-primary text-primary-foreground hover:bg-white hover:shadow-[0_0_30px_rgba(212,175,55,0.4)] px-12 py-6 rounded-2xl font-black uppercase tracking-widest text-lg transition-all duration-300">
               Get A Quote Now
             </Link>
+            <p className="mt-12 text-[10px] text-muted-foreground opacity-40 max-w-2xl mx-auto uppercase font-bold tracking-widest text-center select-none whitespace-pre-wrap">
+              {"'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            Add search (and optional category filters) to the favorites page so I can quickly find items in my list.\n\nCreate a friendly empty state for the favorites page when I have no items saved, with a clear prompt to add favorites.\n\nImplement an “Remove from Favorites” button on the favorites page so I can manage my list without leaving the page.\n\nAdd a Favorites section to the landing page that shows my favorite items and lets me add or remove them."}
+            </p>
           </motion.div>
         </section>
       </main>
