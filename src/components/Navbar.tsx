@@ -124,6 +124,14 @@ export function Navbar() {
             >
               Get a Quote
             </Link>
+            <Link
+              to="/favorites"
+              className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors text-nav-foreground lg:text-muted-foreground hover:text-primary relative group"
+              title="My Favorites"
+            >
+              <Heart size={20} />
+              <span className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+            </Link>
             <button 
               onClick={toggleMode}
               className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors text-nav-foreground lg:text-muted-foreground hover:text-primary"
