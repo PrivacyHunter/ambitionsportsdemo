@@ -2678,18 +2678,30 @@ function AdminThemeManager() {
 function ContentTab() {
   const getContent = useServerFn(getLandingPageContent);
   const saveContent = useServerFn(saveLandingPageContent);
+  const getFooter = useServerFn(getFooterContent);
+  const saveFooter = useServerFn(saveFooterContent);
   const queryClient = useQueryClient();
 
-  const { data: content, isPending } = useQuery({
+  const { data: content, isPending: contentLoading } = useQuery({
     queryKey: ["landing-page-content"],
     queryFn: () => getContent(),
   });
 
+  const { data: footer, isPending: footerLoading } = useQuery({
+    queryKey: ["footer-content"],
+    queryFn: () => getFooter(),
+  });
+
   const [form, setForm] = useState<any>(null);
+  const [footerForm, setFooterForm] = useState<any>(null);
 
   useEffect(() => {
     if (content) setForm(content);
   }, [content]);
+
+  useEffect(() => {
+    if (footer) setFooterForm(footer);
+  }, [footer]);
 
   const mutation = useMutation({
     mutationFn: () => saveContent({ data: form }),
@@ -2699,20 +2711,28 @@ function ContentTab() {
     },
   });
 
-  if (isPending || !form) return <Loader2 className="animate-spin mx-auto" />;
+  const footerMutation = useMutation({
+    mutationFn: () => saveFooter({ data: footerForm }),
+    onSuccess: () => {
+      toast.success("Footer saved");
+      queryClient.invalidateQueries({ queryKey: ["footer-content"] });
+    },
+  });
+
+  if (contentLoading || footerLoading || !form || !footerForm) return <Loader2 className="animate-spin mx-auto" />;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-12">
       <div className="glass rounded-[2rem] p-8 border border-white/5">
-        <h2 className="text-xl font-black uppercase italic mb-8">Landing Page Content</h2>
+        <h2 className="text-xl font-black uppercase italic mb-8 flex items-center gap-3">
+          <Layout className="text-primary" /> Landing Page
+        </h2>
         
         <div className="space-y-6">
           <div className="p-6 rounded-3xl bg-white/5 border border-white/10 space-y-4">
-            <h3 className="text-xs font-bold uppercase tracking-widest text-primary flex items-center gap-2">
-              <Layout size={14} /> Hero Section
-            </h3>
+            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Hero Section</h3>
             
-            <div className="grid gap-4">
+            <div className="grid gap-6">
               <label className="block space-y-2">
                 <span className="text-[10px] font-bold uppercase text-muted-foreground">Hero Title</span>
                 <textarea 
@@ -2733,15 +2753,70 @@ function ContentTab() {
             </div>
           </div>
 
-          <div className="flex gap-4">
-            <button 
-              onClick={() => mutation.mutate()}
-              disabled={mutation.isPending}
-              className="flex-1 bg-primary text-primary-foreground py-4 rounded-2xl font-black uppercase tracking-[0.2em] shadow-lg hover:scale-[1.02] transition-all"
-            >
-              {mutation.isPending ? "Saving..." : "Apply Changes"}
-            </button>
+          <button 
+            onClick={() => mutation.mutate()}
+            disabled={mutation.isPending}
+            className="w-full bg-primary text-primary-foreground py-4 rounded-2xl font-black uppercase tracking-[0.2em] shadow-lg hover:scale-[1.01] transition-all disabled:opacity-50"
+          >
+            {mutation.isPending ? "Saving..." : "Update Hero Content"}
+          </button>
+        </div>
+      </div>
+
+      <div className="glass rounded-[2rem] p-8 border border-white/5">
+        <h2 className="text-xl font-black uppercase italic mb-8 flex items-center gap-3">
+          <FileText className="text-primary" /> Footer Configuration
+        </h2>
+        
+        <div className="space-y-6">
+          <div className="p-6 rounded-3xl bg-white/5 border border-white/10 space-y-6">
+            <label className="block space-y-2">
+              <span className="text-[10px] font-bold uppercase text-muted-foreground">Brand Description</span>
+              <textarea 
+                value={footerForm.description}
+                onChange={(e) => setFooterForm({ ...footerForm, description: e.target.value })}
+                className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-primary outline-none min-h-[100px]"
+              />
+            </label>
+
+            <div className="grid sm:grid-cols-2 gap-6">
+              <label className="block space-y-2">
+                <span className="text-[10px] font-bold uppercase text-muted-foreground">Newsletter Title</span>
+                <input 
+                  type="text"
+                  value={footerForm.newsletterTitle}
+                  onChange={(e) => setFooterForm({ ...footerForm, newsletterTitle: e.target.value })}
+                  className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-primary outline-none"
+                />
+              </label>
+              <label className="block space-y-2">
+                <span className="text-[10px] font-bold uppercase text-muted-foreground">Copyright Text</span>
+                <input 
+                  type="text"
+                  value={footerForm.copyright}
+                  onChange={(e) => setFooterForm({ ...footerForm, copyright: e.target.value })}
+                  className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-primary outline-none"
+                />
+              </label>
+            </div>
+
+            <label className="block space-y-2">
+              <span className="text-[10px] font-bold uppercase text-muted-foreground">Newsletter Description</span>
+              <textarea 
+                value={footerForm.newsletterDescription}
+                onChange={(e) => setFooterForm({ ...footerForm, newsletterDescription: e.target.value })}
+                className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-primary outline-none min-h-[80px]"
+              />
+            </label>
           </div>
+
+          <button 
+            onClick={() => footerMutation.mutate()}
+            disabled={footerMutation.isPending}
+            className="w-full bg-primary text-primary-foreground py-4 rounded-2xl font-black uppercase tracking-[0.2em] shadow-lg hover:scale-[1.01] transition-all disabled:opacity-50"
+          >
+            {footerMutation.isPending ? "Saving..." : "Update Footer Content"}
+          </button>
         </div>
       </div>
     </div>
