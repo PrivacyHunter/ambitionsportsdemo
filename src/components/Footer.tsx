@@ -2,6 +2,9 @@ import { Link } from "@tanstack/react-router";
 import { Send, MapPin, Phone, Mail } from "lucide-react";
 import { FaFacebook, FaInstagram, FaTwitter, FaLinkedin } from "react-icons/fa";
 import { useTheme } from "./ThemeProvider";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { getFooterContent } from "@/lib/content.functions";
 
 export function Footer() {
   const { branding } = useTheme();
