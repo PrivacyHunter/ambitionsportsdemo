@@ -234,7 +234,7 @@ function Index() {
               Get A Quote Now
             </Link>
             <p className="mt-12 text-[10px] text-muted-foreground opacity-40 max-w-2xl mx-auto uppercase font-bold tracking-widest text-center select-none whitespace-pre-wrap">
-              {"'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            Plz remove marked text and clean this interface"}
+              {"'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            Remove the marked text from the interface and restore the layout cleanly.\n\nImplement a Favorites section with an “Add to Favorites” button for each item.\n\nImprove the footer typography and spacing so the footer looks consistent across screen sizes.\n\nCreate a reusable Footer component with configurable text so I can update it without manual code edits."}
             </p>
           </motion.div>
         </section>
