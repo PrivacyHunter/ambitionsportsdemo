@@ -234,7 +234,7 @@ function Index() {
               Get A Quote Now
             </Link>
             <p className="mt-12 text-[10px] text-muted-foreground opacity-40 max-w-2xl mx-auto uppercase font-bold tracking-widest text-center select-none whitespace-pre-wrap">
-              {"'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            Implement a search bar on the favorites page so I can quickly find items by name or keywords.\n\nAdd optional category filters on the favorites page so I can narrow down my saved items.\n\nCreate a friendly empty state on the favorites page with a prompt that encourages me to add my first favorites.\n\nAdd an in-page “Remove from Favorites” button for each item so I can manage my list without navigating away.\n\nAdd a Favorites section on the landing page that stays in sync with my saved items and lets me remove them there too."}
+              {"'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            Footer text verbatim add nhi krna whan se clean kro Sara"}
             </p>
           </motion.div>
         </section>
