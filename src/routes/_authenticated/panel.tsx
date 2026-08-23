@@ -42,7 +42,7 @@ import {
   deleteProduct, getDashboard, updateStatus, upsertProduct, setUserRole,
   inviteUser, backupSettings, restoreSettings, listSettings, saveSetting,
 } from "@/lib/admin.functions";
-import { getLandingPageContent, saveLandingPageContent } from "@/lib/content.functions";
+import { getLandingPageContent, saveLandingPageContent, getFooterContent, saveFooterContent } from "@/lib/content.functions";
 import { saveThemeVersion, getThemeHistory, scheduleReport } from "@/lib/history.functions";
 import { getPageSeo, savePageSeo } from "@/lib/seo.functions";
 import { getSeoBulk, saveSeoBulk, autoGenerateSeo } from "@/lib/seo-bulk.functions";
