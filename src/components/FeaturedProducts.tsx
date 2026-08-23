@@ -18,14 +18,21 @@ export function FeaturedProducts() {
   const [showFavoriteNotification, setShowFavoriteNotification] = useState(false);
 
   const toggleFavorite = (idx: number) => {
-    setFavorites(prev => 
-      prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx]
-    );
+    setFavorites(prev => {
+      const next = prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx];
+      localStorage.setItem("ambition_favorites", JSON.stringify(next));
+      return next;
+    });
     if (!favorites.includes(idx)) {
       setShowFavoriteNotification(true);
       setTimeout(() => setShowFavoriteNotification(false), 2000);
     }
   };
+
+  useEffect(() => {
+    const stored = localStorage.getItem("ambition_favorites");
+    if (stored) setFavorites(JSON.parse(stored));
+  }, []);
 
 
   return (
