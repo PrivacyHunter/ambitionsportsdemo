@@ -20,3 +20,22 @@ export const saveLandingPageContent = createServerFn({ method: "POST" })
     const { updateLandingPageContent } = await import("./content.server");
     return updateLandingPageContent(context.supabase, context.userId, data);
   });
+
+export const getFooterContent = createServerFn({ method: "GET" })
+  .handler(async () => {
+    const { fetchFooterContent } = await import("./content.server");
+    return fetchFooterContent();
+  });
+
+export const saveFooterContent = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => z.object({
+    description: z.string(),
+    copyright: z.string(),
+    newsletterTitle: z.string(),
+    newsletterDescription: z.string()
+  }).parse(data))
+  .handler(async ({ context, data }) => {
+    const { updateFooterContent } = await import("./content.server");
+    return updateFooterContent(context.supabase, context.userId, data);
+  });

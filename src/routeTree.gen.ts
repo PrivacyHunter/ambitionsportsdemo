@@ -18,6 +18,7 @@ import { Route as CasualWearRouteImport } from './routes/casual-wear'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CustomizationRouteImport } from './routes/customization'
+import { Route as FavoritesRouteImport } from './routes/favorites'
 import { Route as QuoteRouteImport } from './routes/quote'
 import { Route as SportswearRouteImport } from './routes/sportswear'
 import { Route as TrackRouteImport } from './routes/track'
@@ -70,6 +71,11 @@ const CustomizationRoute = CustomizationRouteImport.update({
   path: '/customization',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FavoritesRoute = FavoritesRouteImport.update({
+  id: '/favorites',
+  path: '/favorites',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const QuoteRoute = QuoteRouteImport.update({
   id: '/quote',
   path: '/quote',
@@ -116,6 +122,7 @@ export interface FileRoutesByFullPath {
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/customization': typeof CustomizationRoute
+  '/favorites': typeof FavoritesRoute
   '/quote': typeof QuoteRoute
   '/sportswear': typeof SportswearRoute
   '/track': typeof TrackRoute
@@ -133,6 +140,7 @@ export interface FileRoutesByTo {
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/customization': typeof CustomizationRoute
+  '/favorites': typeof FavoritesRoute
   '/quote': typeof QuoteRoute
   '/sportswear': typeof SportswearRoute
   '/track': typeof TrackRoute
@@ -152,6 +160,7 @@ export interface FileRoutesById {
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/customization': typeof CustomizationRoute
+  '/favorites': typeof FavoritesRoute
   '/quote': typeof QuoteRoute
   '/sportswear': typeof SportswearRoute
   '/track': typeof TrackRoute
@@ -171,6 +180,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/contact'
     | '/customization'
+    | '/favorites'
     | '/quote'
     | '/sportswear'
     | '/track'
@@ -188,6 +198,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/contact'
     | '/customization'
+    | '/favorites'
     | '/quote'
     | '/sportswear'
     | '/track'
@@ -206,6 +217,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/contact'
     | '/customization'
+    | '/favorites'
     | '/quote'
     | '/sportswear'
     | '/track'
@@ -225,6 +237,7 @@ export interface RootRouteChildren {
   CheckoutRoute: typeof CheckoutRoute
   ContactRoute: typeof ContactRoute
   CustomizationRoute: typeof CustomizationRoute
+  FavoritesRoute: typeof FavoritesRoute
   QuoteRoute: typeof QuoteRoute
   SportswearRoute: typeof SportswearRoute
   TrackRoute: typeof TrackRoute
@@ -296,6 +309,13 @@ declare module '@tanstack/react-router' {
       path: '/customization'
       fullPath: '/customization'
       preLoaderRoute: typeof CustomizationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/favorites': {
+      id: '/favorites'
+      path: '/favorites'
+      fullPath: '/favorites'
+      preLoaderRoute: typeof FavoritesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/quote': {
@@ -371,6 +391,7 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutRoute: CheckoutRoute,
   ContactRoute: ContactRoute,
   CustomizationRoute: CustomizationRoute,
+  FavoritesRoute: FavoritesRoute,
   QuoteRoute: QuoteRoute,
   SportswearRoute: SportswearRoute,
   TrackRoute: TrackRoute,
