@@ -99,7 +99,7 @@ export function HeroSlider() {
         </motion.div>
       </AnimatePresence>
 
-      <div className="relative z-20 h-full max-w-7xl mx-auto px-4 lg:px-8 flex items-center">
+      <div className="relative z-20 h-full max-w-7xl mx-auto px-5 sm:px-8 lg:px-8 flex items-center">
         <AnimatePresence mode="wait">
           <motion.div
             key={current}
@@ -107,16 +107,16 @@ export function HeroSlider() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 50 }}
             transition={{ duration: 0.6 }}
-            className="max-w-3xl"
+            className="w-full max-w-3xl min-w-0 pb-16 md:pb-0"
           >
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-primary font-black tracking-widest uppercase mb-4 flex items-center gap-3 text-[10px] md:text-sm"
+              className="text-primary font-black tracking-[0.14em] sm:tracking-widest uppercase mb-4 flex items-start gap-3 text-[9px] leading-relaxed sm:text-[10px] md:text-sm"
             >
-              <span className="w-12 h-[2px] bg-primary" /> {current === 0 ? (content?.hero?.subtitle || activeBanner?.subtitle) : activeBanner?.subtitle}
+              <span className="mt-[0.55em] h-[2px] w-7 shrink-0 bg-primary sm:w-12" /> <span className="min-w-0 break-words">{current === 0 ? (content?.hero?.subtitle || activeBanner?.subtitle) : activeBanner?.subtitle}</span>
             </motion.p>
-            <h1 className="text-xl sm:text-2xl md:text-5xl lg:text-6xl font-black uppercase italic leading-[0.85] tracking-tighter mb-10 text-slate-900 dark:text-foreground">
+            <h1 className="max-w-[11ch] text-3xl sm:text-4xl md:max-w-none md:text-5xl lg:text-6xl font-black uppercase italic leading-[0.9] tracking-tighter mb-8 md:mb-10 text-slate-900 dark:text-foreground">
               {current === 0 ? (content?.hero?.title || activeBanner?.title1) : activeBanner?.title1} <br />
               <span className={activeBanner?.accent === 'text-white' ? 'text-slate-900 dark:text-white' : activeBanner?.accent}>{activeBanner?.title2}</span>
             </h1>
