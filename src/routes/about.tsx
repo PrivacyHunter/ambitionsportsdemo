@@ -126,7 +126,7 @@ function About() {
             transition={{ duration: 0.8 }}
             className="relative z-10 w-full min-w-0 text-center px-5 sm:px-8"
           >
-            <h1 className="mx-auto max-w-[12ch] text-4xl sm:text-5xl md:max-w-none md:text-6xl lg:text-8xl font-black uppercase italic tracking-normal leading-[0.92] mb-4 break-words">
+            <h1 className="mx-auto text-[2rem] sm:text-4xl md:text-5xl lg:text-7xl font-black uppercase italic tracking-normal leading-[0.92] mb-4 whitespace-nowrap">
               Our <span className="text-primary">Ambition</span>
             </h1>
             <p className="mx-auto max-w-[28ch] text-primary font-black tracking-[0.14em] sm:tracking-[0.25em] md:tracking-[0.35em] uppercase text-[9px] sm:text-xs md:text-base leading-relaxed">Legacy of Manufacturing Excellence</p>

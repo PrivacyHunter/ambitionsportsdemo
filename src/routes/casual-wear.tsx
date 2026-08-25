@@ -126,8 +126,8 @@ function CasualWear() {
             className="text-center relative z-10 w-full min-w-0 px-5 sm:px-8"
           >
              <h3 className="text-white/50 font-black tracking-[0.18em] sm:tracking-[0.3em] md:tracking-[0.4em] uppercase mb-3 md:mb-4 text-[9px] sm:text-xs md:text-sm">Style Meets Substance</h3>
-             <h1 className="mx-auto max-w-[12ch] text-4xl sm:text-5xl md:max-w-none md:text-6xl lg:text-8xl font-black uppercase italic tracking-normal leading-[0.92] mb-5 md:mb-6 break-words">
-               Custom <br /><span className="text-white">Streetwear</span>
+             <h1 className="mx-auto text-[2rem] sm:text-4xl md:text-5xl lg:text-7xl font-black uppercase italic tracking-normal leading-[0.92] mb-5 md:mb-6">
+               <span className="block whitespace-nowrap">Custom</span><span className="block whitespace-nowrap text-white">Streetwear</span>
              </h1>
              <div className="grid grid-cols-[minmax(16px,48px)_minmax(0,auto)_minmax(16px,48px)] items-center justify-center gap-2 sm:gap-4">
                <div className="h-[2px] w-full bg-white/20" />
