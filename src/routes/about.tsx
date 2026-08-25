@@ -115,7 +115,7 @@ function About() {
 
       <main>
         {/* Sub-Hero Banner */}
-        <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">
+        <section className="relative h-[clamp(320px,48svh,460px)] md:h-[clamp(400px,56svh,580px)] flex items-center justify-center overflow-hidden">
           <div className="absolute inset-0 z-0">
              <div className="absolute inset-0 bg-gradient-to-b from-background/20 via-background/60 to-background z-10" />
              <div className="w-full h-full bg-[url('https://images.unsplash.com/photo-1552674605-db6ffd4facb5?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center" />
@@ -124,12 +124,12 @@ function About() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="relative z-10 text-center px-4"
+            className="relative z-10 w-full min-w-0 text-center px-5 sm:px-8"
           >
-            <h1 className="text-6xl md:text-9xl font-black uppercase italic tracking-tighter leading-none mb-4">
+            <h1 className="mx-auto text-[2rem] sm:text-4xl md:text-5xl lg:text-7xl font-black uppercase italic tracking-normal leading-[0.92] mb-4 whitespace-nowrap">
               Our <span className="text-primary">Ambition</span>
             </h1>
-            <p className="text-primary font-black tracking-[0.4em] uppercase text-sm md:text-lg">Legacy of Manufacturing Excellence</p>
+            <p className="mx-auto max-w-[28ch] text-primary font-black tracking-[0.14em] sm:tracking-[0.25em] md:tracking-[0.35em] uppercase text-[9px] sm:text-xs md:text-base leading-relaxed">Legacy of Manufacturing Excellence</p>
           </motion.div>
         </section>
 

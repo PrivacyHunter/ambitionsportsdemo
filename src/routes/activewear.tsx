@@ -116,23 +116,23 @@ function Activewear() {
 
       <main>
         {/* Banner */}
-        <section className="relative h-[50vh] flex items-center justify-center overflow-hidden border-b border-white/5">
+        <section className="relative h-[clamp(300px,46svh,440px)] md:h-[clamp(380px,52svh,540px)] flex items-center justify-center overflow-hidden border-b border-white/5">
           <div className="absolute inset-0 z-0 opacity-25">
             <div className="w-full h-full bg-[url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center grayscale" />
           </div>
           <motion.div 
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="text-center relative z-10 px-4"
+            className="text-center relative z-10 w-full min-w-0 px-5 sm:px-8"
           >
-             <h3 className="text-neon-cyan font-black tracking-[0.4em] uppercase mb-4 text-sm">Engineered For Motion</h3>
-             <h1 className="text-6xl md:text-9xl font-black uppercase italic tracking-tighter leading-none mb-6">
-               Custom <br /><span className="text-neon-lime">Activewear</span>
+             <h3 className="text-neon-cyan font-black tracking-[0.18em] sm:tracking-[0.3em] md:tracking-[0.4em] uppercase mb-3 md:mb-4 text-[9px] sm:text-xs md:text-sm">Engineered For Motion</h3>
+             <h1 className="mx-auto text-[2rem] sm:text-4xl md:text-5xl lg:text-7xl font-black uppercase italic tracking-normal leading-[0.92] mb-5 md:mb-6">
+               <span className="block whitespace-nowrap">Custom</span><span className="block whitespace-nowrap text-neon-lime">Activewear</span>
              </h1>
-             <div className="flex items-center justify-center gap-4">
-               <div className="h-[2px] w-12 bg-neon-lime" />
-               <p className="text-white font-bold uppercase tracking-widest text-xs">High-Performance Gym & Fitness Gear</p>
-               <div className="h-[2px] w-12 bg-neon-lime" />
+             <div className="grid grid-cols-[minmax(16px,48px)_minmax(0,auto)_minmax(16px,48px)] items-center justify-center gap-2 sm:gap-4">
+               <div className="h-[2px] w-full bg-neon-lime" />
+               <p className="max-w-[25ch] text-white font-bold uppercase tracking-[0.1em] sm:tracking-widest text-[9px] sm:text-xs leading-relaxed">High-Performance Gym & Fitness Gear</p>
+               <div className="h-[2px] w-full bg-neon-lime" />
              </div>
           </motion.div>
         </section>
