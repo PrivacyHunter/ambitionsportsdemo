@@ -81,7 +81,7 @@ export function HeroSlider() {
   const activeBanner = banners[current] || banners[0];
 
   return (
-    <section className="relative min-h-[560px] h-[72vh] md:h-[85vh] w-full overflow-hidden bg-background">
+    <section className="relative h-[clamp(400px,62svh,520px)] md:h-[clamp(480px,68svh,660px)] lg:h-[78vh] lg:max-h-[760px] w-full overflow-hidden bg-background">
       <AnimatePresence mode="wait">
         <motion.div
           key={current}
@@ -91,7 +91,7 @@ export function HeroSlider() {
           transition={{ duration: 1.2, ease: "easeOut" }}
           className="absolute inset-0 z-0"
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-white dark:from-background via-white/40 dark:via-background/60 to-transparent z-10" />
+          <div className="absolute inset-0 bg-gradient-to-r from-white/95 dark:from-background/95 via-white/55 dark:via-background/70 to-transparent z-10" />
           <div 
             className="w-full h-full bg-cover bg-center" 
             style={{ backgroundImage: `url(${activeBanner?.image})` }} 
@@ -107,29 +107,29 @@ export function HeroSlider() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 50 }}
             transition={{ duration: 0.6 }}
-            className="w-full max-w-3xl min-w-0 pb-16 md:pb-0"
+            className="w-full max-w-3xl min-w-0 pb-10 sm:pb-12 md:pb-0"
           >
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-primary font-black tracking-[0.14em] sm:tracking-widest uppercase mb-4 flex items-start gap-3 text-[9px] leading-relaxed sm:text-[10px] md:text-sm"
+              className="text-primary font-black tracking-[0.12em] sm:tracking-widest uppercase mb-3 sm:mb-4 flex items-start gap-2 sm:gap-3 text-[9px] leading-relaxed sm:text-[10px] md:text-xs lg:text-sm"
             >
               <span className="mt-[0.55em] h-[2px] w-7 shrink-0 bg-primary sm:w-12" /> <span className="min-w-0 break-words">{current === 0 ? (content?.hero?.subtitle || activeBanner?.subtitle) : activeBanner?.subtitle}</span>
             </motion.p>
-            <h1 className="max-w-[11ch] text-3xl sm:text-4xl md:max-w-none md:text-5xl lg:text-6xl font-black uppercase italic leading-[0.9] tracking-tighter mb-8 md:mb-10 text-slate-900 dark:text-foreground">
+            <h1 className="max-w-[13ch] text-[2rem] sm:text-4xl md:max-w-[15ch] md:text-5xl lg:max-w-none lg:text-6xl font-black uppercase italic leading-[0.94] tracking-normal mb-6 sm:mb-8 md:mb-10 text-slate-900 dark:text-foreground break-words">
               {current === 0 ? (content?.hero?.title || activeBanner?.title1) : activeBanner?.title1} <br />
               <span className={activeBanner?.accent === 'text-white' ? 'text-slate-900 dark:text-white' : activeBanner?.accent}>{activeBanner?.title2}</span>
             </h1>
             <div className="flex flex-wrap gap-3 sm:gap-6">
               <Link
                 to="/sportswear"
-                className="bg-primary hover:bg-slate-900 dark:hover:bg-white text-white dark:text-primary-foreground px-5 py-4 sm:px-10 sm:py-5 rounded-sm font-black uppercase text-xs sm:text-base transition-all hover:scale-105 hover:shadow-xl flex items-center gap-2 sm:gap-3"
+                className="bg-primary hover:bg-slate-900 dark:hover:bg-white text-white dark:text-primary-foreground px-4 py-3 sm:px-8 sm:py-4 lg:px-10 lg:py-5 rounded-sm font-black uppercase text-[10px] sm:text-sm lg:text-base transition-all hover:scale-105 hover:shadow-xl flex items-center gap-2 sm:gap-3"
               >
                 Shop Now <ArrowRight size={18} />
               </Link>
               <Link
                 to="/contact"
-                className="border-2 border-slate-900/20 dark:border-white/20 text-slate-900 dark:text-white hover:border-primary hover:text-primary px-5 py-4 sm:px-10 sm:py-5 rounded-sm font-black uppercase text-xs sm:text-base transition-all backdrop-blur-sm"
+                className="border-2 border-slate-900/20 dark:border-white/20 text-slate-900 dark:text-white hover:border-primary hover:text-primary px-4 py-3 sm:px-8 sm:py-4 lg:px-10 lg:py-5 rounded-sm font-black uppercase text-[10px] sm:text-sm lg:text-base transition-all backdrop-blur-sm"
               >
                 Custom Order
               </Link>
@@ -139,13 +139,14 @@ export function HeroSlider() {
       </div>
 
       {/* Navigation Controls */}
-      <div className="absolute bottom-12 left-1/2 -translate-x-1/2 lg:left-8 lg:translate-x-0 z-30 flex items-center gap-8">
+      <div className="absolute bottom-6 sm:bottom-8 lg:bottom-12 left-1/2 -translate-x-1/2 lg:left-8 lg:translate-x-0 z-30 flex items-center gap-8">
         <div className="flex gap-3">
           {banners.map((_, i) => (
             <button
               key={i}
               onClick={() => setCurrent(i)}
-              className={`h-1 transition-all duration-500 ${i === current ? "w-16 bg-primary" : "w-6 bg-slate-900/20 dark:bg-white/20"}`}
+                aria-label={`Show banner ${i + 1}`}
+                className={`h-1 transition-all duration-500 ${i === current ? "w-10 sm:w-16 bg-primary" : "w-4 sm:w-6 bg-slate-900/20 dark:bg-white/20"}`}
             />
           ))}
         </div>

@@ -117,23 +117,23 @@ function Sportswear() {
 
       <main>
         {/* Banner */}
-        <section className="relative h-[50vh] flex items-center justify-center overflow-hidden border-b border-white/5">
+        <section className="relative h-[clamp(300px,46svh,440px)] md:h-[clamp(380px,52svh,540px)] flex items-center justify-center overflow-hidden border-b border-white/5">
           <div className="absolute inset-0 z-0 opacity-20">
             <div className="w-full h-full bg-[url('https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center grayscale" />
           </div>
           <motion.div 
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="text-center relative z-10 px-4"
+            className="text-center relative z-10 w-full min-w-0 px-5 sm:px-8"
           >
-             <h3 className="text-primary font-black tracking-[0.4em] uppercase mb-4 text-sm">Professional Grade</h3>
-             <h1 className="text-6xl md:text-9xl font-black uppercase italic tracking-tighter leading-none mb-6">
+             <h3 className="text-primary font-black tracking-[0.18em] sm:tracking-[0.3em] md:tracking-[0.4em] uppercase mb-3 md:mb-4 text-[9px] sm:text-xs md:text-sm">Professional Grade</h3>
+             <h1 className="mx-auto max-w-[12ch] text-4xl sm:text-5xl md:max-w-none md:text-6xl lg:text-8xl font-black uppercase italic tracking-normal leading-[0.92] mb-5 md:mb-6 break-words">
                Performance <br /><span className="text-primary">Sportswear</span>
              </h1>
-             <div className="flex items-center justify-center gap-4">
-               <div className="h-[2px] w-12 bg-primary" />
-               <p className="text-white font-bold uppercase tracking-widest text-xs">Custom Sublimation Specialists</p>
-               <div className="h-[2px] w-12 bg-primary" />
+             <div className="grid grid-cols-[minmax(16px,48px)_minmax(0,auto)_minmax(16px,48px)] items-center justify-center gap-2 sm:gap-4">
+               <div className="h-[2px] w-full bg-primary" />
+               <p className="max-w-[25ch] text-white font-bold uppercase tracking-[0.1em] sm:tracking-widest text-[9px] sm:text-xs leading-relaxed">Custom Sublimation Specialists</p>
+               <div className="h-[2px] w-full bg-primary" />
              </div>
           </motion.div>
         </section>
