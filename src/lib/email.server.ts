@@ -1,4 +1,65 @@
-import { Resend } from 'resend';
+type EmailResult = { success: true; data?: unknown; mock?: boolean } | { success: false; error: unknown };
+
+type EmailPayload = {
+  to: string;
+  subject: string;
+  html: string;
+  replyTo?: string;
+  orderId?: string;
+};
+
+function escapeHtml(value: unknown): string {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+async function sendEmail(payload: EmailPayload): Promise<EmailResult> {
+  const resendKey = process.env['RESEND_API_KEY'];
+  const lovableKey = process.env['LOVABLE_API_KEY'];
+
+  if (!resendKey || !lovableKey) {
+    console.error("Email connector is not configured");
+    return { success: false, error: "Email connector is not configured" };
+  }
+
+  try {
+    const response = await fetch("https://connector-gateway.lovable.dev/resend/emails", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${lovableKey}`,
+        "X-Connection-Api-Key": resendKey,
+      },
+      body: JSON.stringify({
+        from: process.env['EMAIL_FROM'] || "Ambition Sports <onboarding@resend.dev>",
+        to: [payload.to],
+        reply_to: payload.replyTo ? [payload.replyTo] : undefined,
+        subject: payload.subject,
+        html: payload.html,
+      }),
+    });
+
+    const bodyText = await response.text();
+    let body: unknown = bodyText;
+    try {
+      body = bodyText ? JSON.parse(bodyText) : null;
+    } catch {}
+
+    if (!response.ok) {
+      console.error(`Email gateway failed [${response.status}]: ${bodyText}`);
+      return { success: false, error: `Email gateway failed [${response.status}]: ${bodyText}` };
+    }
+
+    return { success: true, data: body };
+  } catch (error) {
+    console.error("Error sending email:", error);
+    return { success: false, error };
+  }
+}
 
 export async function sendInquiryEmail(data: {
   name: string;
@@ -7,45 +68,29 @@ export async function sendInquiryEmail(data: {
   message: string;
   details?: Record<string, any>;
 }) {
-  const apiKey = process.env['RESEND_API_KEY'];
-  if (!apiKey) {
-    console.log("MOCK EMAIL (No API Key):", data);
-    return { success: true, mock: true };
-  }
-
-  const resend = new Resend(apiKey);
   const { name, email, subject, message, details } = data;
-  
+  const detailRows = details
+    ? Object.entries(details)
+        .map(([key, value]) => `<li><strong>${escapeHtml(key)}:</strong> ${escapeHtml(value)}</li>`)
+        .join("")
+    : "";
+
   const html = `
     <h2>New Inquiry from Ambition Sports</h2>
-    <p><strong>Name:</strong> ${name}</p>
-    <p><strong>Email:</strong> ${email}</p>
-    <p><strong>Subject:</strong> ${subject}</p>
+    <p><strong>Name:</strong> ${escapeHtml(name)}</p>
+    <p><strong>Email:</strong> ${escapeHtml(email)}</p>
+    <p><strong>Subject:</strong> ${escapeHtml(subject)}</p>
     <p><strong>Message:</strong></p>
-    <p>${message}</p>
-    ${details ? `
-      <h3>Additional Details:</h3>
-      <ul>
-        ${Object.entries(details).map(([key, value]) => `<li><strong>${key}:</strong> ${value}</li>`).join('')}
-      </ul>
-    ` : ''}
+    <p>${escapeHtml(message).replace(/\n/g, "<br />")}</p>
+    ${detailRows ? `<h3>Additional Details:</h3><ul>${detailRows}</ul>` : ""}
   `;
 
-  try {
-    const adminEmail = process.env['ADMIN_EMAIL'] || 'delivered@resend.dev';
-    const response = await resend.emails.send({
-      from: 'Ambition Sports <onboarding@resend.dev>',
-      to: adminEmail,
-      replyTo: email,
-      subject: `[Website Inquiry] ${subject}`,
-      html: html,
-    });
-
-    return { success: true, data: response };
-  } catch (error) {
-    console.error('Error sending email:', error);
-    return { success: false, error };
-  }
+  return sendEmail({
+    to: process.env['ADMIN_EMAIL'] || "ambitionsports381@gmail.com",
+    replyTo: email,
+    subject: `[Website Inquiry] ${subject}`,
+    html,
+  });
 }
 
 export async function sendOrderConfirmationEmail(data: {
@@ -54,103 +99,65 @@ export async function sendOrderConfirmationEmail(data: {
   amount: number;
   items: any[];
 }) {
-  const apiKey = process.env['RESEND_API_KEY'];
-  const { email, orderId, amount, items } = data;
-
-  if (!apiKey) {
-    console.log("MOCK ORDER EMAIL (No API Key):", data);
-    return { success: true, mock: true };
-  }
-
-  const resend = new Resend(apiKey);
+  const { email, orderId, amount } = data;
+  const subject = `Order Confirmation #${orderId.slice(0, 8)}`;
   const html = `
     <h2>Order Confirmed!</h2>
     <p>Thank you for your order from Ambition Sports.</p>
-    <p><strong>Order ID:</strong> ${orderId}</p>
+    <p><strong>Order ID:</strong> ${escapeHtml(orderId)}</p>
     <p><strong>Total Amount:</strong> $${amount.toFixed(2)}</p>
     <p>Our team is currently preparing your custom gear. You will receive another update once your order has shipped.</p>
   `;
 
+  const result = await sendEmail({ to: email, subject, html, orderId });
+
   try {
-    const response = await resend.emails.send({
-      from: 'Ambition Sports <onboarding@resend.dev>',
-      to: email,
-      subject: `Order Confirmation #${orderId.slice(0, 8)}`,
-      html: html,
-    });
-    
-    // Log success to database
-    const { createClient } = await import('@supabase/supabase-js');
-    const supabaseAdmin = createClient(
-      process.env['SUPABASE_URL']!,
-      process.env['SUPABASE_SERVICE_ROLE_KEY']!,
-      { auth: { persistSession: false, autoRefreshToken: false } }
-    );
+    const { supabaseAdmin } = await import('@/integrations/supabase/client.server');
     await supabaseAdmin.from('email_logs').insert({
       recipient: email,
-      subject: `Order Confirmation #${orderId.slice(0, 8)}`,
+      subject,
       order_id: orderId,
-      status: 'sent',
+      status: result.success ? 'sent' : 'failed',
+      error: result.success ? null : String(result.error),
     });
-
-    return { success: true, data: response };
-  } catch (error) {
-    console.error('Error sending order email:', error);
-    
-    // Log failure to database
-    try {
-      const { createClient } = await import('@supabase/supabase-js');
-      const supabaseAdmin = createClient(
-        process.env['SUPABASE_URL']!,
-        process.env['SUPABASE_SERVICE_ROLE_KEY']!,
-        { auth: { persistSession: false, autoRefreshToken: false } }
-      );
-      await supabaseAdmin.from('email_logs').insert({
-        recipient: email,
-        subject: `Order Confirmation #${orderId.slice(0, 8)}`,
-        order_id: orderId,
-        status: 'failed',
-        error: error instanceof Error ? error.message : String(error),
-      });
-    } catch (logErr) {
-      console.error('Failed to log email failure:', logErr);
-    }
-
-    return { success: false, error };
+  } catch (logErr) {
+    console.error('Failed to log order email:', logErr);
   }
+
+  return result;
+}
+
+
+export async function sendNewsletterWelcomeEmail(email: string) {
+  const html = `
+    <h2>Welcome to Ambition Sports</h2>
+    <p>Thank you for subscribing to Ambition Sports updates.</p>
+    <p>You will receive our latest custom sportswear launches, manufacturing updates, and quote-ready product news.</p>
+  `;
+
+  return sendEmail({
+    to: email,
+    subject: "Welcome to Ambition Sports Updates",
+    html,
+  });
 }
 
 export async function sendInvitationEmail(data: {
   email: string;
   role: string;
 }) {
-  const apiKey = process.env['RESEND_API_KEY'];
   const { email, role } = data;
-
-  if (!apiKey) {
-    console.log("MOCK INVITATION EMAIL (No API Key):", data);
-    return { success: true, mock: true };
-  }
-
-  const resend = new Resend(apiKey);
+  const siteUrl = process.env['SITE_URL'] || 'https://demositesale.lovable.app';
   const html = `
     <h2>Ambition Sports Access Granted</h2>
-    <p>You have been granted <strong>${role}</strong> access to the Ambition Sports Control Panel.</p>
-    <p>Please log in at <a href="${process.env['SITE_URL'] || 'https://ambitionsports.com'}/auth">ambitionsports.com/auth</a> using your email.</p>
-    <p>If you don't have an account yet, one has been prepared for you. Use the "Forgot Password" flow if you need to set a password.</p>
+    <p>You have been granted <strong>${escapeHtml(role)}</strong> access to the Ambition Sports Control Panel.</p>
+    <p>Please log in at <a href="${escapeHtml(siteUrl)}/auth">${escapeHtml(siteUrl)}/auth</a> using your email.</p>
+    <p>If you don't have an account yet, use the password reset flow to set a password.</p>
   `;
 
-  try {
-    const response = await resend.emails.send({
-      from: 'Ambition Sports <onboarding@resend.dev>',
-      to: email,
-      subject: `Ambition Sports Access: ${role} Role Assigned`,
-      html: html,
-    });
-
-    return { success: true, data: response };
-  } catch (error) {
-    console.error('Error sending invitation email:', error);
-    return { success: false, error };
-  }
+  return sendEmail({
+    to: email,
+    subject: `Ambition Sports Access: ${role} Role Assigned`,
+    html,
+  });
 }

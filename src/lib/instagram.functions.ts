@@ -1,7 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { assertStaff, assertDeveloper } from "./admin.server";
+import { assertStaff } from "./admin.server";
 
 export const getInstagramSettings = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -23,7 +24,7 @@ export const updateInstagramSettings = createServerFn({ method: "POST" })
     token_expires_at: z.string().optional(),
   }).parse(data))
   .handler(async ({ context, data }) => {
-    await assertDeveloper(context.supabase, context.userId);
+    await assertStaff(context.supabase, context.userId);
     const { data: existing } = await context.supabase.from("instagram_settings").select("id, webhook_verify_token").maybeSingle();
     const patch: Record<string, unknown> = { ...data, updated_at: new Date().toISOString() };
     if (!existing?.webhook_verify_token) patch["webhook_verify_token"] = crypto.randomUUID().replace(/-/g, "");
@@ -37,7 +38,7 @@ export const reconnectInstagram = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => z.object({ access_token: z.string().min(10) }).parse(data))
   .handler(async ({ context, data }) => {
-    await assertDeveloper(context.supabase, context.userId);
+    await assertStaff(context.supabase, context.userId);
     const profileRes = await fetch(`https://graph.instagram.com/me?fields=id,username&access_token=${encodeURIComponent(data.access_token)}`);
     const profile: any = await profileRes.json().catch(() => ({}));
     if (!profileRes.ok || !profile?.id) throw new Error("Instagram rejected this token");
@@ -56,6 +57,44 @@ export const reconnectInstagram = createServerFn({ method: "POST" })
     });
     if (error) throw new Error(error.message);
     return { ok: true, username: profile.username as string | null };
+  });
+
+
+export const initiateInstagramAuth = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertStaff(context.supabase, context.userId);
+
+    const appId = process.env['INSTAGRAM_APP_ID'];
+    if (!appId) throw new Error("Instagram App ID is not configured");
+
+    const request = getRequest();
+    const origin = new URL(request.url).origin;
+    const state = crypto.randomUUID();
+    const { data: existing } = await context.supabase
+      .from("instagram_settings")
+      .select("id, webhook_verify_token")
+      .maybeSingle();
+
+    const patch: Record<string, unknown> = {
+      oauth_state: state,
+      webhook_verify_token: existing?.webhook_verify_token ?? crypto.randomUUID().replace(/-/g, ""),
+      updated_at: new Date().toISOString(),
+    };
+    if (existing?.id) patch["id"] = existing.id;
+
+    const { error } = await (context.supabase as any).from("instagram_settings").upsert(patch);
+    if (error) throw new Error(error.message);
+
+    const redirectUri = `${origin}/api/public/instagram-oauth/callback`;
+    const authUrl = new URL("https://api.instagram.com/oauth/authorize");
+    authUrl.searchParams.set("client_id", appId);
+    authUrl.searchParams.set("redirect_uri", redirectUri);
+    authUrl.searchParams.set("scope", "user_profile,user_media");
+    authUrl.searchParams.set("response_type", "code");
+    authUrl.searchParams.set("state", state);
+
+    return { url: authUrl.toString() };
   });
 
 export const syncInstagramPosts = createServerFn({ method: "POST" })

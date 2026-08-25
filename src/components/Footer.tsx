@@ -1,18 +1,39 @@
 import { Link } from "@tanstack/react-router";
+import { useState, type FormEvent, type ReactNode } from "react";
 import { Send, MapPin, Phone, Mail } from "lucide-react";
 import { FaFacebook, FaInstagram, FaTwitter, FaLinkedin } from "react-icons/fa";
 import { useTheme } from "./ThemeProvider";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getFooterContent } from "@/lib/content.functions";
+import { subscribeNewsletter } from "@/lib/newsletter.functions";
+import { toast } from "sonner";
 
 export function Footer() {
   const { branding } = useTheme();
   const getFooter = useServerFn(getFooterContent);
+  const subscribe = useServerFn(subscribeNewsletter);
+  const [email, setEmail] = useState("");
+  const [isSubscribing, setIsSubscribing] = useState(false);
   const { data: content } = useQuery({
     queryKey: ["footer-content"],
     queryFn: () => getFooter(),
   });
+
+  const handleNewsletterSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!email.trim()) return;
+    setIsSubscribing(true);
+    try {
+      await subscribe({ data: { email } });
+      toast.success("Newsletter subscription confirmed");
+      setEmail("");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Newsletter subscription failed");
+    } finally {
+      setIsSubscribing(false);
+    }
+  };
 
   const footer = content || {
     description: "Leading manufacturer of high-performance custom sportswear and activewear. Exporting excellence from Sialkot to the world.",
@@ -90,16 +111,23 @@ export function Footer() {
           <p className="text-slate-600 dark:text-zinc-400 text-sm mb-8 font-medium leading-relaxed">
             {footer.newsletterDescription}
           </p>
-          <div className="relative group">
-            <input 
-              type="email" 
-              placeholder="YOUR EMAIL" 
-              className="w-full bg-slate-50 dark:bg-zinc-900/50 border border-slate-200 dark:border-white/10 rounded-xl py-4 px-5 text-xs font-bold uppercase tracking-widest focus:outline-none focus:border-primary transition-all group-hover:border-primary/50"
+          <form onSubmit={handleNewsletterSubmit} className="relative group">
+            <input
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder="YOUR EMAIL"
+              className="w-full bg-slate-50 dark:bg-zinc-900/50 border border-slate-200 dark:border-white/10 rounded-xl py-4 pl-5 pr-16 text-xs font-bold uppercase tracking-widest focus:outline-none focus:border-primary transition-all group-hover:border-primary/50"
             />
-            <button className="absolute right-2 top-2 bottom-2 px-4 bg-primary rounded-lg text-white hover:bg-black dark:hover:bg-white dark:hover:text-black transition-all shadow-lg hover:shadow-primary/20">
+            <button
+              type="submit"
+              disabled={isSubscribing}
+              aria-label="Subscribe to newsletter"
+              className="absolute right-2 top-2 bottom-2 px-4 bg-primary rounded-lg text-white hover:bg-black dark:hover:bg-white dark:hover:text-black transition-all shadow-lg hover:shadow-primary/20 disabled:opacity-50"
+            >
               <Send size={18} />
             </button>
-          </div>
+          </form>
         </div>
       </div>
 
@@ -115,7 +143,7 @@ export function Footer() {
   );
 }
 
-function SocialIcon({ icon, href }: { icon: React.ReactNode; href: string }) {
+function SocialIcon({ icon, href }: { icon: ReactNode; href: string }) {
   return (
     <a 
       href={href} 

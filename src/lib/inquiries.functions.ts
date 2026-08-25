@@ -1,6 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { sendInquiryEmail } from "./email.server";
 
 export const submitInquiry = createServerFn({ method: "POST" })
   .validator((data: unknown) => {
@@ -29,16 +28,18 @@ export const submitInquiry = createServerFn({ method: "POST" })
 
     if (dbError) {
       console.error('Error saving inquiry:', dbError);
+      throw new Error(dbError.message);
     }
 
     // 2. Send email
+    const { sendInquiryEmail } = await import("./email.server");
     const result = await sendInquiryEmail({
       ...data,
       details: data.details as Record<string, any>
     });
 
     if (!result.success) {
-      return { success: false as const, error: String(result.error) };
+      throw new Error(String(result.error));
     }
 
     return { 

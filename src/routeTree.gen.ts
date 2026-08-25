@@ -26,6 +26,7 @@ import { Route as AuthenticatedPanelRouteImport } from './routes/_authenticated/
 import { Route as ApiPublicInstagramWebhookRouteImport } from './routes/api/public/instagram-webhook'
 import { Route as ApiPublicTrackingRouteImport } from './routes/api/public/tracking'
 import { Route as ApiPublicWebhookRouteImport } from './routes/api/public/webhook'
+import { Route as ApiPublicInstagramOauthCallbackRouteImport } from './routes/api/public/instagram-oauth/callback'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -112,6 +113,12 @@ const ApiPublicWebhookRoute = ApiPublicWebhookRouteImport.update({
   path: '/api/public/webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicInstagramOauthCallbackRoute =
+  ApiPublicInstagramOauthCallbackRouteImport.update({
+    id: '/api/public/instagram-oauth/callback',
+    path: '/api/public/instagram-oauth/callback',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -130,6 +137,7 @@ export interface FileRoutesByFullPath {
   '/api/public/instagram-webhook': typeof ApiPublicInstagramWebhookRoute
   '/api/public/tracking': typeof ApiPublicTrackingRoute
   '/api/public/webhook': typeof ApiPublicWebhookRoute
+  '/api/public/instagram-oauth/callback': typeof ApiPublicInstagramOauthCallbackRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -148,6 +156,7 @@ export interface FileRoutesByTo {
   '/api/public/instagram-webhook': typeof ApiPublicInstagramWebhookRoute
   '/api/public/tracking': typeof ApiPublicTrackingRoute
   '/api/public/webhook': typeof ApiPublicWebhookRoute
+  '/api/public/instagram-oauth/callback': typeof ApiPublicInstagramOauthCallbackRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -168,6 +177,7 @@ export interface FileRoutesById {
   '/api/public/instagram-webhook': typeof ApiPublicInstagramWebhookRoute
   '/api/public/tracking': typeof ApiPublicTrackingRoute
   '/api/public/webhook': typeof ApiPublicWebhookRoute
+  '/api/public/instagram-oauth/callback': typeof ApiPublicInstagramOauthCallbackRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -188,6 +198,7 @@ export interface FileRouteTypes {
     | '/api/public/instagram-webhook'
     | '/api/public/tracking'
     | '/api/public/webhook'
+    | '/api/public/instagram-oauth/callback'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -206,6 +217,7 @@ export interface FileRouteTypes {
     | '/api/public/instagram-webhook'
     | '/api/public/tracking'
     | '/api/public/webhook'
+    | '/api/public/instagram-oauth/callback'
   id:
     | '__root__'
     | '/'
@@ -225,6 +237,7 @@ export interface FileRouteTypes {
     | '/api/public/instagram-webhook'
     | '/api/public/tracking'
     | '/api/public/webhook'
+    | '/api/public/instagram-oauth/callback'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -244,6 +257,7 @@ export interface RootRouteChildren {
   ApiPublicInstagramWebhookRoute: typeof ApiPublicInstagramWebhookRoute
   ApiPublicTrackingRoute: typeof ApiPublicTrackingRoute
   ApiPublicWebhookRoute: typeof ApiPublicWebhookRoute
+  ApiPublicInstagramOauthCallbackRoute: typeof ApiPublicInstagramOauthCallbackRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -367,6 +381,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/instagram-oauth/callback': {
+      id: '/api/public/instagram-oauth/callback'
+      path: '/api/public/instagram-oauth/callback'
+      fullPath: '/api/public/instagram-oauth/callback'
+      preLoaderRoute: typeof ApiPublicInstagramOauthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -398,6 +419,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicInstagramWebhookRoute: ApiPublicInstagramWebhookRoute,
   ApiPublicTrackingRoute: ApiPublicTrackingRoute,
   ApiPublicWebhookRoute: ApiPublicWebhookRoute,
+  ApiPublicInstagramOauthCallbackRoute: ApiPublicInstagramOauthCallbackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
