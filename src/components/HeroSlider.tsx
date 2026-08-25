@@ -81,7 +81,7 @@ export function HeroSlider() {
   const activeBanner = banners[current] || banners[0];
 
   return (
-    <section className="relative h-[60vh] md:h-[85vh] w-full overflow-hidden bg-background">
+    <section className="relative min-h-[560px] h-[72vh] md:h-[85vh] w-full overflow-hidden bg-background">
       <AnimatePresence mode="wait">
         <motion.div
           key={current}
