@@ -127,6 +127,21 @@ export async function sendOrderConfirmationEmail(data: {
   return result;
 }
 
+
+export async function sendNewsletterWelcomeEmail(email: string) {
+  const html = `
+    <h2>Welcome to Ambition Sports</h2>
+    <p>Thank you for subscribing to Ambition Sports updates.</p>
+    <p>You will receive our latest custom sportswear launches, manufacturing updates, and quote-ready product news.</p>
+  `;
+
+  return sendEmail({
+    to: email,
+    subject: "Welcome to Ambition Sports Updates",
+    html,
+  });
+}
+
 export async function sendInvitationEmail(data: {
   email: string;
   role: string;

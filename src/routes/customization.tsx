@@ -199,7 +199,7 @@ function CustomizationPage() {
               Manufacturing Excellence
             </p>
             <h1 className="text-[1.85rem] sm:text-4xl md:text-5xl lg:text-6xl font-extrabold uppercase italic tracking-normal leading-[1.02]">
-              <span className="block whitespace-nowrap">Elite</span><span className="block whitespace-nowrap text-primary">Customization</span><span className="block whitespace-nowrap">Studio</span>
+              <span className="block">Elite</span><span className="block text-primary">Customization</span><span className="block">Studio</span>
             </h1>
             <p className="mt-5 md:mt-6 text-muted-foreground max-w-2xl text-sm sm:text-base md:text-lg leading-relaxed">
               {seo?.description || "Where engineering meets artistry. We utilize state-of-the-art machinery and proprietary techniques to transform raw materials into professional-grade athletic armor."}

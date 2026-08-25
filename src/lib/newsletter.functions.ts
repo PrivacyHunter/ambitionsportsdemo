@@ -21,5 +21,17 @@ export const subscribeNewsletter = createServerFn({ method: "POST" })
 
     if (error) throw new Error(error.message);
 
+    const { sendNewsletterWelcomeEmail } = await import("./email.server");
+    const result = await sendNewsletterWelcomeEmail(email);
+    await (supabaseAdmin as any)
+      .from("newsletter_subscribers")
+      .update({
+        email_status: result.success ? "sent" : "failed",
+        updated_at: new Date().toISOString(),
+      })
+      .eq("email", email);
+
+    if (!result.success) throw new Error(String(result.error));
+
     return { ok: true };
   });
