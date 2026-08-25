@@ -120,16 +120,16 @@ export function HeroSlider() {
               {current === 0 ? (content?.hero?.title || activeBanner?.title1) : activeBanner?.title1} <br />
               <span className={activeBanner?.accent === 'text-white' ? 'text-slate-900 dark:text-white' : activeBanner?.accent}>{activeBanner?.title2}</span>
             </h1>
-            <div className="flex flex-wrap gap-6">
+            <div className="flex flex-wrap gap-3 sm:gap-6">
               <Link
                 to="/sportswear"
-                className="bg-primary hover:bg-slate-900 dark:hover:bg-white text-white dark:text-primary-foreground px-10 py-5 rounded-sm font-black uppercase transition-all hover:scale-105 hover:shadow-xl flex items-center gap-3"
+                className="bg-primary hover:bg-slate-900 dark:hover:bg-white text-white dark:text-primary-foreground px-5 py-4 sm:px-10 sm:py-5 rounded-sm font-black uppercase text-xs sm:text-base transition-all hover:scale-105 hover:shadow-xl flex items-center gap-2 sm:gap-3"
               >
-                Shop Now <ArrowRight size={22} />
+                Shop Now <ArrowRight size={18} />
               </Link>
               <Link
                 to="/contact"
-                className="border-2 border-slate-900/20 dark:border-white/20 text-slate-900 dark:text-white hover:border-primary hover:text-primary px-10 py-5 rounded-sm font-black uppercase transition-all backdrop-blur-sm"
+                className="border-2 border-slate-900/20 dark:border-white/20 text-slate-900 dark:text-white hover:border-primary hover:text-primary px-5 py-4 sm:px-10 sm:py-5 rounded-sm font-black uppercase text-xs sm:text-base transition-all backdrop-blur-sm"
               >
                 Custom Order
               </Link>
