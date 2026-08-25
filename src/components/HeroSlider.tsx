@@ -81,7 +81,7 @@ export function HeroSlider() {
   const activeBanner = banners[current] || banners[0];
 
   return (
-    <section className="relative h-[60vh] md:h-[85vh] w-full overflow-hidden bg-background">
+    <section className="relative min-h-[560px] h-[72vh] md:h-[85vh] w-full overflow-hidden bg-background">
       <AnimatePresence mode="wait">
         <motion.div
           key={current}
@@ -99,7 +99,7 @@ export function HeroSlider() {
         </motion.div>
       </AnimatePresence>
 
-      <div className="relative z-20 h-full max-w-7xl mx-auto px-4 lg:px-8 flex items-center">
+      <div className="relative z-20 h-full max-w-7xl mx-auto px-5 sm:px-8 lg:px-8 flex items-center">
         <AnimatePresence mode="wait">
           <motion.div
             key={current}
@@ -107,29 +107,29 @@ export function HeroSlider() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 50 }}
             transition={{ duration: 0.6 }}
-            className="max-w-3xl"
+            className="w-full max-w-3xl min-w-0 pb-16 md:pb-0"
           >
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-primary font-black tracking-widest uppercase mb-4 flex items-center gap-3 text-[10px] md:text-sm"
+              className="text-primary font-black tracking-[0.14em] sm:tracking-widest uppercase mb-4 flex items-start gap-3 text-[9px] leading-relaxed sm:text-[10px] md:text-sm"
             >
-              <span className="w-12 h-[2px] bg-primary" /> {current === 0 ? (content?.hero?.subtitle || activeBanner?.subtitle) : activeBanner?.subtitle}
+              <span className="mt-[0.55em] h-[2px] w-7 shrink-0 bg-primary sm:w-12" /> <span className="min-w-0 break-words">{current === 0 ? (content?.hero?.subtitle || activeBanner?.subtitle) : activeBanner?.subtitle}</span>
             </motion.p>
-            <h1 className="text-xl sm:text-2xl md:text-5xl lg:text-6xl font-black uppercase italic leading-[0.85] tracking-tighter mb-10 text-slate-900 dark:text-foreground">
+            <h1 className="max-w-[11ch] text-3xl sm:text-4xl md:max-w-none md:text-5xl lg:text-6xl font-black uppercase italic leading-[0.9] tracking-tighter mb-8 md:mb-10 text-slate-900 dark:text-foreground">
               {current === 0 ? (content?.hero?.title || activeBanner?.title1) : activeBanner?.title1} <br />
               <span className={activeBanner?.accent === 'text-white' ? 'text-slate-900 dark:text-white' : activeBanner?.accent}>{activeBanner?.title2}</span>
             </h1>
-            <div className="flex flex-wrap gap-6">
+            <div className="flex flex-wrap gap-3 sm:gap-6">
               <Link
                 to="/sportswear"
-                className="bg-primary hover:bg-slate-900 dark:hover:bg-white text-white dark:text-primary-foreground px-10 py-5 rounded-sm font-black uppercase transition-all hover:scale-105 hover:shadow-xl flex items-center gap-3"
+                className="bg-primary hover:bg-slate-900 dark:hover:bg-white text-white dark:text-primary-foreground px-5 py-4 sm:px-10 sm:py-5 rounded-sm font-black uppercase text-xs sm:text-base transition-all hover:scale-105 hover:shadow-xl flex items-center gap-2 sm:gap-3"
               >
-                Shop Now <ArrowRight size={22} />
+                Shop Now <ArrowRight size={18} />
               </Link>
               <Link
                 to="/contact"
-                className="border-2 border-slate-900/20 dark:border-white/20 text-slate-900 dark:text-white hover:border-primary hover:text-primary px-10 py-5 rounded-sm font-black uppercase transition-all backdrop-blur-sm"
+                className="border-2 border-slate-900/20 dark:border-white/20 text-slate-900 dark:text-white hover:border-primary hover:text-primary px-5 py-4 sm:px-10 sm:py-5 rounded-sm font-black uppercase text-xs sm:text-base transition-all backdrop-blur-sm"
               >
                 Custom Order
               </Link>
