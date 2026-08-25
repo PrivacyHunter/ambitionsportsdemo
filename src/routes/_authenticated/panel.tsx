@@ -58,7 +58,8 @@ import {
 import { 
   getInstagramSettings, 
   updateInstagramSettings, 
-  syncInstagramPosts 
+  syncInstagramPosts,
+  initiateInstagramAuth 
 } from "@/lib/instagram.functions";
 import { DEFAULT_BRANDING, DEFAULT_THEME, FONT_PRESETS, THEME_PRESETS, type BrandingConfig, type ThemeConfig } from "@/lib/theme";
 import { getInstagramLogs, retrySyncLog, reconnectInstagram } from "@/lib/instagram.functions";
@@ -2305,6 +2306,7 @@ function InstagramTab() {
 
   const updateSettings = useServerFn(updateInstagramSettings);
   const syncPosts = useServerFn(syncInstagramPosts);
+  const startInstagramAuth = useServerFn(initiateInstagramAuth);
   const getLogs = useServerFn(getInstagramLogs);
   const retryLog = useServerFn(retrySyncLog);
   const reconnect = useServerFn(reconnectInstagram);
@@ -2332,6 +2334,14 @@ function InstagramTab() {
       refetch(); 
       queryClient.invalidateQueries({ queryKey: ['instagram-logs'] });
     }
+  });
+
+  const authMutation = useMutation({
+    mutationFn: () => startInstagramAuth(),
+    onSuccess: (res: any) => {
+      if (res?.url) window.location.href = res.url;
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Instagram connection failed"),
   });
 
   const retryMutation = useMutation({
@@ -2433,19 +2443,12 @@ function InstagramTab() {
                         {tokenExpired ? 'Expired — re-auth required' : 'Valid'}
                       </span>
                     </div>
-                    <input
-                      type="password"
-                      placeholder="Paste fresh Graph API token to re-authorise..."
-                      className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm"
-                      value={token}
-                      onChange={e => setToken(e.target.value)}
-                    />
                     <button
-                      onClick={() => reconnectMutation.mutate(token)}
-                      disabled={!token || reconnectMutation.isPending}
+                      onClick={() => authMutation.mutate()}
+                      disabled={authMutation.isPending}
                       className="w-full py-3 rounded-xl bg-primary text-primary-foreground text-[10px] font-black uppercase tracking-[0.2em] disabled:opacity-40"
                     >
-                      {reconnectMutation.isPending ? 'Re-authorising...' : 'One-Click Reconnect'}
+                      {authMutation.isPending ? 'Opening Instagram...' : 'Reconnect with Instagram'}
                     </button>
                   </div>
 
@@ -2470,26 +2473,16 @@ function InstagramTab() {
                   <p className="text-xs text-muted-foreground leading-relaxed">
                     Link your Instagram Business account to automatically display your latest posts and reels on your website.
                   </p>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-bold uppercase text-muted-foreground">Access Token</label>
-                    <input 
-                      type="password"
-                      placeholder="Enter Graph API Token..."
-                      className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm"
-                      value={token}
-                      onChange={e => setToken(e.target.value)}
-                    />
-                  </div>
                   <button 
-                    onClick={() => updateMutation.mutate({ access_token: token, is_connected: true, username: 'ambitionsports' })}
-                    disabled={updateMutation.isPending || !token}
-                    className="w-full py-4 rounded-xl bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(212,175,55,0.3)] hover:scale-[1.02] transition-all"
+                    onClick={() => authMutation.mutate()}
+                    disabled={authMutation.isPending}
+                    className="w-full py-4 rounded-xl bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(212,175,55,0.3)] hover:scale-[1.02] transition-all disabled:opacity-50"
                   >
-                    {updateMutation.isPending ? 'Connecting...' : 'Connect Instagram'}
+                    {authMutation.isPending ? 'Opening Instagram...' : 'Connect Instagram'}
                   </button>
-                  <a href="https://developers.facebook.com/" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 text-[9px] font-bold uppercase text-muted-foreground hover:text-white transition-colors">
-                    <ExternalLink size={10} /> How to get a token?
-                  </a>
+                  <p className="text-center text-[9px] font-bold uppercase text-muted-foreground leading-relaxed">
+                    The account owner will be redirected to Instagram to approve access.
+                  </p>
                 </div>
               )}
             </div>

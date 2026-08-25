@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { assertStaff, assertDeveloper } from "./admin.server";
@@ -67,7 +68,8 @@ export const initiateInstagramAuth = createServerFn({ method: "POST" })
     const appId = process.env['INSTAGRAM_APP_ID'];
     if (!appId) throw new Error("Instagram App ID is not configured");
 
-    const origin = new URL(context.request.url).origin;
+    const request = getRequest();
+    const origin = new URL(request.url).origin;
     const state = crypto.randomUUID();
     const { data: existing } = await context.supabase
       .from("instagram_settings")
