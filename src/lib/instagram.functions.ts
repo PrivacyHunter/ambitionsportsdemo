@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { assertStaff, assertDeveloper } from "./admin.server";
+import { assertStaff } from "./admin.server";
 
 export const getInstagramSettings = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -24,7 +24,7 @@ export const updateInstagramSettings = createServerFn({ method: "POST" })
     token_expires_at: z.string().optional(),
   }).parse(data))
   .handler(async ({ context, data }) => {
-    await assertDeveloper(context.supabase, context.userId);
+    await assertStaff(context.supabase, context.userId);
     const { data: existing } = await context.supabase.from("instagram_settings").select("id, webhook_verify_token").maybeSingle();
     const patch: Record<string, unknown> = { ...data, updated_at: new Date().toISOString() };
     if (!existing?.webhook_verify_token) patch["webhook_verify_token"] = crypto.randomUUID().replace(/-/g, "");
@@ -38,7 +38,7 @@ export const reconnectInstagram = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => z.object({ access_token: z.string().min(10) }).parse(data))
   .handler(async ({ context, data }) => {
-    await assertDeveloper(context.supabase, context.userId);
+    await assertStaff(context.supabase, context.userId);
     const profileRes = await fetch(`https://graph.instagram.com/me?fields=id,username&access_token=${encodeURIComponent(data.access_token)}`);
     const profile: any = await profileRes.json().catch(() => ({}));
     if (!profileRes.ok || !profile?.id) throw new Error("Instagram rejected this token");
@@ -63,7 +63,7 @@ export const reconnectInstagram = createServerFn({ method: "POST" })
 export const initiateInstagramAuth = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await assertDeveloper(context.supabase, context.userId);
+    await assertStaff(context.supabase, context.userId);
 
     const appId = process.env['INSTAGRAM_APP_ID'];
     if (!appId) throw new Error("Instagram App ID is not configured");

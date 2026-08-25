@@ -9,7 +9,7 @@ import {
   Search, BarChart3, TrendingUp, MapPin, Smartphone,
   ArrowRight, GripVertical, Check, Wand2, FileJson,
   Layout, ShoppingBag, FileText, Activity, Mail, Layers, Play, Subtitles, X,
-  Trash2, CheckSquare, Square, DownloadCloud, RefreshCw, Link, ExternalLink, AlertCircle
+  Trash2, CheckSquare, Square, DownloadCloud, RefreshCw, Link, AlertCircle
 } from "lucide-react";
 
 import { SiGooglechrome as Chrome, SiInstagram as Instagram } from "react-icons/si";
@@ -62,7 +62,7 @@ import {
   initiateInstagramAuth 
 } from "@/lib/instagram.functions";
 import { DEFAULT_BRANDING, DEFAULT_THEME, FONT_PRESETS, THEME_PRESETS, type BrandingConfig, type ThemeConfig } from "@/lib/theme";
-import { getInstagramLogs, retrySyncLog, reconnectInstagram } from "@/lib/instagram.functions";
+import { getInstagramLogs, retrySyncLog } from "@/lib/instagram.functions";
 import { CaptionPreview } from "@/components/CaptionPreview";
 
 
@@ -2309,7 +2309,6 @@ function InstagramTab() {
   const startInstagramAuth = useServerFn(initiateInstagramAuth);
   const getLogs = useServerFn(getInstagramLogs);
   const retryLog = useServerFn(retrySyncLog);
-  const reconnect = useServerFn(reconnectInstagram);
   
   const { data: settings, refetch } = useQuery({
     queryKey: ['instagram-settings'],
@@ -2354,19 +2353,7 @@ function InstagramTab() {
     onError: (e: any) => toast.error(e?.message ?? "Retry failed"),
   });
 
-  const reconnectMutation = useMutation({
-    mutationFn: (access_token: string) => reconnect({ data: { access_token } }),
-    onSuccess: (res: any) => {
-      toast.success(`Reconnected as @${res?.username ?? 'instagram'}`);
-      setToken("");
-      refetch();
-      queryClient.invalidateQueries({ queryKey: ['instagram-logs'] });
-    },
-    onError: (e: any) => toast.error(e?.message ?? "Re-authorisation failed"),
-  });
-
-  const [token, setToken] = useState("");
-  const [openLog, setOpenLog] = useState<any>(null);
+    const [openLog, setOpenLog] = useState<any>(null);
   const webhookUrl = typeof window !== 'undefined' ? `${window.location.origin}/api/public/instagram-webhook` : '';
   const tokenExpired = settings?.token_expires_at ? new Date(settings.token_expires_at).getTime() < Date.now() : false;
 
