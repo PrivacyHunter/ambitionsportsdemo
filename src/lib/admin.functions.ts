@@ -2,18 +2,26 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
+  ADMIN_PERMISSIONS,
   assertDeveloper,
+  assertRoleManager,
   assertStaff,
   listAccounts,
+  listPermissionMap,
+  listPermissions,
   resolveRole,
 } from "./admin.server";
 
 export const getMyRole = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => ({
-    userId: context.userId,
-    role: await resolveRole(context.supabase, context.userId),
-  }));
+  .handler(async ({ context }) => {
+    const role = await resolveRole(context.supabase, context.userId);
+    return {
+      userId: context.userId,
+      role,
+      permissions: await listPermissions(context.supabase, context.userId, role),
+    };
+  });
 
 export const getDashboard = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
