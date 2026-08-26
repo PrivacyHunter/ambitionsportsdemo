@@ -163,6 +163,69 @@ export type Database = {
           },
         ]
       }
+      hero_banners: {
+        Row: {
+          accent: string
+          created_at: string
+          cta_label: string
+          cta_url: string
+          draft_data: Json | null
+          id: string
+          image_url: string
+          is_active: boolean
+          published_at: string | null
+          scheduled_publish_at: string | null
+          secondary_label: string
+          secondary_url: string
+          sort_order: number
+          status: string
+          subtitle: string
+          title1: string
+          title2: string
+          updated_at: string
+        }
+        Insert: {
+          accent?: string
+          created_at?: string
+          cta_label?: string
+          cta_url?: string
+          draft_data?: Json | null
+          id?: string
+          image_url: string
+          is_active?: boolean
+          published_at?: string | null
+          scheduled_publish_at?: string | null
+          secondary_label?: string
+          secondary_url?: string
+          sort_order?: number
+          status?: string
+          subtitle?: string
+          title1: string
+          title2?: string
+          updated_at?: string
+        }
+        Update: {
+          accent?: string
+          created_at?: string
+          cta_label?: string
+          cta_url?: string
+          draft_data?: Json | null
+          id?: string
+          image_url?: string
+          is_active?: boolean
+          published_at?: string | null
+          scheduled_publish_at?: string | null
+          secondary_label?: string
+          secondary_url?: string
+          sort_order?: number
+          status?: string
+          subtitle?: string
+          title1?: string
+          title2?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       inquiries: {
         Row: {
           created_at: string | null
@@ -438,15 +501,19 @@ export type Database = {
           created_at: string
           currency: string
           description: string | null
+          draft_data: Json | null
           id: string
           images: Json
           is_active: boolean
           is_featured: boolean
           name: string
           price: number | null
+          published_at: string | null
+          scheduled_publish_at: string | null
           sizes: Json
           slug: string
           sort_order: number
+          status: string
           stock: number
           updated_at: string
         }
@@ -457,15 +524,19 @@ export type Database = {
           created_at?: string
           currency?: string
           description?: string | null
+          draft_data?: Json | null
           id?: string
           images?: Json
           is_active?: boolean
           is_featured?: boolean
           name: string
           price?: number | null
+          published_at?: string | null
+          scheduled_publish_at?: string | null
           sizes?: Json
           slug: string
           sort_order?: number
+          status?: string
           stock?: number
           updated_at?: string
         }
@@ -476,15 +547,19 @@ export type Database = {
           created_at?: string
           currency?: string
           description?: string | null
+          draft_data?: Json | null
           id?: string
           images?: Json
           is_active?: boolean
           is_featured?: boolean
           name?: string
           price?: number | null
+          published_at?: string | null
+          scheduled_publish_at?: string | null
           sizes?: Json
           slug?: string
           sort_order?: number
+          status?: string
           stock?: number
           updated_at?: string
         }
@@ -511,6 +586,48 @@ export type Database = {
           full_name?: string | null
           id?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      publish_jobs: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          error: string | null
+          id: string
+          notes: string | null
+          publish_at: string
+          published_at: string | null
+          status: string
+          target_id: string
+          target_type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          error?: string | null
+          id?: string
+          notes?: string | null
+          publish_at: string
+          published_at?: string | null
+          status?: string
+          target_id: string
+          target_type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          error?: string | null
+          id?: string
+          notes?: string | null
+          publish_at?: string
+          published_at?: string | null
+          status?: string
+          target_id?: string
+          target_type?: string
+          updated_at?: string
         }
         Relationships: []
       }
