@@ -167,7 +167,13 @@ function PanelPage() {
   }
 
   const role = data!.role;
-  const visibleTabs = TABS.filter((t) => !t.roles || t.roles.includes(role as any));
+  const permissions: string[] = (data as any)?.permissions ?? [];
+  const can = (permission?: string) =>
+    role === "owner" || role === "developer" || !permission || permissions.includes(permission);
+  const visibleTabs = TABS.filter(
+    (t) => (!t.roles || t.roles.includes(role as any)) && can(t.permission),
+  );
+  const activeTab = visibleTabs.some((t) => t.id === tab) ? tab : "overview";
 
   return (
     <main className="min-h-screen px-4 py-8 sm:px-6 lg:px-10">
