@@ -40,7 +40,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { useTheme } from "@/components/ThemeProvider";
 import {
   deleteProduct, getDashboard, updateStatus, upsertProduct, setUserRole,
-  inviteUser, backupSettings, restoreSettings, listSettings, saveSetting,
+  inviteUser, setAdminPermissions, backupSettings, restoreSettings, listSettings, saveSetting,
 } from "@/lib/admin.functions";
 import { getLandingPageContent, saveLandingPageContent, getFooterContent, saveFooterContent } from "@/lib/content.functions";
 import { saveThemeVersion, getThemeHistory, scheduleReport } from "@/lib/history.functions";
