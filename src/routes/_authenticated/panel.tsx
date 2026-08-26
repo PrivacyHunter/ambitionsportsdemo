@@ -201,7 +201,7 @@ function PanelPage() {
             key={t.id}
             onClick={() => setTab(t.id)}
             className={`flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 text-[11px] font-bold uppercase tracking-widest transition-colors ${
-              tab === t.id ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:text-foreground"
+              activeTab === t.id ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:text-foreground"
             }`}
           >
             <t.icon size={14} /> {t.label}
@@ -210,21 +210,20 @@ function PanelPage() {
       </nav>
 
       <section className="mx-auto mt-8 max-w-7xl pb-20">
-        {tab === "overview" && <Overview data={data!} />}
-        {tab === "inbox" && <InboxTab data={data!} onDone={() => void refetch()} />}
-        {tab === "products" && <ProductsTab data={data!} onDone={() => void refetch()} />}
-        {tab === "theme" && <ThemeStudio />}
-        {tab === "branding" && <BrandingTab />}
-        {tab === "seo" && <SeoTab />}
-        {tab === "customization" && <CustomizationTab onDone={() => void refetch()} />}
-        {tab === "visitors" && <VisitorsTab data={data!} />}
-        { tab === "analytics" && <AnalyticsDashboard data={data!} />}
-        { tab === "instagram" && <InstagramTab />}
-        { tab === "accounts" && role === "developer" && <AccountsTab data={data!} onDone={() => void refetch()} />}
-        { tab === "logs" && role === "developer" && <LogsTab />}
-        { tab === "content" && (role === "owner" || role === "developer") && <ContentTab />}
-        { tab === "settings" && (role === "owner" || role === "developer") && <AlertSettingsTab />}
-        { tab === "analytics" && <div className="p-8 glass rounded-3xl">Add analytics to track landing page CTA button clicks and report conversion by page section.</div>}
+        {activeTab === "overview" && <Overview data={data!} />}
+        {activeTab === "inbox" && can("inbox") && <InboxTab data={data!} onDone={() => void refetch()} />}
+        {activeTab === "products" && can("products") && <ProductsTab data={data!} onDone={() => void refetch()} />}
+        {activeTab === "theme" && can("theme") && <ThemeStudio />}
+        {activeTab === "branding" && can("branding") && <BrandingTab />}
+        {activeTab === "seo" && can("seo") && <SeoTab />}
+        {activeTab === "customization" && can("customization") && <CustomizationTab onDone={() => void refetch()} />}
+        {activeTab === "visitors" && can("visitors") && <VisitorsTab data={data!} />}
+        {activeTab === "analytics" && can("analytics") && <AnalyticsDashboard data={data!} />}
+        {activeTab === "instagram" && can("instagram") && <InstagramTab />}
+        {activeTab === "accounts" && (role === "owner" || role === "developer") && <AccountsTab data={data!} onDone={() => void refetch()} />}
+        {activeTab === "logs" && role === "developer" && <LogsTab />}
+        {activeTab === "content" && can("content") && <ContentTab />}
+        {activeTab === "settings" && can("settings") && <AlertSettingsTab />}
       </section>
     </main>
   );
