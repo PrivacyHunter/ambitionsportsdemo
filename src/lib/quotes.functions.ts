@@ -1,6 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { sendInquiryEmail } from "./email.server";
 
 export type OrderStatus = 'pending' | 'designing' | 'production' | 'quality_check' | 'shipped' | 'delivered';
 
@@ -35,6 +34,7 @@ export const submitQuote = createServerFn({ method: "POST" })
     }
 
     // 2. Send email notification
+    const { sendInquiryEmail } = await import("./email.server");
     await sendInquiryEmail({
       name: data.name,
       email: data.email,
