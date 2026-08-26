@@ -49,17 +49,17 @@ function Quote() {
   return (
     <div className="min-h-screen bg-[#020617] text-white selection:bg-neon-cyan selection:text-background">
       <Navbar />
-      <main className="py-24 px-4 lg:px-8 max-w-7xl mx-auto">
+      <main className="py-16 md:py-24 px-4 lg:px-8 max-w-7xl mx-auto overflow-x-hidden">
         {orderId ? (
           <motion.div 
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="max-w-3xl mx-auto bg-card p-12 md:p-20 rounded-[3rem] border border-neon-cyan/30 text-center shadow-[0_0_100px_rgba(0,243,255,0.1)]"
+            className="max-w-3xl mx-auto bg-card p-6 sm:p-12 md:p-20 rounded-3xl md:rounded-[3rem] border border-neon-cyan/30 text-center shadow-[0_0_100px_rgba(0,243,255,0.1)]"
           >
             <div className="w-24 h-24 bg-neon-cyan/10 rounded-full flex items-center justify-center mx-auto mb-8 border border-neon-cyan/20">
               <CheckCircle2 className="text-neon-cyan w-12 h-12" />
             </div>
-            <h2 className="text-5xl font-black uppercase italic tracking-tighter mb-4 leading-none">Quote <br /><span className="text-neon-cyan">Received!</span></h2>
+            <h2 className="text-3xl sm:text-5xl font-black uppercase italic tracking-tighter mb-4 leading-none">Quote <br /><span className="text-neon-cyan">Received!</span></h2>
             <div className="bg-white/5 border border-white/10 p-6 rounded-2xl mb-12">
                <p className="text-xs font-bold uppercase tracking-[0.3em] text-muted-foreground mb-2">Your Tracking ID</p>
                <p className="text-3xl font-black tracking-tighter italic text-white">{orderId}</p>
@@ -75,13 +75,13 @@ function Quote() {
             </div>
           </motion.div>
         ) : (
-          <div className="grid lg:grid-cols-2 gap-24 items-start">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-24 items-start">
              <div>
-                <h3 className="text-neon-lime font-black tracking-[0.4em] uppercase mb-6 text-sm">Custom Order Portal</h3>
-                <h1 className="text-6xl md:text-8xl font-black uppercase italic tracking-tighter leading-[0.9] mb-8">
+                <h3 className="text-neon-lime font-black tracking-[0.25em] sm:tracking-[0.4em] uppercase mb-4 text-[10px] sm:text-sm break-words">Custom Order Portal</h3>
+                <h1 className="text-[clamp(1.9rem,9vw,4.5rem)] md:text-7xl font-black uppercase italic tracking-tighter leading-[1.05] mb-6 break-words">
                    Build Your <br /><span className="text-neon-cyan">Legendary Gear</span>
                 </h1>
-                <p className="text-muted-foreground text-xl leading-relaxed mb-12">
+                <p className="text-muted-foreground text-sm sm:text-lg leading-relaxed mb-10">
                    From professional soccer clubs to elite combat athletes, we manufacture gear that defines teams. Use our portal to submit your vision.
                 </p>
 
@@ -95,10 +95,10 @@ function Quote() {
              <motion.div 
                initial={{ opacity: 0, x: 20 }}
                animate={{ opacity: 1, x: 0 }}
-               className="bg-card p-10 md:p-16 rounded-[3rem] border border-white/10 relative overflow-hidden shadow-2xl"
+               className="bg-card p-6 sm:p-10 md:p-16 rounded-3xl md:rounded-[3rem] border border-white/10 relative overflow-hidden shadow-2xl"
              >
                 <div className="absolute top-0 right-0 w-64 h-64 bg-neon-cyan/5 blur-[100px] -z-10" />
-                <h2 className="text-3xl font-black uppercase italic tracking-tighter mb-8 leading-none">Order Specifications</h2>
+                <h2 className="text-xl sm:text-3xl font-black uppercase italic tracking-tighter mb-8 leading-none">Order Specifications</h2>
                 
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                   <div className="grid md:grid-cols-2 gap-6">

@@ -116,10 +116,22 @@ export function HeroSlider() {
             >
               <span className="mt-[0.55em] h-[2px] w-7 shrink-0 bg-primary sm:w-12" /> <span className="min-w-0 break-words">{current === 0 ? (content?.hero?.subtitle || activeBanner?.subtitle) : activeBanner?.subtitle}</span>
             </motion.p>
-            <h1 className="max-w-[13ch] text-[2rem] sm:text-4xl md:max-w-[15ch] md:text-5xl lg:max-w-none lg:text-6xl font-black uppercase italic leading-[0.94] tracking-normal mb-6 sm:mb-8 md:mb-10 text-slate-900 dark:text-foreground break-words">
-              {current === 0 ? (content?.hero?.title || activeBanner?.title1) : activeBanner?.title1} <br />
-              <span className={activeBanner?.accent === 'text-white' ? 'text-slate-900 dark:text-white' : activeBanner?.accent}>{activeBanner?.title2}</span>
-            </h1>
+            {(() => {
+              const cmsTitle = current === 0 ? content?.hero?.title : undefined;
+              const line1 = cmsTitle || activeBanner?.title1;
+              const line2 = cmsTitle ? "" : activeBanner?.title2;
+              return (
+                <h1 className="max-w-[13ch] text-[2rem] sm:text-4xl md:max-w-[15ch] md:text-5xl lg:max-w-none lg:text-6xl font-black uppercase italic leading-[0.94] tracking-normal mb-6 sm:mb-8 md:mb-10 text-slate-900 dark:text-foreground break-words">
+                  {line1}
+                  {line2 ? (
+                    <>
+                      <br />
+                      <span className={activeBanner?.accent === 'text-white' ? 'text-slate-900 dark:text-white' : activeBanner?.accent}>{line2}</span>
+                    </>
+                  ) : null}
+                </h1>
+              );
+            })()}
             <div className="flex flex-wrap gap-3 sm:gap-6">
               <Link
                 to="/sportswear"

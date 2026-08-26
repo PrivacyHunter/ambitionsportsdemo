@@ -31,7 +31,7 @@ export const subscribeNewsletter = createServerFn({ method: "POST" })
       })
       .eq("email", email);
 
-    if (!result.success) throw new Error(String(result.error));
+    if (!result.success) console.error("Newsletter welcome email failed:", result.error);
 
-    return { ok: true };
+    return { ok: true, emailed: result.success };
   });

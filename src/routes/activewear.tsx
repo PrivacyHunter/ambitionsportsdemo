@@ -202,10 +202,10 @@ function Activewear() {
            </div>
            <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-12 relative z-10">
               <div className="text-center lg:text-left">
-                <h2 className="text-background font-black text-4xl md:text-5xl uppercase italic tracking-tighter mb-4">Request Our Activewear Range</h2>
-                <p className="text-background/70 font-bold uppercase tracking-widest text-xs">Gym gear, compression wear & fitness apparel</p>
+                <h2 className="text-background font-black text-[clamp(1.4rem,7vw,3rem)] md:text-5xl uppercase italic tracking-tighter mb-4 break-words">Request Our Activewear Range</h2>
+                <p className="text-background/70 font-bold uppercase tracking-wider sm:tracking-widest text-[10px] sm:text-xs break-words">Gym gear, compression wear & fitness apparel</p>
               </div>
-              <button className="bg-background text-neon-lime hover:text-white px-12 py-6 rounded-2xl font-black uppercase tracking-widest text-sm transition-all shadow-xl">
+              <button className="bg-background text-neon-lime hover:text-white px-6 sm:px-12 py-4 sm:py-6 rounded-2xl font-black uppercase tracking-widest text-xs sm:text-sm transition-all shadow-xl">
                 Bulk Order Inquiry
               </button>
            </div>

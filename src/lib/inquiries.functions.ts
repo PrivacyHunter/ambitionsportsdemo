@@ -39,13 +39,14 @@ export const submitInquiry = createServerFn({ method: "POST" })
     });
 
     if (!result.success) {
-      throw new Error(String(result.error));
+      console.error("Inquiry email delivery failed:", result.error);
     }
 
-    return { 
-      success: true as const, 
-      data: result.data || null, 
-      mock: (result as any).mock || false 
+    return {
+      success: true as const,
+      emailed: result.success,
+      data: result.success ? result.data || null : null,
+      mock: (result as any).mock || false
     };
   });
 
