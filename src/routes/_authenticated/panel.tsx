@@ -85,22 +85,43 @@ export const Route = createFileRoute("/_authenticated/panel")({
 
 type Tab = "overview" | "inbox" | "products" | "theme" | "branding" | "seo" | "customization" | "visitors" | "analytics" | "instagram" | "accounts" | "logs" | "content" | "settings";
 
-const TABS: { id: Tab; label: string; icon: any; roles?: ("owner" | "admin" | "developer")[] }[] = [
+const TABS: {
+  id: Tab;
+  label: string;
+  icon: any;
+  roles?: ("owner" | "admin" | "developer")[];
+  /** For admins, this section also requires the matching granted right. */
+  permission?: string;
+}[] = [
   { id: "overview", label: "Overview", icon: ShieldCheck },
-  { id: "inbox", label: "Inbox", icon: Inbox, roles: ["owner", "admin", "developer"] },
-  { id: "products", label: "Products", icon: Package, roles: ["owner", "admin", "developer"] },
-  { id: "theme", label: "Theme Studio", icon: Palette, roles: ["owner", "admin", "developer"] },
-  { id: "branding", label: "Branding", icon: Settings2, roles: ["owner", "admin", "developer"] },
-  { id: "seo", label: "SEO Editor", icon: Globe2, roles: ["owner", "admin", "developer"] },
-  { id: "customization", label: "Studio Manager", icon: Layers, roles: ["owner", "admin", "developer"] },
-  { id: "visitors", label: "Visitors", icon: Globe2, roles: ["owner", "admin", "developer"] },
-  { id: "analytics", label: "Analytics", icon: BarChart3, roles: ["owner", "admin", "developer"] },
-  { id: "instagram", label: "Instagram", icon: Instagram, roles: ["owner", "admin", "developer"] },
-  { id: "accounts", label: "Accounts", icon: Users, roles: ["developer"] },
+  { id: "inbox", label: "Inbox", icon: Inbox, roles: ["owner", "admin", "developer"], permission: "inbox" },
+  { id: "products", label: "Products", icon: Package, roles: ["owner", "admin", "developer"], permission: "products" },
+  { id: "theme", label: "Theme Studio", icon: Palette, roles: ["owner", "admin", "developer"], permission: "theme" },
+  { id: "branding", label: "Branding", icon: Settings2, roles: ["owner", "admin", "developer"], permission: "branding" },
+  { id: "seo", label: "SEO Editor", icon: Globe2, roles: ["owner", "admin", "developer"], permission: "seo" },
+  { id: "customization", label: "Studio Manager", icon: Layers, roles: ["owner", "admin", "developer"], permission: "customization" },
+  { id: "visitors", label: "Visitors", icon: Globe2, roles: ["owner", "admin", "developer"], permission: "visitors" },
+  { id: "analytics", label: "Analytics", icon: BarChart3, roles: ["owner", "admin", "developer"], permission: "analytics" },
+  { id: "instagram", label: "Instagram", icon: Instagram, roles: ["owner", "admin", "developer"], permission: "instagram" },
+  { id: "accounts", label: "Accounts", icon: Users, roles: ["owner", "developer"] },
   { id: "logs", label: "Logs", icon: Activity, roles: ["developer"] },
-  { id: "content", label: "Content", icon: FileText, roles: ["owner", "developer"] },
-  { id: "settings", label: "Settings", icon: Settings2, roles: ["owner", "developer"] },
+  { id: "content", label: "Content", icon: FileText, roles: ["owner", "admin", "developer"], permission: "content" },
+  { id: "settings", label: "Settings", icon: Settings2, roles: ["owner", "admin", "developer"], permission: "settings" },
 ];
+
+const PERMISSION_LABELS: Record<string, string> = {
+  inbox: "Inbox",
+  products: "Products",
+  theme: "Theme Studio",
+  branding: "Branding",
+  seo: "SEO Editor",
+  customization: "Studio Manager",
+  visitors: "Visitors",
+  analytics: "Analytics",
+  instagram: "Instagram",
+  content: "Content",
+  settings: "Settings",
+};
 
 function PanelPage() {
   const navigate = useNavigate();
