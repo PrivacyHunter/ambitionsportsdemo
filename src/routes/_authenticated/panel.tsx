@@ -1003,28 +1003,77 @@ function VisitorsTab({ data }: { data: Dash }) {
 
 function AccountsTab({ data, onDone }: { data: Dash; onDone: () => void }) {
   const assign = useServerFn(setUserRole);
+  const savePermissions = useServerFn(setAdminPermissions);
+  const permissionKeys: string[] = (data as any).permissionKeys ?? [];
+  const permissionMap: Record<string, string[]> = (data as any).permissionMap ?? {};
+
   const mutation = useMutation({
     mutationFn: (input: { userId: string; role: "owner" | "admin" | "developer" | "user" }) => assign({ data: input }),
     onSuccess: () => { toast.success("Role updated"); onDone(); },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Update failed"),
   });
 
+  const rightsMutation = useMutation({
+    mutationFn: (input: { userId: string; permissions: string[] }) =>
+      savePermissions({ data: input as any }),
+    onSuccess: () => { toast.success("Rights updated"); onDone(); },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Update failed"),
+  });
+
+  function toggleRight(userId: string, permission: string, on: boolean) {
+    const current = permissionMap[userId] ?? [];
+    const next = on ? [...new Set([...current, permission])] : current.filter((p) => p !== permission);
+    rightsMutation.mutate({ userId, permissions: next });
+  }
+
   return (
     <div className="glass rounded-3xl p-6">
       <h2 className="mb-2 text-lg font-extrabold uppercase">Accounts &amp; roles</h2>
-      <p className="mb-5 text-xs text-muted-foreground">Only developers can allocate roles. Developer accounts are hidden from owners and admins.</p>
+      <p className="mb-5 text-xs text-muted-foreground">
+        Owners have full access and can appoint admins. Admins only see the sections you tick below.
+      </p>
       {data.accounts.map((account) => (
-        <div key={account.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 border-b border-border py-4 last:border-0">
-          <div className="min-w-0">
-            <p className="truncate text-sm font-bold">{account.full_name || account.email || account.id}</p>
-            <p className="truncate text-xs text-muted-foreground">{account.email}</p>
+        <div key={account.id} className="border-b border-border py-4 last:border-0">
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4">
+            <div className="min-w-0">
+              <p className="truncate text-sm font-bold">{account.full_name || account.email || account.id}</p>
+              <p className="truncate text-xs text-muted-foreground">{account.email}</p>
+            </div>
+            <select value={account.role} aria-label="Role"
+              disabled={account.role === 'developer' && data.role !== 'developer'}
+              onChange={(e) => mutation.mutate({ userId: account.id, role: e.target.value as "owner" | "admin" | "developer" | "user" })}
+              className="shrink-0 rounded-lg border border-border bg-transparent px-3 py-2 text-xs font-bold uppercase">
+              {["user", "admin", "owner", data.role === 'developer' ? "developer" : null].filter(Boolean).map((r) => <option key={r} value={r!}>{r}</option>)}
+            </select>
           </div>
-          <select value={account.role} aria-label="Role"
-            disabled={account.role === 'developer' && data.role !== 'developer'}
-            onChange={(e) => mutation.mutate({ userId: account.id, role: e.target.value as "owner" | "admin" | "developer" | "user" })}
-            className="shrink-0 rounded-lg border border-border bg-transparent px-3 py-2 text-xs font-bold uppercase">
-            {["user", "admin", "owner", data.role === 'developer' ? "developer" : null].filter(Boolean).map((r) => <option key={r} value={r!}>{r}</option>)}
-          </select>
+
+          {account.role === "admin" && (
+            <div className="mt-4 rounded-2xl border border-border/60 p-4">
+              <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.25em] text-primary">Assigned rights</p>
+              <div className="flex flex-wrap gap-2">
+                {permissionKeys.map((key) => {
+                  const active = (permissionMap[account.id] ?? []).includes(key);
+                  return (
+                    <label
+                      key={key}
+                      className={`flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest ${
+                        active ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground"
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        className="h-3 w-3 accent-primary"
+                        checked={active}
+                        disabled={rightsMutation.isPending}
+                        onChange={(e) => toggleRight(account.id, key, e.target.checked)}
+                      />
+                      {PERMISSION_LABELS[key] ?? key}
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       ))}
     </div>
