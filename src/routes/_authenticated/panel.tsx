@@ -40,7 +40,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { useTheme } from "@/components/ThemeProvider";
 import {
   deleteProduct, getDashboard, updateStatus, upsertProduct, setUserRole,
-  inviteUser, backupSettings, restoreSettings, listSettings, saveSetting,
+  inviteUser, setAdminPermissions, backupSettings, restoreSettings, listSettings, saveSetting,
 } from "@/lib/admin.functions";
 import { getLandingPageContent, saveLandingPageContent, getFooterContent, saveFooterContent } from "@/lib/content.functions";
 import { saveThemeVersion, getThemeHistory, scheduleReport } from "@/lib/history.functions";
@@ -85,22 +85,43 @@ export const Route = createFileRoute("/_authenticated/panel")({
 
 type Tab = "overview" | "inbox" | "products" | "theme" | "branding" | "seo" | "customization" | "visitors" | "analytics" | "instagram" | "accounts" | "logs" | "content" | "settings";
 
-const TABS: { id: Tab; label: string; icon: any; roles?: ("owner" | "admin" | "developer")[] }[] = [
+const TABS: {
+  id: Tab;
+  label: string;
+  icon: any;
+  roles?: ("owner" | "admin" | "developer")[];
+  /** For admins, this section also requires the matching granted right. */
+  permission?: string;
+}[] = [
   { id: "overview", label: "Overview", icon: ShieldCheck },
-  { id: "inbox", label: "Inbox", icon: Inbox, roles: ["owner", "admin", "developer"] },
-  { id: "products", label: "Products", icon: Package, roles: ["owner", "admin", "developer"] },
-  { id: "theme", label: "Theme Studio", icon: Palette, roles: ["owner", "admin", "developer"] },
-  { id: "branding", label: "Branding", icon: Settings2, roles: ["owner", "admin", "developer"] },
-  { id: "seo", label: "SEO Editor", icon: Globe2, roles: ["owner", "admin", "developer"] },
-  { id: "customization", label: "Studio Manager", icon: Layers, roles: ["owner", "admin", "developer"] },
-  { id: "visitors", label: "Visitors", icon: Globe2, roles: ["owner", "admin", "developer"] },
-  { id: "analytics", label: "Analytics", icon: BarChart3, roles: ["owner", "admin", "developer"] },
-  { id: "instagram", label: "Instagram", icon: Instagram, roles: ["owner", "admin", "developer"] },
-  { id: "accounts", label: "Accounts", icon: Users, roles: ["developer"] },
+  { id: "inbox", label: "Inbox", icon: Inbox, roles: ["owner", "admin", "developer"], permission: "inbox" },
+  { id: "products", label: "Products", icon: Package, roles: ["owner", "admin", "developer"], permission: "products" },
+  { id: "theme", label: "Theme Studio", icon: Palette, roles: ["owner", "admin", "developer"], permission: "theme" },
+  { id: "branding", label: "Branding", icon: Settings2, roles: ["owner", "admin", "developer"], permission: "branding" },
+  { id: "seo", label: "SEO Editor", icon: Globe2, roles: ["owner", "admin", "developer"], permission: "seo" },
+  { id: "customization", label: "Studio Manager", icon: Layers, roles: ["owner", "admin", "developer"], permission: "customization" },
+  { id: "visitors", label: "Visitors", icon: Globe2, roles: ["owner", "admin", "developer"], permission: "visitors" },
+  { id: "analytics", label: "Analytics", icon: BarChart3, roles: ["owner", "admin", "developer"], permission: "analytics" },
+  { id: "instagram", label: "Instagram", icon: Instagram, roles: ["owner", "admin", "developer"], permission: "instagram" },
+  { id: "accounts", label: "Accounts", icon: Users, roles: ["owner", "developer"] },
   { id: "logs", label: "Logs", icon: Activity, roles: ["developer"] },
-  { id: "content", label: "Content", icon: FileText, roles: ["owner", "developer"] },
-  { id: "settings", label: "Settings", icon: Settings2, roles: ["owner", "developer"] },
+  { id: "content", label: "Content", icon: FileText, roles: ["owner", "admin", "developer"], permission: "content" },
+  { id: "settings", label: "Settings", icon: Settings2, roles: ["owner", "admin", "developer"], permission: "settings" },
 ];
+
+const PERMISSION_LABELS: Record<string, string> = {
+  inbox: "Inbox",
+  products: "Products",
+  theme: "Theme Studio",
+  branding: "Branding",
+  seo: "SEO Editor",
+  customization: "Studio Manager",
+  visitors: "Visitors",
+  analytics: "Analytics",
+  instagram: "Instagram",
+  content: "Content",
+  settings: "Settings",
+};
 
 function PanelPage() {
   const navigate = useNavigate();
@@ -146,7 +167,13 @@ function PanelPage() {
   }
 
   const role = data!.role;
-  const visibleTabs = TABS.filter((t) => !t.roles || t.roles.includes(role as any));
+  const permissions: string[] = (data as any)?.permissions ?? [];
+  const can = (permission?: string) =>
+    role === "owner" || role === "developer" || !permission || permissions.includes(permission);
+  const visibleTabs = TABS.filter(
+    (t) => (!t.roles || t.roles.includes(role as any)) && can(t.permission),
+  );
+  const activeTab = visibleTabs.some((t) => t.id === tab) ? tab : "overview";
 
   return (
     <main className="min-h-screen px-4 py-8 sm:px-6 lg:px-10">
@@ -174,7 +201,7 @@ function PanelPage() {
             key={t.id}
             onClick={() => setTab(t.id)}
             className={`flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 text-[11px] font-bold uppercase tracking-widest transition-colors ${
-              tab === t.id ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:text-foreground"
+              activeTab === t.id ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:text-foreground"
             }`}
           >
             <t.icon size={14} /> {t.label}
@@ -183,21 +210,20 @@ function PanelPage() {
       </nav>
 
       <section className="mx-auto mt-8 max-w-7xl pb-20">
-        {tab === "overview" && <Overview data={data!} />}
-        {tab === "inbox" && <InboxTab data={data!} onDone={() => void refetch()} />}
-        {tab === "products" && <ProductsTab data={data!} onDone={() => void refetch()} />}
-        {tab === "theme" && <ThemeStudio />}
-        {tab === "branding" && <BrandingTab />}
-        {tab === "seo" && <SeoTab />}
-        {tab === "customization" && <CustomizationTab onDone={() => void refetch()} />}
-        {tab === "visitors" && <VisitorsTab data={data!} />}
-        { tab === "analytics" && <AnalyticsDashboard data={data!} />}
-        { tab === "instagram" && <InstagramTab />}
-        { tab === "accounts" && role === "developer" && <AccountsTab data={data!} onDone={() => void refetch()} />}
-        { tab === "logs" && role === "developer" && <LogsTab />}
-        { tab === "content" && (role === "owner" || role === "developer") && <ContentTab />}
-        { tab === "settings" && (role === "owner" || role === "developer") && <AlertSettingsTab />}
-        { tab === "analytics" && <div className="p-8 glass rounded-3xl">Add analytics to track landing page CTA button clicks and report conversion by page section.</div>}
+        {activeTab === "overview" && <Overview data={data!} />}
+        {activeTab === "inbox" && can("inbox") && <InboxTab data={data!} onDone={() => void refetch()} />}
+        {activeTab === "products" && can("products") && <ProductsTab data={data!} onDone={() => void refetch()} />}
+        {activeTab === "theme" && can("theme") && <ThemeStudio />}
+        {activeTab === "branding" && can("branding") && <BrandingTab />}
+        {activeTab === "seo" && can("seo") && <SeoTab />}
+        {activeTab === "customization" && can("customization") && <CustomizationTab onDone={() => void refetch()} />}
+        {activeTab === "visitors" && can("visitors") && <VisitorsTab data={data!} />}
+        {activeTab === "analytics" && can("analytics") && <AnalyticsDashboard data={data!} />}
+        {activeTab === "instagram" && can("instagram") && <InstagramTab />}
+        {activeTab === "accounts" && (role === "owner" || role === "developer") && <AccountsTab data={data!} onDone={() => void refetch()} />}
+        {activeTab === "logs" && role === "developer" && <LogsTab />}
+        {activeTab === "content" && can("content") && <ContentTab />}
+        {activeTab === "settings" && can("settings") && <AlertSettingsTab />}
       </section>
     </main>
   );
@@ -977,28 +1003,77 @@ function VisitorsTab({ data }: { data: Dash }) {
 
 function AccountsTab({ data, onDone }: { data: Dash; onDone: () => void }) {
   const assign = useServerFn(setUserRole);
+  const savePermissions = useServerFn(setAdminPermissions);
+  const permissionKeys: string[] = (data as any).permissionKeys ?? [];
+  const permissionMap: Record<string, string[]> = (data as any).permissionMap ?? {};
+
   const mutation = useMutation({
     mutationFn: (input: { userId: string; role: "owner" | "admin" | "developer" | "user" }) => assign({ data: input }),
     onSuccess: () => { toast.success("Role updated"); onDone(); },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Update failed"),
   });
 
+  const rightsMutation = useMutation({
+    mutationFn: (input: { userId: string; permissions: string[] }) =>
+      savePermissions({ data: input as any }),
+    onSuccess: () => { toast.success("Rights updated"); onDone(); },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Update failed"),
+  });
+
+  function toggleRight(userId: string, permission: string, on: boolean) {
+    const current = permissionMap[userId] ?? [];
+    const next = on ? [...new Set([...current, permission])] : current.filter((p) => p !== permission);
+    rightsMutation.mutate({ userId, permissions: next });
+  }
+
   return (
     <div className="glass rounded-3xl p-6">
       <h2 className="mb-2 text-lg font-extrabold uppercase">Accounts &amp; roles</h2>
-      <p className="mb-5 text-xs text-muted-foreground">Only developers can allocate roles. Developer accounts are hidden from owners and admins.</p>
+      <p className="mb-5 text-xs text-muted-foreground">
+        Owners have full access and can appoint admins. Admins only see the sections you tick below.
+      </p>
       {data.accounts.map((account) => (
-        <div key={account.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 border-b border-border py-4 last:border-0">
-          <div className="min-w-0">
-            <p className="truncate text-sm font-bold">{account.full_name || account.email || account.id}</p>
-            <p className="truncate text-xs text-muted-foreground">{account.email}</p>
+        <div key={account.id} className="border-b border-border py-4 last:border-0">
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4">
+            <div className="min-w-0">
+              <p className="truncate text-sm font-bold">{account.full_name || account.email || account.id}</p>
+              <p className="truncate text-xs text-muted-foreground">{account.email}</p>
+            </div>
+            <select value={account.role} aria-label="Role"
+              disabled={account.role === 'developer' && data.role !== 'developer'}
+              onChange={(e) => mutation.mutate({ userId: account.id, role: e.target.value as "owner" | "admin" | "developer" | "user" })}
+              className="shrink-0 rounded-lg border border-border bg-transparent px-3 py-2 text-xs font-bold uppercase">
+              {["user", "admin", "owner", data.role === 'developer' ? "developer" : null].filter(Boolean).map((r) => <option key={r} value={r!}>{r}</option>)}
+            </select>
           </div>
-          <select value={account.role} aria-label="Role"
-            disabled={account.role === 'developer' && data.role !== 'developer'}
-            onChange={(e) => mutation.mutate({ userId: account.id, role: e.target.value as "owner" | "admin" | "developer" | "user" })}
-            className="shrink-0 rounded-lg border border-border bg-transparent px-3 py-2 text-xs font-bold uppercase">
-            {["user", "admin", "owner", data.role === 'developer' ? "developer" : null].filter(Boolean).map((r) => <option key={r} value={r!}>{r}</option>)}
-          </select>
+
+          {account.role === "admin" && (
+            <div className="mt-4 rounded-2xl border border-border/60 p-4">
+              <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.25em] text-primary">Assigned rights</p>
+              <div className="flex flex-wrap gap-2">
+                {permissionKeys.map((key) => {
+                  const active = (permissionMap[account.id] ?? []).includes(key);
+                  return (
+                    <label
+                      key={key}
+                      className={`flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest ${
+                        active ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground"
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        className="h-3 w-3 accent-primary"
+                        checked={active}
+                        disabled={rightsMutation.isPending}
+                        onChange={(e) => toggleRight(account.id, key, e.target.checked)}
+                      />
+                      {PERMISSION_LABELS[key] ?? key}
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       ))}
     </div>

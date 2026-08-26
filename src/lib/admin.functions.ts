@@ -2,18 +2,26 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
+  ADMIN_PERMISSIONS,
   assertDeveloper,
+  assertRoleManager,
   assertStaff,
   listAccounts,
+  listPermissionMap,
+  listPermissions,
   resolveRole,
 } from "./admin.server";
 
 export const getMyRole = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => ({
-    userId: context.userId,
-    role: await resolveRole(context.supabase, context.userId),
-  }));
+  .handler(async ({ context }) => {
+    const role = await resolveRole(context.supabase, context.userId);
+    return {
+      userId: context.userId,
+      role,
+      permissions: await listPermissions(context.supabase, context.userId, role),
+    };
+  });
 
 export const getDashboard = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -35,6 +43,10 @@ export const getDashboard = createServerFn({ method: "GET" })
       products: products.data ?? [],
       tracking: role === "user" ? [] : (tracking.data ?? []),
       accounts: await listAccounts(s, role),
+      permissions: await listPermissions(s, context.userId, role),
+      permissionKeys: [...ADMIN_PERMISSIONS],
+      permissionMap:
+        role === "owner" || role === "developer" ? await listPermissionMap(s) : {},
     };
   });
 
@@ -49,12 +61,67 @@ export const setUserRole = createServerFn({ method: "POST" })
       .parse(data),
   )
   .handler(async ({ context, data }) => {
-    // Only developers may allocate roles at all, and only they touch developer rows.
-    await assertDeveloper(context.supabase, context.userId);
+    // Owners and developers may allocate roles; only developers touch developer rows.
+    const callerRole = await assertRoleManager(context.supabase, context.userId);
     const s = context.supabase;
+
+    const { data: targetRows } = await s
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", data.userId);
+    const targetIsDeveloper = (targetRows ?? []).some((r) => r.role === "developer");
+
+    if (callerRole !== "developer" && (data.role === "developer" || targetIsDeveloper)) {
+      throw new Error("Forbidden: only developers can manage developer accounts");
+    }
+
     await s.from("user_roles").delete().eq("user_id", data.userId);
     if (data.role !== "user") {
       const { error } = await s.from("user_roles").insert({ user_id: data.userId, role: data.role });
+      if (error) throw new Error(error.message);
+    }
+    // Rights only apply to admins; clear them whenever the role changes away from admin.
+    if (data.role !== "admin") {
+      await s.from("admin_permissions" as any).delete().eq("user_id", data.userId);
+    }
+    return { ok: true as const };
+  });
+
+export const setAdminPermissions = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) =>
+    z
+      .object({
+        userId: z.string().uuid(),
+        permissions: z.array(z.enum(ADMIN_PERMISSIONS)).max(ADMIN_PERMISSIONS.length),
+      })
+      .parse(data),
+  )
+  .handler(async ({ context, data }) => {
+    const callerRole = await assertRoleManager(context.supabase, context.userId);
+    const s = context.supabase;
+
+    const { data: targetRows } = await s
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", data.userId);
+    const roles = (targetRows ?? []).map((r) => r.role);
+    if (roles.includes("developer") && callerRole !== "developer") {
+      throw new Error("Forbidden: only developers can manage developer accounts");
+    }
+    if (!roles.includes("admin")) {
+      throw new Error("Rights can only be assigned to admin accounts");
+    }
+
+    await s.from("admin_permissions" as any).delete().eq("user_id", data.userId);
+    if (data.permissions.length) {
+      const { error } = await s.from("admin_permissions" as any).insert(
+        data.permissions.map((permission) => ({
+          user_id: data.userId,
+          permission,
+          granted_by: context.userId,
+        })) as any,
+      );
       if (error) throw new Error(error.message);
     }
     return { ok: true as const };
@@ -163,7 +230,10 @@ export const inviteUser = createServerFn({ method: "POST" })
       .parse(data),
   )
   .handler(async ({ context, data }) => {
-    await assertDeveloper(context.supabase, context.userId);
+    const callerRole = await assertRoleManager(context.supabase, context.userId);
+    if (data.role === "developer" && callerRole !== "developer") {
+      throw new Error("Forbidden: only developers can manage developer accounts");
+    }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { sendInvitationEmail } = await import("./email.server");
 

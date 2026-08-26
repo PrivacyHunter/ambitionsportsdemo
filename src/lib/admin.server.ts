@@ -26,6 +26,59 @@ export async function assertDeveloper(supabase: DB, userId: string): Promise<App
   return role;
 }
 
+/** Owners and developers may manage staff accounts and admin rights. */
+export async function assertRoleManager(supabase: DB, userId: string): Promise<AppRole> {
+  const role = await resolveRole(supabase, userId);
+  if (role !== "owner" && role !== "developer") {
+    throw new Error("Forbidden: owner or developer access required");
+  }
+  return role;
+}
+
+/** Sections an admin can be granted access to. Owners/developers always have all. */
+export const ADMIN_PERMISSIONS = [
+  "inbox",
+  "products",
+  "theme",
+  "branding",
+  "seo",
+  "customization",
+  "visitors",
+  "analytics",
+  "instagram",
+  "content",
+  "settings",
+] as const;
+
+export type AdminPermission = (typeof ADMIN_PERMISSIONS)[number];
+
+/** Permissions for a single user (owners/developers implicitly hold all). */
+export async function listPermissions(
+  supabase: DB,
+  userId: string,
+  role: AppRole,
+): Promise<string[]> {
+  if (role === "owner" || role === "developer") return [...ADMIN_PERMISSIONS];
+  if (role !== "admin") return [];
+  const { data } = await supabase
+    .from("admin_permissions" as any)
+    .select("permission")
+    .eq("user_id", userId);
+  return ((data ?? []) as unknown as { permission: string }[]).map((r) => r.permission);
+}
+
+/** Permission map for every staff account, used by the accounts manager. */
+export async function listPermissionMap(supabase: DB): Promise<Record<string, string[]>> {
+  const { data } = await supabase
+    .from("admin_permissions" as any)
+    .select("user_id, permission");
+  const map: Record<string, string[]> = {};
+  for (const row of (data ?? []) as unknown as { user_id: string; permission: string }[]) {
+    (map[row.user_id] ??= []).push(row.permission);
+  }
+  return map;
+}
+
 export type StaffUser = {
   id: string;
   email: string | null;
