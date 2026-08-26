@@ -164,26 +164,60 @@ export const upsertProduct = createServerFn({ method: "POST" })
         description: z.string().max(4000).optional().default(""),
         price: z.number().nonnegative().optional(),
         stock: z.number().int().nonnegative().default(0),
-        images: z.array(z.string().url()).max(8).default([]),
+        images: z.array(z.string().min(1).max(600)).max(12).default([]),
+        cover_image: z.string().max(600).nullable().optional(),
         sizes: z.array(z.string().max(12)).max(20).default([]),
         colors: z.array(z.string().max(24)).max(20).default([]),
         is_featured: z.boolean().default(false),
         is_active: z.boolean().default(true),
+        status: z.enum(["draft", "published", "scheduled"]).default("published"),
+        scheduled_publish_at: z.string().nullable().optional(),
+        sort_order: z.number().int().min(0).max(9999).default(0),
       })
       .parse(data),
   )
   .handler(async ({ context, data }) => {
     await assertStaff(context.supabase, context.userId);
-    const { id, price, ...rest } = data;
+    const { id, price, cover_image, scheduled_publish_at, ...rest } = data;
     const row = {
       ...rest,
+      cover_image: cover_image || rest.images[0] || null,
+      scheduled_publish_at: scheduled_publish_at || null,
+      published_at: rest.status === "published" ? new Date().toISOString() : null,
       ...(id ? { id } : {}),
       ...(price === undefined ? {} : { price }),
       updated_at: new Date().toISOString(),
     };
     const { error } = await context.supabase
       .from("products")
-      .upsert(row, { onConflict: "slug" });
+      .upsert(row, { onConflict: id ? "id" : "slug" });
+    if (error) throw new Error(error.message);
+    return { ok: true as const };
+  });
+
+export const duplicateProduct = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => z.object({ id: z.string().uuid() }).parse(data))
+  .handler(async ({ context, data }) => {
+    await assertStaff(context.supabase, context.userId);
+    const { data: original, error: readError } = await context.supabase
+      .from("products")
+      .select("*")
+      .eq("id", data.id)
+      .single();
+    if (readError || !original) throw new Error(readError?.message ?? "Product not found");
+
+    const { id: _id, created_at: _c, updated_at: _u, ...rest } = original as Record<string, any>;
+    const suffix = Date.now().toString(36);
+    const { error } = await context.supabase.from("products").insert({
+      ...rest,
+      name: `${original.name} (Copy)`,
+      slug: `${original.slug}-copy-${suffix}`.slice(0, 158),
+      status: "draft",
+      is_active: false,
+      published_at: null,
+      updated_at: new Date().toISOString(),
+    } as any);
     if (error) throw new Error(error.message);
     return { ok: true as const };
   });
@@ -197,6 +231,7 @@ export const deleteProduct = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true as const };
   });
+
 
 export const updateStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
