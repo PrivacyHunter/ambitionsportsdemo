@@ -64,7 +64,7 @@ export async function listPermissions(
     .from("admin_permissions" as any)
     .select("permission")
     .eq("user_id", userId);
-  return ((data ?? []) as { permission: string }[]).map((r) => r.permission);
+  return ((data ?? []) as unknown as { permission: string }[]).map((r) => r.permission);
 }
 
 /** Permission map for every staff account, used by the accounts manager. */
@@ -73,7 +73,7 @@ export async function listPermissionMap(supabase: DB): Promise<Record<string, st
     .from("admin_permissions" as any)
     .select("user_id, permission");
   const map: Record<string, string[]> = {};
-  for (const row of (data ?? []) as { user_id: string; permission: string }[]) {
+  for (const row of (data ?? []) as unknown as { user_id: string; permission: string }[]) {
     (map[row.user_id] ??= []).push(row.permission);
   }
   return map;
