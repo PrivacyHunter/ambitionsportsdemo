@@ -230,7 +230,10 @@ export const inviteUser = createServerFn({ method: "POST" })
       .parse(data),
   )
   .handler(async ({ context, data }) => {
-    await assertDeveloper(context.supabase, context.userId);
+    const callerRole = await assertRoleManager(context.supabase, context.userId);
+    if (data.role === "developer" && callerRole !== "developer") {
+      throw new Error("Forbidden: only developers can manage developer accounts");
+    }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { sendInvitationEmail } = await import("./email.server");
 
