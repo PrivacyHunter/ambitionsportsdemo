@@ -14,11 +14,12 @@ function safeName(name: string) {
 /** Uploads an image or video from the admin panel and returns its public URL. */
 export async function uploadMedia(file: File, folder: MediaFolder, bucket = "site-media") {
   const path = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${safeName(file.name)}`;
-  const { error } = await supabase.storage.from(bucket).upload(path, file, {
+  const options = {
     cacheControl: "31536000",
     upsert: false,
-    contentType: file.type || undefined,
-  });
+    ...(file.type ? { contentType: file.type } : {}),
+  };
+  const { error } = await supabase.storage.from(bucket).upload(path, file, options);
   if (error) throw new Error(error.message);
   return mediaUrl(bucket, path);
 }
