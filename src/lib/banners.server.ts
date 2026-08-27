@@ -4,7 +4,7 @@ import type { Database } from "@/integrations/supabase/types";
 type DB = SupabaseClient<Database>;
 
 export type BannerInput = {
-  id?: string;
+  id?: string | undefined;
   title1: string;
   title2: string;
   subtitle: string;
@@ -17,7 +17,7 @@ export type BannerInput = {
   sort_order: number;
   is_active: boolean;
   status: string;
-  scheduled_publish_at?: string | null;
+  scheduled_publish_at?: string | null | undefined;
 };
 
 export async function fetchBanners(supabase: DB) {
@@ -79,7 +79,7 @@ export async function fetchPublishedBanners() {
 }
 
 /** Public, anon-readable catalog for the live site. */
-export async function fetchPublishedProducts(options: { category?: string; featuredOnly?: boolean }) {
+export async function fetchPublishedProducts(options: { category?: string | undefined; featuredOnly?: boolean | undefined }) {
   const { createClient } = await import("@supabase/supabase-js");
   const client = createClient<Database>(
     process.env["SUPABASE_URL"]!,
